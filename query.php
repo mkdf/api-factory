@@ -8,7 +8,7 @@
  */
 
 require 'vendor/autoload.php'; // include Composer's autoloader
-require 'MKSAPIF_CustomAPI.php';
+//require 'MKSAPIF_CustomAPI.php';
 $config = include('config.php');
 
 /**
@@ -16,7 +16,8 @@ $config = include('config.php');
  */
 $QUERYLIMIT = 100;
 
-function doQuery($key, $uuid, $queryBody, $restEntity = false){
+function doQuery($key, $uuid, $queryBody, $restEntity = false)
+{
     global $QUERYLIMIT;
     $limit = $QUERYLIMIT;
     $queryObj = json_decode($queryBody);
@@ -42,7 +43,7 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false){
         $result = $collection->find($queryObj, $options);
         $resultArray = $result->toArray();
 
-        if ($restEntity and (sizeof($resultArray) == 0)){
+        if ($restEntity and (sizeof($resultArray) == 0)) {
             http_response_code(404);
             echo 'Object not found';
             exit();
@@ -63,7 +64,7 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false){
  */
 
 //Check AUTH has been passed
-$request_method=$_SERVER["REQUEST_METHOD"];
+$request_method = $_SERVER["REQUEST_METHOD"];
 if (!isset($_SERVER['PHP_AUTH_USER'])) {
     header('WWW-Authenticate: Basic realm="Realm"');
     header('HTTP/1.0 401 Unauthorized');
@@ -85,60 +86,24 @@ if (isset($_GET["limit"])) {
 //Are we retrieving an object/doc in a RESTful way, via an entity ID in the URL?
 $restEntity = false;
 
-/*
- * Establish whether this is a basic APIF call, or is using a custom API
- * Essentially this entire block just generates a custom query, using an MKSAPIF_CustomAPI object
- * then the query is run as per any other non-custom-api call.
- */
-if (isset($_GET["customAPI"])) {
-    $apiID = $_GET["customAPI"];
-    if (isset($_GET["endpoint"])) {
-        $endpoint = $_GET["endpoint"];
-    } else {
-        http_response_code(400);
-        print "Bad request, custom API endpoint not specified";
-        exit();
-    }
-    if (isset($_GET["id"])) {
-        $docID = $_GET["id"];
-        $restEntity = true;
-    } else {
-        $docID = null;
-    }
-
-    //Create customAPI object...
-    $customApi = new MKSAPIF_CustomAPI($apiID, $endpoint, $docID);
-    $uuid = $customApi->getDataset();
-
-    if (isset($_GET["query"]) AND !isset($_GET["id"])) {
-        $baseQuery = $customApi->getQuery($_GET["query"]);
-    } else {
-        $baseQuery = $customApi->getQuery();
-    }
+//Regular non-custom-api call
+if (!isset($_GET["uuid"])) {
+    http_response_code(400);
+    print "Bad request, dataset uuid not specified";
+    exit();
 }
-else {
-    //Regular non-custom-api call
-    if (!isset($_GET["uuid"])) {
-        http_response_code(400);
-        print "Bad request, dataset uuid not specified";
-        exit();
-    }
-    $uuid = $_GET["uuid"];
-    $baseQuery = "{}";
-}
+$uuid = $_GET["uuid"];
+$baseQuery = "{}";
 
 
-
-switch($request_method)
-{
+switch ($request_method) {
     case 'GET':
         doQuery($key, $uuid, $baseQuery, $restEntity);
         break;
     case 'POST':
         if (file_get_contents("php://input") == "") {
             doQuery($key, $uuid, "{}", $restEntity);
-        }
-        else {
+        } else {
             doQuery($key, $uuid, file_get_contents("php://input"), $restEntity);
         }
         break;
