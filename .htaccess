@@ -1,0 +1,47 @@
+#APIF data stream API
+RewriteEngine On
+
+#Catch old customStream style requests for read?path=/<uuid>
+RewriteCond %{QUERY_STRING} path=/([0-9,a-z,A-Z_-]+)$
+RewriteRule ^read data/query/%1/?
+
+
+RewriteRule ^data/query/([0-9,a-z,A-Z_-]+)/?$ api-factory/query.php?uuid=$1 [QSA,NC,L]
+
+#creation of new doc
+RewriteRule ^data/object/([0-9,a-z,A-Z_-]+)/?$ api-factory/object.php?uuid=$1 [QSA,NC,L]
+
+#updting existing doc
+RewriteCond %{REQUEST_METHOD} PUT   
+RewriteRule ^data/object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ api-factory/object.php?uuid=$1&id=$3&idType=$2 [QSA,NC,L]
+
+#deleting an existing doc
+RewriteCond %{REQUEST_METHOD} DELETE
+RewriteRule ^data/object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ api-factory/object.php?uuid=$1&id=$3&idType=$2 [QSA,NC,L]
+
+####
+#Entries for BT/IS-API compatibility
+####
+#GET ENTRIES
+# /sensors/feeds/<dataset-uuid> gives metadata for that dataset
+RewriteCond %{REQUEST_METHOD} GET
+RewriteRule ^sensors/feeds/([0-9,a-z,A-Z_-]+)/?$ api-factory/isapi_query.php?uuid=$1 [QSA,NC,L]
+# /sensors/feeds/<dataset-uuid>/datapoints gives datapoints from the dataseet (all streams)
+RewriteCond %{REQUEST_METHOD} GET
+RewriteRule ^sensors/feeds/([0-9,a-z,A-Z_-]+)/datapoints/?$ api-factory/isapi_query.php?uuid=$1&datapoints=1 [QSA,NC,L]
+# /sensors/feeds/<dataset-uuid>/datastreams/<datastreamID> gives metadata about the individual datastream
+RewriteCond %{REQUEST_METHOD} GET
+RewriteRule ^sensors/feeds/([0-9,a-z,A-Z_-]+)/datastreams/([0-9,a-z,A-Z_-]+)/?$ api-factory/isapi_query.php?uuid=$1&datastream=1&datastreamID=$2 [QSA,NC,L]
+# /sensors/feeds/<dataset-uuid>/datastreams/<datastreamID>/datapoints gives datapoints from the individual datastream
+RewriteCond %{REQUEST_METHOD} GET
+RewriteRule ^sensors/feeds/([0-9,a-z,A-Z_-]+)/datastreams/([0-9,a-z,A-Z_-]+)/datapoints/?$ api-factory/isapi_query.php?uuid=$1&datastream=1&datastreamID=$2&datapoints=1 [QSA,NC,L]
+
+#POST ENTRIES
+RewriteCond %{REQUEST_METHOD} POST
+RewriteRule ^sensors/feeds/([0-9,a-z,A-Z_-]+)/datapoints/?$ api-factory/isapi_write.php?uuid=$1 [QSA,NC,L]
+RewriteCond %{REQUEST_METHOD} POST
+RewriteRule ^sensors/feeds/([0-9,a-z,A-Z_-]+)/datastreams/([0-9,a-z,A-Z_-]+)/datapoints/?$ api-factory/isapi_write.php?uuid=$1 [QSA,NC,L]
+
+####
+#END BT/IS-API stuff
+####

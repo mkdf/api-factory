@@ -1,0 +1,19 @@
+{
+    "name": "mkdf/mkdf-datasets",
+    "description": "MKDF Data Catalogue",
+    "type": "library",
+    "require": {
+        "mongodb/mongodb": "^1.4"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "enridaga",
+            "email": "enricodaga@gmail.com"
+        },
+        {
+            "name": "jasemk",
+            "email": "jase@jasoncarvalho.com"
+        }
+    ],
+}
