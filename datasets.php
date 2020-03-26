@@ -22,7 +22,7 @@ $config = include('config.php');
 
 function createDataset($put_vars) {
 	$matchFound = ( isset($put_vars["uuid"]) && isset($put_vars["key"]) && isset($put_vars["user"]) && isset($put_vars["pwd"]) );
-
+	print_r($put_vars);
 	if (!$matchFound) {
 		http_response_code(400);
 		print "Bad request";
