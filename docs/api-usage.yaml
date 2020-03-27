@@ -2,9 +2,9 @@ openapi: 3.0.1
 info:
   title: API Factory
   description: API Factory
-  termsOfService: http://swagger.io/terms/
+  termsOfService: http://datahub.mksmart.org
   contact:
-    email: apiteam@swagger.io
+    email: datahub-support@mksmart.org
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -71,11 +71,6 @@ paths:
         405:
           description: Method not allowed
           content: {}
-      security:
-        - petstore_auth:
-            - write:pets
-            - read:pets
-      x-codegen-request-body-name: query
   /object/{dataset-uuid}:
     put:
       tags:

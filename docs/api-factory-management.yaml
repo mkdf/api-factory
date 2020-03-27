@@ -1,0 +1,215 @@
+openapi: 3.0.1
+info:
+  title: API Factory Management
+  description: API Factory Management
+  termsOfService: http://datahub.mksmart.org
+  contact:
+    email: datahub-support@mksmart.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+tags:
+  - name: datasets
+    description: Query documents
+    externalDocs:
+      description: Find out more
+      url: http://datahub.mksmart.org
+  - name: permissions
+    description: Push, update and delete documents
+paths:
+  /datasets:
+    get:
+      tags:
+        - datasets
+      summary: Retrieve all datasets
+      description: Retrieves a full list of dataset UUIDs
+      operationId: getAllDatasets
+      parameters:
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pwd
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+  /datasets/{dataset-uuid}:
+    get:
+      tags:
+        - datasets
+      summary: Retrieve a single dataset
+      description: Retrieves a single dataset, including the number of documents in that dataset
+      operationId: getOneDataset
+      parameters:
+        - name: dataset-uuid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pwd
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+    post:
+      tags:
+        - datasets
+      summary: Create a new dataset
+      description: Create a new dataset
+      operationId: createDataset
+      parameters:
+        - name: dataset-uuid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: key
+          description: The master key to assign read and write privileges to
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: user
+          description: Username/password with privileges to create MongoDB collections
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pwd
+          description: Username/password with privileges to create MongoDB collections
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+  /object/{dataset-uuid}:
+    put:
+      tags:
+        - permissions
+      summary: Create a new document in the dataset
+      operationId: createDocument
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The document to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              example:   # Sample object
+                _id: "1067"
+                sensorID: "42-a"
+                sesnorValue: 34.7
+        required: false
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid Order
+          content: {}
+  /permissions:
+    get:
+      tags:
+        - permissions
+      summary: Update a document by ID
+      description: Update an existing document, referenced by ID. Note that the existing
+        document will be overwritten, so a full document should be supplied.
+      operationId: getOrderById
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: The UUID of the dataset
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+  /permissions/{key}:
+    get:
+      tags:
+        - permissions
+      summary: Get permissions
+      description: Get permissions for a given API key
+      operationId: getPermissionsByKey
+      parameters:
+        - name: key
+          in: path
+          description: The API key that you require a permissions summary for
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+    post:
+      tags:
+        - permissions
+      summary: Update permissions
+      description: Update the permissions on a dataset for a given key
+      operationId: setPermissions
+      parameters:
+        - name: key
+          in: path
+          description: Key
+          required: true
+          schema:
+            type: string
+        - name: dataset-uuid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: read
+          description: Set read access
+          in: query
+          required: true
+          schema:
+            enum: [1,0]
+        - name: write
+          description: Set write access
+          in: query
+          required: true
+          schema:
+            enum: [1,0]
+      responses:
+        200:
+          description: OK
+externalDocs:
+  description: Find out more about the API Factory
+  url: http://datahu.mksmart.org
+servers:
+  - url: https://api.mksmart.org/data/
+security:
+  - DatasetAuth: []
+components:
+  securitySchemes:
+    DatasetAuth:
+      type: http
+      scheme: basic
