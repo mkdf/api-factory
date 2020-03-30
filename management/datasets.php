@@ -28,8 +28,8 @@ function createDataset($put_vars) {
 		exit();
 	}
 
-	$datasetUUID = $put_vars["uuid"];
-	$key = $put_vars["key"];
+	$datasetUUID = $_GET["uuid"];
+	$key = $_GET["key"];
 	$user = $_SERVER['PHP_AUTH_USER'];
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
