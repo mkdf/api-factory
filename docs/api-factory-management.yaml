@@ -25,17 +25,6 @@ paths:
       summary: Retrieve all datasets
       description: Retrieves a full list of dataset UUIDs
       operationId: getAllDatasets
-      parameters:
-        - name: user
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: pwd
-          in: query
-          required: true
-          schema:
-            type: string
       responses:
         200:
           description: Success
