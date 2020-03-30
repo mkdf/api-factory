@@ -43,8 +43,8 @@ paths:
     get:
       tags:
         - datasets
-      summary: Retrieve a single dataset
-      description: Retrieves a single dataset, including the number of documents in that dataset
+      summary: Retrieve single dataset details
+      description: Retrieves a single dataset summary, including the number of documents in that dataset
       operationId: getOneDataset
       parameters:
         - name: dataset-uuid
@@ -98,56 +98,13 @@ paths:
       responses:
         200:
           description: Success
-  /object/{dataset-uuid}:
-    put:
-      tags:
-        - permissions
-      summary: Create a new document in the dataset
-      operationId: createDocument
-      parameters:
-        - name: dataset-uuid
-          in: path
-          description: dataset uuid identifier
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: The document to be created
-        content:
-          application/json:
-            schema:
-              type: object
-              example:   # Sample object
-                _id: "1067"
-                sensorID: "42-a"
-                sesnorValue: 34.7
-        required: false
-      responses:
-        200:
-          description: Success
-        400:
-          description: Invalid Order
-          content: {}
   /permissions:
     get:
       tags:
         - permissions
-      summary: Update a document by ID
-      description: Update an existing document, referenced by ID. Note that the existing
-        document will be overwritten, so a full document should be supplied.
-      operationId: getOrderById
-      parameters:
-        - name: dataset-uuid
-          in: path
-          description: The UUID of the dataset
-          required: true
-          schema:
-            type: string
-        - name: doc_id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: Get all permissions
+      description: Get all permissions
+      operationId: getAllPermissions
       responses:
         200:
           description: successful operation
@@ -155,7 +112,7 @@ paths:
     get:
       tags:
         - permissions
-      summary: Get permissions
+      summary: Get permissions for single key
       description: Get permissions for a given API key
       operationId: getPermissionsByKey
       parameters:
@@ -171,8 +128,8 @@ paths:
     post:
       tags:
         - permissions
-      summary: Update permissions
-      description: Update the permissions on a dataset for a given key
+      summary: Set/update permissions
+      description: Set or update the permissions on a dataset for a given key
       operationId: setPermissions
       parameters:
         - name: key
@@ -203,9 +160,9 @@ paths:
           description: OK
 externalDocs:
   description: Find out more about the API Factory
-  url: http://datahu.mksmart.org
+  url: http://datahub.mksmart.org
 servers:
-  - url: https://api.mksmart.org/data/
+  - url: http://portal-dev-tmp.datahub.kmi.open.ac.uk/api-factory/management/
 security:
   - DatasetAuth: []
 components:

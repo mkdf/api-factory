@@ -256,7 +256,7 @@
   },
   "servers": [
     {
-      "url": "http://portal-dev-tmp.datahub.kmi.open.ac.uk/api-factory/"
+      "url": "http://portal-dev-tmp.datahub.kmi.open.ac.uk/api-factory/management/"
     }
   ],
   "security": [
