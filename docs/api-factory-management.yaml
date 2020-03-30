@@ -44,7 +44,7 @@ paths:
       responses:
         200:
           description: Success
-    post:
+    put:
       tags:
         - datasets
       summary: Create a new dataset

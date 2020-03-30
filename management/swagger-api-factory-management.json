@@ -67,7 +67,7 @@
           }
         }
       },
-      "post": {
+      "put": {
         "tags": [
           "datasets"
         ],
