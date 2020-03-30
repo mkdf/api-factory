@@ -21,10 +21,10 @@ require '../vendor/autoload.php'; // include Composer's autoloader
 $config = include('../config.php');
 
 function createDataset($put_vars) {
-	$matchFound = ( isset($put_vars["uuid"]) && isset($put_vars["key"]) );
+	$matchFound = ( isset($_GET["uuid"]) && isset($_GET["key"]) );
 	if (!$matchFound) {
 		http_response_code(400);
-		print "Bad request";
+		print "Bad request, missing dataset uuid or access key";
 		exit();
 	}
 
