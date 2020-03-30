@@ -14,15 +14,4 @@ RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ o
 RewriteCond %{REQUEST_METHOD} DELETE
 RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$3&idType=$2 [QSA,NC,L]
 
-#API FACTORY MANAGEMENT
-#Get all datasets
-RewriteCond %{REQUEST_METHOD} GET
-RewriteRule datasets/?$ datasets.php [QSA,NC,L]
 
-#Get single dataset
-RewriteCond %{REQUEST_METHOD} GET
-RewriteRule datasets/([0-9,a-z,A-Z_-]+)/?$ datasets.php?uuid=$1 [QSA,NC,L]
-
-#Create new dataset
-RewriteCond %{REQUEST_METHOD} PUT
-RewriteRule datasets/([0-9,a-z,A-Z_-]+)/?$ datasets.php?uuid=$1 [QSA,NC,L]

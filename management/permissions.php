@@ -5,8 +5,8 @@
  * JCarvalho - created 07/03/2019
  */
 
-require 'vendor/autoload.php'; // include Composer's autoloader
-$config = include('config.php');
+require '../vendor/autoload.php'; // include Composer's autoloader
+$config = include('../config.php');
 
 function getPermissions($key = "-") {
     $matchFound = ( isset($_GET["user"]) && isset($_GET["pwd"]) );

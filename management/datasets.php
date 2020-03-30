@@ -17,8 +17,8 @@
  * JCarvalho - created 06/03/2019
  */
 
-require 'vendor/autoload.php'; // include Composer's autoloader
-$config = include('config.php');
+require '../vendor/autoload.php'; // include Composer's autoloader
+$config = include('../config.php');
 
 function createDataset($put_vars) {
 	$matchFound = ( isset($put_vars["uuid"]) && isset($put_vars["key"]) && isset($put_vars["user"]) && isset($put_vars["pwd"]) );
