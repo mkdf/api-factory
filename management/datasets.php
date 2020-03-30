@@ -31,7 +31,7 @@ function createDataset($put_vars) {
 	$datasetUUID = $put_vars["uuid"];
 	$key = $put_vars["key"];
 	$user = $_SERVER['PHP_AUTH_USER'];
-	$pwd = $_SERVER['PHP_AUTH_PWD'];
+	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
 	$client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
@@ -154,7 +154,7 @@ function createDataset($put_vars) {
 
 function getDatasets($uuid = "-") {
 	$user = $_SERVER['PHP_AUTH_USER'];
-	$pwd = $_SERVER['PHP_AUTH_PWD'];
+	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
 	$client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
@@ -222,7 +222,7 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
 	//echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
 	//echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
 	$user = $_SERVER['PHP_AUTH_USER'];
-	$pwd = $_SERVER['PHP_AUTH_PWD'];
+	$pwd = $_SERVER['PHP_AUTH_PW'];
 }
 
 $request_method=$_SERVER["REQUEST_METHOD"];
