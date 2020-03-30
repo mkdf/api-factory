@@ -21,7 +21,7 @@ require '../vendor/autoload.php'; // include Composer's autoloader
 $config = include('../config.php');
 
 function createDataset($put_vars) {
-	$matchFound = ( isset($put_vars["uuid"]) && isset($put_vars["key"]) && isset($put_vars["user"]) && isset($put_vars["pwd"]) );
+	$matchFound = ( isset($put_vars["uuid"]) && isset($put_vars["key"]) );
 	if (!$matchFound) {
 		http_response_code(400);
 		print "Bad request";
@@ -30,9 +30,8 @@ function createDataset($put_vars) {
 
 	$datasetUUID = $put_vars["uuid"];
 	$key = $put_vars["key"];
-	$user = $put_vars["user"];
-	$pwd = $put_vars["pwd"];
-
+	$user = $_SERVER['PHP_AUTH_USER'];
+	$pwd = $_SERVER['PHP_AUTH_PWD'];
 
 	//db connection
 	$client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
@@ -154,16 +153,8 @@ function createDataset($put_vars) {
  */
 
 function getDatasets($uuid = "-") {
-	$matchFound = ( isset($_GET["user"]) && isset($_GET["pwd"]) );
-
-	if (!$matchFound) {
-		http_response_code(400);
-		print "Bad request, user/pwd not specified";
-		exit();
-	}
-
-	$user = $_GET["user"];
-	$pwd = $_GET["pwd"];
+	$user = $_SERVER['PHP_AUTH_USER'];
+	$pwd = $_SERVER['PHP_AUTH_PWD'];
 
 	//db connection
 	$client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
@@ -222,6 +213,17 @@ function getDatasets($uuid = "-") {
  *  END OF FUNCTIONS. MAIN CODE BELOW
  */
 
+if (!isset($_SERVER['PHP_AUTH_USER'])) {
+	header('WWW-Authenticate: Basic realm="Realm"');
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'HTTP Basic authentication required';
+	exit;
+} else {
+	//echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
+	//echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
+	$user = $_SERVER['PHP_AUTH_USER'];
+	$pwd = $_SERVER['PHP_AUTH_PWD'];
+}
 
 $request_method=$_SERVER["REQUEST_METHOD"];
 switch($request_method)
