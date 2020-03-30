@@ -1,0 +1,275 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Factory Management",
+    "description": "API Factory Management",
+    "termsOfService": "http://datahub.mksmart.org",
+    "contact": {
+      "email": "datahub-support@mksmart.org"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "datasets",
+      "description": "Query documents",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://datahub.mksmart.org"
+      }
+    },
+    {
+      "name": "permissions",
+      "description": "Push, update and delete documents"
+    }
+  ],
+  "paths": {
+    "/datasets": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Retrieve all datasets",
+        "description": "Retrieves a full list of dataset UUIDs",
+        "operationId": "getAllDatasets",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pwd",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/datasets/{dataset-uuid}": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Retrieve single dataset details",
+        "description": "Retrieves a single dataset summary, including the number of documents in that dataset",
+        "operationId": "getOneDataset",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pwd",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Create a new dataset",
+        "description": "Create a new dataset",
+        "operationId": "createDataset",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "description": "The master key to assign read and write privileges to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user",
+            "description": "Username/password with privileges to create MongoDB collections",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pwd",
+            "description": "Username/password with privileges to create MongoDB collections",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/permissions": {
+      "get": {
+        "tags": [
+          "permissions"
+        ],
+        "summary": "Get all permissions",
+        "description": "Get all permissions",
+        "operationId": "getAllPermissions",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/permissions/{key}": {
+      "get": {
+        "tags": [
+          "permissions"
+        ],
+        "summary": "Get permissions for single key",
+        "description": "Get permissions for a given API key",
+        "operationId": "getPermissionsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "The API key that you require a permissions summary for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "permissions"
+        ],
+        "summary": "Set/update permissions",
+        "description": "Set or update the permissions on a dataset for a given key",
+        "operationId": "setPermissions",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset-uuid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "read",
+            "description": "Set read access",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                0
+              ]
+            }
+          },
+          {
+            "name": "write",
+            "description": "Set write access",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about the API Factory",
+    "url": "http://datahub.mksmart.org"
+  },
+  "servers": [
+    {
+      "url": "http://portal-dev-tmp.datahub.kmi.open.ac.uk/api-factory/"
+    }
+  ],
+  "security": [
+    {
+      "DatasetAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "DatasetAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
