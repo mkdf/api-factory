@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+    <link rel="stylesheet" href="https://petstore.swagger.io/swagger-ui.css">
+    <!-- `SwaggerUIBundle` is now available on the page -->
+
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script>
+    ui = SwaggerUIBundle({
+        url: "swagger-api-factory-management.json",
+        dom_id: '#swagger-ui' //,
+        // deepLinking: true,
+//                      presets: [
+//                        // SwaggerUIBundle.presets.apis,
+//                        // SwaggerUIStandalonePreset
+//                      ],
+//                      plugins: [
+//                        SwaggerUIBundle.plugins.DownloadUrl
+//                      ],
+//                      layout: "StandaloneLayout"
+    })
+</script>
+</body>
