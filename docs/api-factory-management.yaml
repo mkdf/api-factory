@@ -41,16 +41,6 @@ paths:
           required: true
           schema:
             type: string
-        - name: user
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: pwd
-          in: query
-          required: true
-          schema:
-            type: string
       responses:
         200:
           description: Success
@@ -68,18 +58,6 @@ paths:
             type: string
         - name: key
           description: The master key to assign read and write privileges to
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: user
-          description: Username/password with privileges to create MongoDB collections
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: pwd
-          description: Username/password with privileges to create MongoDB collections
           in: query
           required: true
           schema:
