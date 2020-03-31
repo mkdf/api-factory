@@ -3,11 +3,21 @@
 function annotateObject($input, $uuid){
     /*
      * Decode JSON, add extra metadata, re-encode and return new annotated JSON
+     * Also add an _id field if one hasn't been submitted
      */
     $object = json_decode($input, true);
 
     $timestamp = time();
     //echo date("d/m/Y H:i:s",$timestamp);
+
+    //if no _id supplied, let geenrate a string version of a Mongo ObjectID
+    if (!array_key_exists('_id',$object)){
+        $OID = new MongoDB\BSON\ObjectId();
+        $idString = (string)$OID;
+        $object['_id'] = $idString;
+    }
+    //convert _id to string if necessary
+    $object['_id'] = (string)$object['_id'];
 
     $object['_datasetid'] = $uuid;
     $object['_timestamp'] = $timestamp;
