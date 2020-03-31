@@ -14,7 +14,7 @@ require 'apif_functions.php';
 //require 'MKSAPIF_CustomAPI.php';
 $config = include('config.php');
 
-function deleteObject($key, $uuid, $docID, $idType)
+function deleteObject($key, $uuid, $docID)
 {
     try {
         //db connection
@@ -26,25 +26,8 @@ function deleteObject($key, $uuid, $docID, $idType)
         $db = $client->datahub;
         $collection = $db->$uuid;
 
-        switch ($idType) {
-            case 'id':
-                //simple string ID passed
-                $deleteResult = $collection->deleteOne(['_id' => $docID]);
-                break;
-            case 'oid':
-                //oid passed, to be converted to Mongo ObjectID
-                $newObj['_id'] = new MongoDB\BSON\ObjectId($docID);
-                $deleteResult = $collection->deleteOne(['_id' => new MongoDB\BSON\ObjectId($docID)]);
-                break;
-            default:
-                // Invalid Request Method
-                http_response_code(400);
-                print "Bad request, unrecognised id type (id/oid)";
-                exit();
-                break;
-        }
+        $deleteResult = $collection->deleteOne(['_id' => $docID]);
 
-        //$insertOneResult = $collection->insertOne(json_decode($annotated));
         if ($deleteResult->getDeletedCount() > 0) {
             http_response_code(204);
         } else {
@@ -59,7 +42,7 @@ function deleteObject($key, $uuid, $docID, $idType)
     }
 }
 
-function updateObject($key, $uuid, $docID, $idType, $body)
+function updateObject($key, $uuid, $docID, $body)
 {
     if (!json_decode($body)) {
         http_response_code(400);
@@ -89,39 +72,19 @@ function updateObject($key, $uuid, $docID, $idType, $body)
         $db = $client->datahub;
         $collection = $db->$uuid;
 
-        switch ($idType) {
-            case 'id':
-                //simple string ID passed
-                //FIXME - is this the best way?
-                //Ignore any _id field in the JSON for now
-                $newObj['_id'] = $docID;
-                $replaceOneResult = $collection->replaceOne(['_id' => $docID], $newObj, ['upsert' => true]);
-                break;
-            case 'oid':
-                //oid passed, to be converted to Mongo ObjectID
-                //FIXME - is this the best way?
-                //Ignore any _id field in the JSON for now
-                $newObj['_id'] = new MongoDB\BSON\ObjectId($docID);
-
-                $replaceOneResult = $collection->replaceOne(['_id' => new MongoDB\BSON\ObjectId($docID)], $newObj, ['upsert' => true]);
-                break;
-            default:
-                // Invalid Request Method
-                http_response_code(400);
-                print "Bad request, unrecognised id type (id/oid)";
-                exit();
-                break;
-        }
+        $newObj['_id'] = $docID;
+        $replaceOneResult = $collection->replaceOne(['_id' => $docID], $newObj, ['upsert' => true]);
 
         if ($replaceOneResult->getModifiedCount() > 0) {
             http_response_code(204);
+            print "Object updated";
         } else {
             http_response_code(201);
             print "Object created";
         }
     } catch (Exception $ex) {
         http_response_code(500);
-        echo 'Fatal error creating updating object: ' . $ex->getMessage();
+        echo 'Fatal error creating or updating object: ' . $ex->getMessage();
         exit();
     }
 }
@@ -199,25 +162,25 @@ if (isset($_GET["id"]) AND isset($_GET["idType"])) {
 
 switch ($request_method) {
     case 'PUT':
-        if (isset($_GET["id"]) AND isset($_GET["idType"])) {
-            updateObject($key, $uuid, $mongoID, $_GET["idType"], $payload);
+        if (isset($_GET["id"])) {
+            updateObject($key, $uuid, $mongoID, $payload);
         } else {
             createObject($key, $uuid, $payload);
         }
         break;
     case 'POST':
-        if (isset($_GET["id"]) AND isset($_GET["idType"])) {
-            updateObject($key, $uuid, $mongoID, $_GET["idType"], $payload);
+        if (isset($_GET["id"])) {
+            updateObject($key, $uuid, $mongoID, $payload);
         } else {
             createObject($key, $uuid, $payload);
         }
         break;
     case 'DELETE':
-        if (isset($_GET["id"]) AND isset($_GET["idType"])) {
-            deleteObject($key, $uuid, $mongoID, $_GET["idType"]);
+        if (isset($_GET["id"])) {
+            deleteObject($key, $uuid, $mongoID);
         } else {
             http_response_code(400);
-            print "Bad request, document id or id type (id/oid) missing";
+            print "Bad request, document id missing";
             exit();
         }
         break;
