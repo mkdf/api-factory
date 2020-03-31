@@ -173,7 +173,7 @@ switch($request_method)
         break;
     case 'POST':
         $key = $_POST["key"];
-        $uuid = $_POST["uuid"];
+        $uuid = $_POST["dataset-uuid"];
         $read = $_POST["read"];
         $write = $_POST["write"];
         updatePermissions($key, $uuid, $read, $write);
