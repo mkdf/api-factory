@@ -23,5 +23,5 @@ RewriteCond %{REQUEST_METHOD} GET
 RewriteRule permissions/([0-9,a-z,A-Z_-]+)/?$ permissions.php?key=$1 [QSA,NC,L]
 
 #Create new key/dataset permissions
-RewriteCond %{REQUEST_METHOD} PUT
+RewriteCond %{REQUEST_METHOD} POST
 RewriteRule permissions/([0-9,a-z,A-Z_-]+)/?$ permissions.php?key=$1 [QSA,NC,L]
