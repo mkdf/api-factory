@@ -50,7 +50,7 @@ function getPermissions($key = "-") {
  */
 
 
-function updatePermissions($key, $uuid, $read, $write) {
+function updatePermissions($key, $datasetUuid, $read, $write) {
     $user = $_SERVER['PHP_AUTH_USER'];
     $pwd = $_SERVER['PHP_AUTH_PW'];
 
@@ -58,10 +58,10 @@ function updatePermissions($key, $uuid, $read, $write) {
     //$user = "admin";
     //$pwd = 'klas228JD!';
 
-    $fullParamsFound = ( isset($_POST["key"]) && isset($_POST["uuid"]) && isset($_POST["read"]) && isset($_POST["write"]));
+    $fullParamsFound = ( isset($_POST["key"]) && isset($_POST["dataset-uuid"]) && isset($_POST["read"]) && isset($_POST["write"]));
     if (!$fullParamsFound) {
         http_response_code(400);
-        print "Bad request. Expecting uuid, key, read, write";
+        print "Bad request. Expecting dataset-uuid, key, read, write";
         exit();
     }
 
@@ -69,8 +69,8 @@ function updatePermissions($key, $uuid, $read, $write) {
     $client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
     $db = $client->datahub;
 
-    $readRole = $uuid . "-R";
-    $writeRole = $uuid . "-W";
+    $readRole = $datasetUuid . "-R";
+    $writeRole = $datasetUuid . "-W";
 
 
     //check if user exists:
