@@ -6,12 +6,7 @@ RewriteRule query/([0-9,a-z,A-Z_-]+)/?$ query.php?uuid=$1 [QSA,NC,L]
 #creation of new doc
 RewriteRule object/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1 [QSA,NC,L]
 
-#updting existing doc
-#RewriteCond %{REQUEST_METHOD} PUT
+#create, update, delete a document with supplied id in the URL
 RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$2 [QSA,NC,L]
-
-#deleting an existing doc
-#RewriteCond %{REQUEST_METHOD} DELETE
-#RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$2 [QSA,NC,L]
 
 

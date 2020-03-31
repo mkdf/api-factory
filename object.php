@@ -147,7 +147,7 @@ if (!isset($_GET["uuid"])) {
 }
 $uuid = $_GET["uuid"];
 
-if (isset($_GET["id"]) AND isset($_GET["idType"])) {
+if (isset($_GET["id"])) {
     $mongoID = $_GET["id"];
 }
 
