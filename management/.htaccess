@@ -13,3 +13,15 @@ RewriteRule datasets/([0-9,a-z,A-Z_-]+)/?$ datasets.php?uuid=$1 [QSA,NC,L]
 #Create new dataset
 RewriteCond %{REQUEST_METHOD} PUT
 RewriteRule datasets/([0-9,a-z,A-Z_-]+)/?$ datasets.php?uuid=$1 [QSA,NC,L]
+
+#Get all permissions
+RewriteCond %{REQUEST_METHOD} GET
+RewriteRule permissions/?$ permissions.php [QSA,NC,L]
+
+#Get single pkey permissions
+RewriteCond %{REQUEST_METHOD} GET
+RewriteRule permissions/([0-9,a-z,A-Z_-]+)/?$ permissions.php?key=$1 [QSA,NC,L]
+
+#Create new key/dataset permissions
+RewriteCond %{REQUEST_METHOD} PUT
+RewriteRule permissions/([0-9,a-z,A-Z_-]+)/?$ permissions.php?key=$1 [QSA,NC,L]
