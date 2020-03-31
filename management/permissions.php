@@ -172,10 +172,10 @@ switch($request_method)
         }
         break;
     case 'POST':
-        $key = $_POST["key"];
-        $uuid = $_POST["dataset-uuid"];
-        $read = $_POST["read"];
-        $write = $_POST["write"];
+        $key = $_GET["key"];
+        $uuid = $_GET["dataset-uuid"];
+        $read = $_GET["read"];
+        $write = $_GET["write"];
         updatePermissions($key, $uuid, $read, $write);
         break;
     default:
