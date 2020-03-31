@@ -261,7 +261,7 @@
   },
   "servers": [
     {
-      "url": "https://api.mksmart.org/data/"
+      "url": "http://portal-dev-tmp.datahub.kmi.open.ac.uk/api-factory/"
     }
   ],
   "security": [
