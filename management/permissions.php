@@ -58,7 +58,7 @@ function updatePermissions($key, $datasetUuid, $read, $write) {
     //$user = "admin";
     //$pwd = 'klas228JD!';
 
-    $fullParamsFound = ( isset($_POST["key"]) && isset($_POST["dataset-uuid"]) && isset($_POST["read"]) && isset($_POST["write"]));
+    $fullParamsFound = ( isset($_GET["key"]) && isset($_GET["dataset-uuid"]) && isset($_GET["read"]) && isset($_GET["write"]));
     if (!$fullParamsFound) {
         http_response_code(400);
         print "Bad request. Expecting dataset-uuid, key, read, write";
