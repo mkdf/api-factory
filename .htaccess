@@ -7,11 +7,11 @@ RewriteRule query/([0-9,a-z,A-Z_-]+)/?$ query.php?uuid=$1 [QSA,NC,L]
 RewriteRule object/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1 [QSA,NC,L]
 
 #updting existing doc
-RewriteCond %{REQUEST_METHOD} PUT   
-RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$3&idType=$2 [QSA,NC,L]
+#RewriteCond %{REQUEST_METHOD} PUT
+RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$2 [QSA,NC,L]
 
 #deleting an existing doc
-RewriteCond %{REQUEST_METHOD} DELETE
-RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$3&idType=$2 [QSA,NC,L]
+#RewriteCond %{REQUEST_METHOD} DELETE
+#RewriteRule object/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/([0-9,a-z,A-Z_-]+)/?$ object.php?uuid=$1&id=$2 [QSA,NC,L]
 
 
