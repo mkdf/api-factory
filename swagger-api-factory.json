@@ -136,27 +136,29 @@
               }
             }
           },
-          "required": false
+          "required": true
         },
         "responses": {
-          "200": {
-            "description": "Success"
+          "201": {
+            "description": "Object creted"
           },
           "400": {
-            "description": "Invalid Order",
-            "content": {}
+            "description": "Bad request, malformed JSON"
+          },
+          "500": {
+            "description": "Fatal error creating object"
           }
         }
       }
     },
-    "/object/{dataset-uuid}/{id_type}/{doc_id}": {
+    "/object/{dataset-uuid}/{doc_id}": {
       "post": {
         "tags": [
           "object"
         ],
         "summary": "Update a document by ID",
         "description": "Update an existing document, referenced by ID. Note that the existing document will be overwritten, so a full document should be supplied.",
-        "operationId": "getOrderById",
+        "operationId": "updateDocumentById",
         "parameters": [
           {
             "name": "dataset-uuid",
@@ -168,19 +170,6 @@
             }
           },
           {
-            "name": "id_type",
-            "in": "path",
-            "description": "Specifiy whether this docuemnt is referenced via a user supplied ID or a MongoDB-generated OID",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "id",
-                "oid"
-              ]
-            }
-          },
-          {
             "name": "doc_id",
             "in": "path",
             "required": true,
@@ -189,17 +178,26 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "The updated document",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
-            "description": "successful operation"
+          "201": {
+            "description": "Object creted"
           },
-          "400": {
-            "description": "Invalid ID supplied",
-            "content": {}
+          "204": {
+            "description": "Object updated"
           },
-          "404": {
-            "description": "Order not found",
-            "content": {}
+          "500": {
+            "description": "Fatal error creating or updating object"
           }
         }
       },
@@ -209,7 +207,7 @@
         ],
         "summary": "Delete a document by ID",
         "description": "Delete an existing document, referenced by ID.",
-        "operationId": "deleteDocument",
+        "operationId": "deleteDocumentById",
         "parameters": [
           {
             "name": "dataset-uuid",
@@ -218,19 +216,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "id_type",
-            "in": "path",
-            "description": "Specifiy whether this docuemnt is referenced via a user supplied ID or a MongoDB-generated OID",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "id",
-                "oid"
-              ]
             }
           },
           {
@@ -243,13 +228,14 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Invalid ID supplied",
-            "content": {}
+          "200": {
+            "description": "No items to delete"
           },
-          "404": {
-            "description": "Order not found",
-            "content": {}
+          "204": {
+            "description": "Object deleted"
+          },
+          "500": {
+            "description": "Fatal error deleting object"
           }
         }
       }

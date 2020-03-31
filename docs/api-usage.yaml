@@ -94,21 +94,22 @@ paths:
                 _id: "1067"
                 sensorID: "42-a"
                 sesnorValue: 34.7
-        required: false
+        required: true
       responses:
-        200:
-          description: Success
+        201:
+          description: Object creted
         400:
-          description: Invalid Order
-          content: {}
-  /object/{dataset-uuid}/{id_type}/{doc_id}:
+          description: Bad request, malformed JSON
+        500:
+          description: Fatal error creating object
+  /object/{dataset-uuid}/{doc_id}:
     post:
       tags:
         - object
       summary: Update a document by ID
       description: Update an existing document, referenced by ID. Note that the existing
         document will be overwritten, so a full document should be supplied.
-      operationId: getOrderById
+      operationId: updateDocumentById
       parameters:
         - name: dataset-uuid
           in: path
@@ -116,16 +117,38 @@ paths:
           required: true
           schema:
             type: string
-        - name: id_type
+        - name: doc_id
           in: path
-          description: Specifiy whether this docuemnt is referenced via a user supplied
-            ID or a MongoDB-generated OID
           required: true
           schema:
             type: string
-            enum:
-              - id
-              - oid
+      requestBody:
+        description: The updated document
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        201:
+          description: Object creted
+        204:
+          description: Object updated
+        500:
+          description: Fatal error creating or updating object
+    delete:
+      tags:
+        - object
+      summary: Delete a document by ID
+      description: Delete an existing document, referenced by ID.
+      operationId: deleteDocumentById
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: The UUID of the dataset
+          required: true
+          schema:
+            type: string
         - name: doc_id
           in: path
           required: true
@@ -133,48 +156,11 @@ paths:
             type: string
       responses:
         200:
-          description: successful operation
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Order not found
-          content: {}
-    delete:
-      tags:
-        - object
-      summary: Delete a document by ID
-      description: Delete an existing document, referenced by ID.
-      operationId: deleteDocument
-      parameters:
-        - name: dataset-uuid
-          in: path
-          description: The UUID of the dataset
-          required: true
-          schema:
-            type: string
-        - name: id_type
-          in: path
-          description: Specifiy whether this docuemnt is referenced via a user supplied
-            ID or a MongoDB-generated OID
-          required: true
-          schema:
-            type: string
-            enum:
-              - id
-              - oid
-        - name: doc_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Order not found
-          content: {}
+          description: No items to delete
+        204:
+          description: Object deleted
+        500:
+          description: Fatal error deleting object
 externalDocs:
   description: Find out more about the API Factory
   url: http://datahu.mksmart.org
