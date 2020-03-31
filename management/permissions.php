@@ -9,16 +9,8 @@ require '../vendor/autoload.php'; // include Composer's autoloader
 $config = include('../config.php');
 
 function getPermissions($key = "-") {
-    $matchFound = ( isset($_GET["user"]) && isset($_GET["pwd"]) );
-
-    if (!$matchFound) {
-        http_response_code(400);
-        print "Bad request, user/pwd not specified";
-        exit();
-    }
-
-    $user = $_GET["user"];
-    $pwd = $_GET["pwd"];
+    $user = $_SERVER['PHP_AUTH_USER'];
+    $pwd = $_SERVER['PHP_AUTH_PW'];
 
     //db connection
     $client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
@@ -59,16 +51,8 @@ function getPermissions($key = "-") {
 
 
 function updatePermissions($key, $uuid, $read, $write) {
-    $credentialsFound = ( isset($_POST["user"]) && isset($_POST["pwd"]) );
-
-    if (!$credentialsFound) {
-        http_response_code(400);
-        print "Bad request, user/pwd not specified";
-        exit();
-    }
-
-    $user = $_POST["user"];
-    $pwd = $_POST["pwd"];
+    $user = $_SERVER['PHP_AUTH_USER'];
+    $pwd = $_SERVER['PHP_AUTH_PW'];
 
     //overwrite these for now
     //$user = "admin";
@@ -158,6 +142,17 @@ function updatePermissions($key, $uuid, $read, $write) {
  *  END OF FUNCTIONS. MAIN CODE BELOW
  */
 
+if (!isset($_SERVER['PHP_AUTH_USER'])) {
+    header('WWW-Authenticate: Basic realm="Realm"');
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'HTTP Basic authentication required';
+    exit;
+} else {
+    //echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
+    //echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
+    $user = $_SERVER['PHP_AUTH_USER'];
+    $pwd = $_SERVER['PHP_AUTH_PW'];
+}
 
 $request_method=$_SERVER["REQUEST_METHOD"];
 switch($request_method)
