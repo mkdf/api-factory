@@ -3,7 +3,8 @@
     "description": "MKDF API Factory",
     "type": "library",
     "require": {
-        "mongodb/mongodb": "^1.4"
+        "mongodb/mongodb": "^1.4",
+        "ext-json": "*"
     },
     "license": "Apache-2.0",
     "authors": [

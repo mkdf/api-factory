@@ -19,9 +19,8 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false)
 {
     global $QUERYLIMIT;
     $limit = $QUERYLIMIT;
-    try {
-        $queryObj = json_decode($queryBody);
-    } catch (Exception $ex) {
+    $queryObj = json_decode($queryBody);
+    if ($queryObj == null) {
         http_response_code(400);
         echo 'Bad request, error interpreting JSON query: ' . $ex->getMessage();
         exit();
