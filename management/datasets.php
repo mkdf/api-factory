@@ -152,18 +152,14 @@ function createDataset($put_vars) {
  */
 
 function getDatasets($uuid = "-") {
-	global $DBCONNECTIONSTRING;
+	global $config;
 
 	$user = $_SERVER['PHP_AUTH_USER'];
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
-	$client = new MongoDB\Client($DBCONNECTIONSTRING, [
-		'username' => $key,
-		'password' => $key,
-		'db' => 'datahub'
-	]);
-	$db = $client->datahub;
+	$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+	$db = $client->selectDatabase($config['mongodb']['database']);
 
 	if ($uuid == "-"){
 		//GET ALL DATASETS
