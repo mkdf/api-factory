@@ -9,12 +9,13 @@ require '../vendor/autoload.php'; // include Composer's autoloader
 $config = include('../config.php');
 
 function getPermissions($key = "-") {
+    global $config;
     $user = $_SERVER['PHP_AUTH_USER'];
     $pwd = $_SERVER['PHP_AUTH_PW'];
 
     //db connection
-    $client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
-    $db = $client->datahub;
+    $client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+    $db = $client->selectDatabase($config['mongodb']['database']);
 
     if ($key == "-"){
         //GET ALL USERS
@@ -51,6 +52,7 @@ function getPermissions($key = "-") {
 
 
 function updatePermissions($key, $datasetUuid, $read, $write) {
+    global $config
     $user = $_SERVER['PHP_AUTH_USER'];
     $pwd = $_SERVER['PHP_AUTH_PW'];
 
@@ -66,8 +68,8 @@ function updatePermissions($key, $datasetUuid, $read, $write) {
     }
 
     //db connection
-    $client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
-    $db = $client->datahub;
+    $client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+	$db = $client->selectDatabase($config['mongodb']['database']);
 
     $readRole = $datasetUuid . "-R";
     $writeRole = $datasetUuid . "-W";
