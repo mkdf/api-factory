@@ -20,10 +20,8 @@
 require '../vendor/autoload.php'; // include Composer's autoloader
 $config = include('../config.php');
 
-$DBCONNECTIONSTRING = 'mongodb://'.$config['mongodb']['host'].':'.$config['mongodb']['port'].'/'.$config['mongodb']['database'];
-
 function createDataset($put_vars) {
-	global $DBCONNECTIONSTRING;
+	global $config;
 	$matchFound = ( isset($_GET["uuid"]) && isset($_GET["key"]) );
 	if (!$matchFound) {
 		http_response_code(400);
@@ -37,12 +35,8 @@ function createDataset($put_vars) {
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
-	$client = new MongoDB\Client($DBCONNECTIONSTRING, [
-		'username' => $key,
-		'password' => $key,
-		'db' => 'datahub'
-	]);
-	$db = $client->datahub;
+	$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+	$db = $client->$config['mongodb']['database'];
 
 	//create collection
 	try {
