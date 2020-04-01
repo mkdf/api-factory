@@ -52,7 +52,7 @@ function getPermissions($key = "-") {
 
 
 function updatePermissions($key, $datasetUuid, $read, $write) {
-    global $config
+    global $config;
     $user = $_SERVER['PHP_AUTH_USER'];
     $pwd = $_SERVER['PHP_AUTH_PW'];
 
