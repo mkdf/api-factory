@@ -1,7 +1,7 @@
 {
     "name": "mkdf/api-factory",
     "description": "MKDF API Factory",
-    "type": "library",
+    "type": "project",
     "require": {
         "mongodb/mongodb": "^1.4",
         "ext-json": "*"
