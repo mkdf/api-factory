@@ -29,3 +29,22 @@ creating, modifying and deleting collections, users and roles
         ],
     ];
     ```
+1. gfh  
+1. Configure web-based Swagger API usage features. Locate teh following section 
+which appears toward the bottom of the following **two** files:  
+`swagger-api-factory.json`  
+`management/swagger-api-factory-management.json`
+```json
+"servers": [
+    {
+      "url": "http://portal-dev-tmp.datahub.kmi.open.ac.uk/api-factory/"
+    }
+  ],
+```
+   
+## Usage
+
+#### API Factory - Management
+The Management API is used for creating new datasets and modifying permissions
+
+#### API Factory - Data stream usage
