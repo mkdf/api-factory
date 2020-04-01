@@ -52,15 +52,6 @@ function updateObject($key, $uuid, $docID, $body)
     $annotated = annotateObject($body, $uuid);
     $newObj = json_decode($annotated, true);
     $newObj['_updated'] = true;
-    //Check if doc ID from URL matches that supplied in updated JSON
-    /*
-    if (isset($newOb['_id']) AND ($docID !=  $newObj['_id'])) {
-        http_response_code(400);
-        print "Bad request, document id specified in URI does not match id passed in JSON body";
-        exit();
-    }
-    */
-
 
     try {
         //db connection
@@ -72,6 +63,7 @@ function updateObject($key, $uuid, $docID, $body)
         $db = $client->datahub;
         $collection = $db->$uuid;
 
+        //Any _id supplied in the JSON is ignored/overwritten with the one passed in the URL path
         $newObj['_id'] = $docID;
         $replaceOneResult = $collection->replaceOne(['_id' => $docID], $newObj, ['upsert' => true]);
 
@@ -121,7 +113,7 @@ function createObject($key, $uuid, $body)
 }
 
 /**
- *  END OF FUNCTIONS. MAIN CODE BELOW
+ *  END OF FUNCTIONS. MAIN PROCESS CODE BELOW
  */
 
 $request_method = $_SERVER["REQUEST_METHOD"];
@@ -131,14 +123,11 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
     echo 'Dataset key must be provided as HTTP Basic Auth username';
     exit;
 } else {
-    //echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
-    //echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
     $key = $_SERVER['PHP_AUTH_USER'];
 }
 
 //get PUT/POST data
 $payload = file_get_contents("php://input");
-
 
 if (!isset($_GET["uuid"])) {
     http_response_code(400);
@@ -151,12 +140,13 @@ if (isset($_GET["id"])) {
     $mongoID = $_GET["id"];
 }
 
-
 /**
  *
  * API USAGE:
- * PUT - THIS SHOULD BE USED FOR PUSHING DATA INTO THE SYSTEM - BOTH NEW DATA AND DATA UPDATES.
- *
+ * PUT - USED FOR PUSHING NEW DATA INTO THE SYSTEM
+ * POST - USED FOR DATA UPDATES WHERE THE ID IS SUPPLIED IN THE PATH
+ * This is the encouraged usage of the API, however, both PUT and POST can be used interchangeably
+ * and actually operate in the same way.
  *
  */
 
@@ -189,5 +179,4 @@ switch ($request_method) {
         header("HTTP/1.0 405 Method Not Allowed");
         break;
 }
-
 ?>

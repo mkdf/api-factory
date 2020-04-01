@@ -8,7 +8,6 @@
  */
 
 require 'vendor/autoload.php'; // include Composer's autoloader
-//require 'MKSAPIF_CustomAPI.php';
 $config = include('config.php');
 
 /**
@@ -20,8 +19,13 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false)
 {
     global $QUERYLIMIT;
     $limit = $QUERYLIMIT;
-    $queryObj = json_decode($queryBody);
-    // FIXME  - need to check this is valid JSON
+    try {
+        $queryObj = json_decode($queryBody);
+    } catch (Exception $ex) {
+        http_response_code(400);
+        echo 'Bad request, error interpreting JSON query: ' . $ex->getMessage();
+        exit();
+    }
 
     try {
         //db connection
