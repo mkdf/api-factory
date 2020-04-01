@@ -22,7 +22,7 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false)
     $queryObj = json_decode($queryBody);
     if ($queryObj == null) {
         http_response_code(400);
-        echo 'Bad request, error interpreting JSON query: ' . $ex->getMessage();
+        echo 'Bad request, malformed JSON query';
         exit();
     }
 
