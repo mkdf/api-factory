@@ -36,7 +36,7 @@ function createDataset($put_vars) {
 
 	//db connection
 	$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
-	$db = $client->$config['mongodb']['database'];
+	$db = $client->selectDatabase($config['mongodb']['database']);
 
 	//create collection
 	try {
