@@ -14,10 +14,7 @@ database for use with the API Factory and a user account with privileges for
 creating, modifying and deleting collections, users and roles
 1. Clone this repository into you web server's document tree.
 1. Install dependencies using 'composer install'
-1. Configure config.php
-    1. MongoDB host
-    1. MongoDB port
-    1. MongoDB database (*the database*)
+1. Configure ```config.php``` with your MongoDB's host, port and database name
     ```php
     <?php
     
