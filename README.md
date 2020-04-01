@@ -38,7 +38,7 @@ toward the bottom of the following **two** files:
 ```
 The url should be updated to reflect the URL of you API Factory installation
 
-###SECURITY NOTE
+### SECURITY NOTE
 **You should configure your web server to only allow requests to the API Factory 
 (both the data stream API and management API) via SSL. The API Factory *can* operate 
 in an unsecure environment but should only be allowed to do so on a private and secure 
@@ -50,10 +50,10 @@ all production use of the API Factory should happen via HTTPS.**
 #### API Factory - Management
 The Management API is used for creating new datasets and modifying permissions.
 
-API methods are documented and can be tested using the web tools provided at:
+API methods are documented and can be tested using the web tools provided at:  
 http://\<yourdomain\>/\<installation folder\>/management/  
 Use the `Authorize` button at the top right of the page to 
 
 #### API Factory - Data stream usage
-API methods are documented and can be tested using the web tools provided at:
+API methods are documented and can be tested using the web tools provided at:  
 http://\<yourdomain\>/\<installation folder\>/
