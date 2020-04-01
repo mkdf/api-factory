@@ -63,7 +63,7 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false)
 }
 
 /**
- *  END OF FUNCTIONS. MAIN CODE BELOW
+ *  END OF FUNCTIONS. MAIN PROCESS CODE BELOW
  */
 
 //Check AUTH has been passed
@@ -74,8 +74,6 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
     echo 'Dataset key must be provided as HTTP Basic Auth username';
     exit;
 } else {
-    //echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
-    //echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
     $key = $_SERVER['PHP_AUTH_USER'];
 }
 
@@ -98,7 +96,6 @@ if (!isset($_GET["uuid"])) {
 $uuid = $_GET["uuid"];
 $baseQuery = "{}";
 
-
 switch ($request_method) {
     case 'GET':
         doQuery($key, $uuid, $baseQuery, $restEntity);
@@ -115,5 +112,4 @@ switch ($request_method) {
         header("HTTP/1.0 405 Method Not Allowed");
         break;
 }
-
 ?>
