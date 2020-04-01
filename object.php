@@ -14,11 +14,14 @@ require 'apif_functions.php';
 //require 'MKSAPIF_CustomAPI.php';
 $config = include('config.php');
 
+$DBCONNECTIONSTRING = 'mongodb://'.$config['mongodb']['host'].':'.$config['mongodb']['port'].'/'.$config['mongodb']['database'];
+
 function deleteObject($key, $uuid, $docID)
 {
+    global $DBCONNECTIONSTRING;
     try {
         //db connection
-        $client = new MongoDB\Client('mongodb://localhost:27017/datahub', [
+        $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
             'db' => 'datahub'
@@ -44,6 +47,7 @@ function deleteObject($key, $uuid, $docID)
 
 function updateObject($key, $uuid, $docID, $body)
 {
+    global $DBCONNECTIONSTRING;
     if (!json_decode($body)) {
         http_response_code(400);
         print "Bad request, malformed JSON";
@@ -55,7 +59,7 @@ function updateObject($key, $uuid, $docID, $body)
 
     try {
         //db connection
-        $client = new MongoDB\Client('mongodb://localhost:27017/datahub', [
+        $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
             'db' => 'datahub'
@@ -84,6 +88,7 @@ function updateObject($key, $uuid, $docID, $body)
 
 function createObject($key, $uuid, $body)
 {
+    global $DBCONNECTIONSTRING;
     if (!json_decode($body)) {
         http_response_code(400);
         print "Bad request, malformed JSON";
@@ -93,7 +98,7 @@ function createObject($key, $uuid, $body)
 
     try {
         //db connection
-        $client = new MongoDB\Client('mongodb://localhost:27017/datahub', [
+        $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
             'db' => 'datahub'

@@ -20,7 +20,10 @@
 require '../vendor/autoload.php'; // include Composer's autoloader
 $config = include('../config.php');
 
+$DBCONNECTIONSTRING = 'mongodb://'.$config['mongodb']['host'].':'.$config['mongodb']['port'].'/'.$config['mongodb']['database'];
+
 function createDataset($put_vars) {
+	global $DBCONNECTIONSTRING;
 	$matchFound = ( isset($_GET["uuid"]) && isset($_GET["key"]) );
 	if (!$matchFound) {
 		http_response_code(400);
@@ -34,10 +37,12 @@ function createDataset($put_vars) {
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
-	$client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
+	$client = new MongoDB\Client($DBCONNECTIONSTRING, [
+		'username' => $key,
+		'password' => $key,
+		'db' => 'datahub'
+	]);
 	$db = $client->datahub;
-
-	// FIXME: Catch errors on all of these operations, eg collection might already exist (which currently breaks things)
 
 	//create collection
 	try {
@@ -50,8 +55,8 @@ function createDataset($put_vars) {
 		echo 'Fatal error creating MongoDB collection: ' .$ex->getMessage();
 		exit();
 	}
-	//FIXME - NEED TO CREATE A GEOSPATIAL INDEX ON THE LOC FIELD, USING:
-	//db.getCollection("3788468c-280b-4548-8880-6c880dce4017").createIndex( { loc : "2dsphere" } )
+	//Geospatial indexes can be created using:
+	//db.getCollection("collection name").createIndex( { loc : "2dsphere" } )
 
 	/**
 	 * CREATE A READ ROLE FOR THIS COLLECTION
@@ -153,11 +158,17 @@ function createDataset($put_vars) {
  */
 
 function getDatasets($uuid = "-") {
+	global $DBCONNECTIONSTRING;
+
 	$user = $_SERVER['PHP_AUTH_USER'];
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
-	$client = new MongoDB\Client("mongodb://${user}:${pwd}@localhost:27017");
+	$client = new MongoDB\Client($DBCONNECTIONSTRING, [
+		'username' => $key,
+		'password' => $key,
+		'db' => 'datahub'
+	]);
 	$db = $client->datahub;
 
 	if ($uuid == "-"){
