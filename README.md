@@ -52,8 +52,15 @@ The Management API is used for creating new datasets and modifying permissions.
 
 API methods are documented and can be tested using the web tools provided at:  
 http://\<yourdomain\>/\<installation folder\>/management/  
-Use the `Authorize` button at the top right of the page to 
+Before testing the API methods, use the `Authorize` button at the top right of 
+the page, logging in using the MongoDB username and password mentioned in Step 1 of
+the installation instructions.  
+[FULL DOCS HERE]
 
 #### API Factory - Data stream usage
 API methods are documented and can be tested using the web tools provided at:  
 http://\<yourdomain\>/\<installation folder\>/
+Before testing the API methods, use the `Authorize` button at the top right of 
+the page. You should authenticate using the specific dataset key as both the 
+username and password.  
+[FULL DOCS HERE]
