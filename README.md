@@ -12,7 +12,7 @@
 1. Ensure you have a MongoDB instance installed and running, with a new empty 
 database ready for use with the API Factory and a user account with privileges for 
 creating, modifying and deleting collections, users and roles.
-1. Clone this repository into you web server's document tree.
+1. Clone this repository into your web server's document tree.
 1. Install dependencies using `composer install`
 1. Edit config.php with your MongoDB host, port and database name
     ```php
