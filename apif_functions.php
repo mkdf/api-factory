@@ -10,7 +10,7 @@ function annotateObject($input, $uuid){
     $timestamp = time();
     //echo date("d/m/Y H:i:s",$timestamp);
 
-    //if no _id supplied, let geenrate a string version of a Mongo ObjectID
+    //if no _id supplied, generate a string version of a Mongo ObjectID
     if (!array_key_exists('_id',$object)){
         $OID = new MongoDB\BSON\ObjectId();
         $idString = (string)$OID;
