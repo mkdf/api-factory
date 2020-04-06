@@ -56,10 +56,6 @@ function updatePermissions($key, $datasetUuid, $read, $write) {
     $user = $_SERVER['PHP_AUTH_USER'];
     $pwd = $_SERVER['PHP_AUTH_PW'];
 
-    //overwrite these for now
-    //$user = "admin";
-    //$pwd = 'klas228JD!';
-
     $fullParamsFound = ( isset($_GET["key"]) && isset($_GET["dataset-uuid"]) && isset($_GET["read"]) && isset($_GET["write"]));
     if (!$fullParamsFound) {
         http_response_code(400);
@@ -110,7 +106,6 @@ function updatePermissions($key, $datasetUuid, $read, $write) {
             //'db' => 'datahub'
         ]);
     }
-    //print (print_r($result));
 
     //if write access:
     if ($write) {
@@ -128,7 +123,6 @@ function updatePermissions($key, $datasetUuid, $read, $write) {
             //'db' => 'datahub'
         ]);
     }
-    //print (print_r($result));
 }
 
 /**
@@ -150,8 +144,6 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
     echo 'HTTP Basic authentication required';
     exit;
 } else {
-    //echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
-    //echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
     $user = $_SERVER['PHP_AUTH_USER'];
     $pwd = $_SERVER['PHP_AUTH_PW'];
 }
@@ -160,16 +152,13 @@ $request_method=$_SERVER["REQUEST_METHOD"];
 switch($request_method)
 {
     case 'GET':
-        //var_dump($_GET);
         // Retrieve users
         if(!empty($_GET["key"]))
         {
-            //echo "passing value";
             getPermissions($_GET["key"]);
         }
         else
         {
-            //echo "no passing value";
             getPermissions();
         }
         break;

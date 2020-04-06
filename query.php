@@ -30,7 +30,6 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false)
 
     try {
         //db connection
-        //$client = new MongoDB\Client('mongodb://localhost:27017/datahub', [
         $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,

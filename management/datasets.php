@@ -2,17 +2,6 @@
 /**
  * API-FACTORY DATASET OPERATIONS
  *
- * CALLING WITH GET:
- * 1. NO UUID PASSED: GET ALL DATASETS
- * 2. UUID PASSED: RETURN DATASET DETAILS FOR ONE DATASET
- *
- * CALLING WITH PUT:
- * - CREATE A NEW DATASET(MONGODB COLLECTION)
- * - ALSO CREATE 'R' AND 'W' ROLES ON THAT DATASET
- * - ALSO CREATE DEFAULT KEY(USER), ASSIGNED THE 'R' AND 'W' ROLES ABOVE
- *
- * CALLING WITH POST:
- * NOT YET IMPLEMENTED - MODIFY EXISTING DATASETS
  *
  * JCarvalho - created 06/03/2019
  */
@@ -41,7 +30,6 @@ function createDataset($put_vars) {
 	//create collection
 	try {
 		$result = $db->createCollection($datasetUUID, []);
-		//var_dump($result);
 	}
 	catch (Exception $ex) {
 		//Most likely error here is that the collection already exists
@@ -220,8 +208,6 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
 	echo 'HTTP Basic authentication required';
 	exit;
 } else {
-	//echo "<p>Hello {$_SERVER['PHP_AUTH_USER']}.</p>";
-	//echo "<p>You entered {$_SERVER['PHP_AUTH_PW']} as your password.</p>";
 	$user = $_SERVER['PHP_AUTH_USER'];
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 }
@@ -230,7 +216,6 @@ $request_method=$_SERVER["REQUEST_METHOD"];
 switch($request_method)
 	{
 		case 'GET':
-			//var_dump($_GET);
 			// Retrive datasets
 			if(!empty($_GET["uuid"]))
 			{

@@ -11,7 +11,6 @@ use MongoDB\BSON\ObjectId;
 
 require 'vendor/autoload.php'; // include Composer's autoloader
 require 'apif_functions.php';
-//require 'MKSAPIF_CustomAPI.php';
 $config = include('config.php');
 
 $DBCONNECTIONSTRING = 'mongodb://'.$config['mongodb']['host'].':'.$config['mongodb']['port'].'/'.$config['mongodb']['database'];
