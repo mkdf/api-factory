@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "API Factory",
-    "description": "API Factory",
+    "title": "API Factory - Object Stream API",
+    "description": "Object Stream API",
     "termsOfService": "http://datahub.mksmart.org",
     "contact": {
       "email": "datahub-support@mksmart.org"

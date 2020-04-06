@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "API Factory Management",
-    "description": "API Factory Management",
+    "title": "API Factory - Management API",
+    "description": "Management API",
     "termsOfService": "http://datahub.mksmart.org",
     "contact": {
       "email": "datahub-support@mksmart.org"
