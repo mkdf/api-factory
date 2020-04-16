@@ -1,6 +1,11 @@
+![Language: PHP](https://img.shields.io/badge/Language-PHP-blue)
+[![Current release](https://img.shields.io/badge/Release-v0.5.0-success)](https://github.com/mkdf/api-factory/releases/tag/v0.5.0)
+
+
 # API Factory
+
 The API Factory is a WebAPI for managing and share streaming data using with the support of open schema specifications.
-Its main goal is to make it easier to setup APIs on-demand, based on specifications such as JSON schemas.
+Its main goal is to make it easier to set up APIs on-demand, based on specifications such as JSON schemas.
 The API Factory is part of the [MK Data Factory](https://github.com/mkdf/) collection of components for distributed, policy-aware data cataloguing and management.
 
 *5G will bring enhanced connectivity to the cities enormously, increasing the variety of applications and use cases. 
