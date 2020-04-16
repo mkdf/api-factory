@@ -11,6 +11,8 @@ Guidance for installation and usage can be found on the [project wiki](https://g
 
 The API Factory is part of the [MK Data Factory](https://github.com/mkdf/) collection of components for distributed, policy-aware data cataloguing and management. 
 
+Vision statement:
+
 *5G will bring enhanced connectivity to the cities enormously, increasing the variety of applications and use cases. 
 In such a distributed environment, it is crucial to support systems interoperability in an agile way, thus reducing the time and cost of development.*
 
