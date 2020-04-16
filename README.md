@@ -4,7 +4,7 @@
 
 # API Factory
 
-The API Factory is a WebAPI for managing and share streaming data with the support of open schema specifications.
+The API Factory is a WebAPI for managing and sharing streaming data with the support of open schema specifications.
 Its main goal is to make it easier to set up APIs on-demand, based on specifications such as JSON schemas.
 
 Guidance for installation and usage can be found on the [project wiki](https://github.com/mkdf/api-factory/wiki).
@@ -15,10 +15,10 @@ The API Factory is part of the [MK Data Factory](https://github.com/mkdf/) colle
 
 Vision statement:
 
-*5G will bring enhanced connectivity to the cities enormously, increasing the variety of applications and use cases. 
+*5G will bring enhanced connectivity to cities enormously, increasing the variety of applications and use cases. 
 In such a distributed environment, it is crucial to support systems interoperability in an agile way, thus reducing the time and cost of development.*
 
-*The API Factory serves the [MK:5G](https://cp.catapult.org.uk/opportunities/mk5g-connecting-communities/) development community by providing a catalogue of IoT and SmartCity data models from cutting-edge Industry standards. Developers can select and mix them to build customised Application Programming Interfaces (APIs) on-demand, tailoring the specificity of their product.*
+*The API Factory serves the [MK:5G](https://cp.catapult.org.uk/opportunities/mk5g-connecting-communities/) development community by providing a catalogue of IoT and SmartCity data models from cutting-edge Industry standards. Developers can select and mix them to build customised Application Programming Interfaces (APIs) on-demand, tailored specifically to their product.*
 
 
 ## Timeline
