@@ -9,6 +9,8 @@ Its main goal is to make it easier to set up APIs on-demand, based on specificat
 
 Guidance for installation and usage can be found on the [project wiki](https://github.com/mkdf/api-factory/wiki).
 
+The Open University develops The API Factory support by the [MK:5G Connecting Communities](https://cp.catapult.org.uk/opportunities/mk5g-connecting-communities/) project as an open-source product to the benefit of technologists, businesses, and researchers.
+
 The API Factory is part of the [MK Data Factory](https://github.com/mkdf/) collection of components for distributed, policy-aware data cataloguing and management. 
 
 Vision statement:
@@ -18,7 +20,6 @@ In such a distributed environment, it is crucial to support systems interoperabi
 
 *The API Factory serves the [MK:5G](https://cp.catapult.org.uk/opportunities/mk5g-connecting-communities/) development community by providing a catalogue of IoT and SmartCity data models from cutting-edge Industry standards. Developers can select and mix them to build customised Application Programming Interfaces (APIs) on-demand, tailoring the specificity of their product.*
 
-*The Open University develops The API Factory as an open-source product to the benefit of technologists, businesses, and researchers.*
 
 ## Timeline
 
