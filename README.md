@@ -4,7 +4,7 @@
 
 # API Factory
 
-The API Factory is a WebAPI for managing and share streaming data using with the support of open schema specifications.
+The API Factory is a WebAPI for managing and share streaming data with the support of open schema specifications.
 Its main goal is to make it easier to set up APIs on-demand, based on specifications such as JSON schemas.
 The API Factory is part of the [MK Data Factory](https://github.com/mkdf/) collection of components for distributed, policy-aware data cataloguing and management.
 
