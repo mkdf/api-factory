@@ -145,50 +145,56 @@ function getDatasets($uuid = "-") {
 	$user = $_SERVER['PHP_AUTH_USER'];
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
-	//db connection
-	$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
-	$db = $client->selectDatabase($config['mongodb']['database']);
-
-	if ($uuid == "-"){
-		//GET ALL DATASETS
-		$collectionArray = array();
-		foreach ($db->listCollections() as $collectionInfo) {
-			array_push($collectionArray,$collectionInfo["name"]);
-		}
-
-		header('Content-Type: application/json');
-		echo json_encode($collectionArray);
-	}
-	else {
-		//GET ONE DATASET
-		//First check if it exists:
-		$data = $db->listCollections([
-			'filter' => [
-				'name' => $uuid,
-			],
-		]);
-		$exist = 0;
-		foreach ($data as $collectionInfo) {
-			$exist = 1;
-		}
-
-		if ($exist) {
-			$total_docs = $db->$uuid->countDocuments();
-			$summary = array();
-			$summary['datasetID'] = $uuid;
-			$summary['totalDocs'] = $total_docs;
+	try {
+		//db connection
+		$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+		$db = $client->selectDatabase($config['mongodb']['database']);
+		if ($uuid == "-"){
+			//GET ALL DATASETS
+			$collectionArray = array();
+			foreach ($db->listCollections() as $collectionInfo) {
+				array_push($collectionArray,$collectionInfo["name"]);
+			}
 
 			header('Content-Type: application/json');
-			echo json_encode($summary);
+			echo json_encode($collectionArray);
 		}
-		//If dataset/collection doesn't exist, return empty object
 		else {
-			header('Content-Type: application/json');
-			echo json_encode([],JSON_FORCE_OBJECT);
+			//GET ONE DATASET
+			//First check if it exists:
+			$data = $db->listCollections([
+				'filter' => [
+					'name' => $uuid,
+				],
+			]);
+			$exist = 0;
+			foreach ($data as $collectionInfo) {
+				$exist = 1;
+			}
+
+			if ($exist) {
+				$total_docs = $db->$uuid->countDocuments();
+				$summary = array();
+				$summary['datasetID'] = $uuid;
+				$summary['totalDocs'] = $total_docs;
+
+				header('Content-Type: application/json');
+				echo json_encode($summary);
+			}
+			//If dataset/collection doesn't exist, return empty object
+			else {
+				header('Content-Type: application/json');
+				echo json_encode([],JSON_FORCE_OBJECT);
+			}
 		}
-
-
+	}catch (Exception $ex) {
+		http_response_code(500);
+		echo 'Error retrieving dataset(s): ' . $ex->getMessage();
+		exit();
 	}
+
+
+
 
 }
 /**
