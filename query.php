@@ -15,10 +15,11 @@ $config = include('config.php');
  */
 $QUERYLIMIT = 100;
 $DBCONNECTIONSTRING = 'mongodb://'.$config['mongodb']['host'].':'.$config['mongodb']['port'].'/'.$config['mongodb']['database'];
+$DBNAME = $config['mongodb']['database'];
 
 function doQuery($key, $uuid, $queryBody, $restEntity = false)
 {
-    global $DBCONNECTIONSTRING;
+    global $DBCONNECTIONSTRING,$DBNAME;
     global $QUERYLIMIT;
     $limit = $QUERYLIMIT;
     $queryObj = json_decode($queryBody);
@@ -33,7 +34,7 @@ function doQuery($key, $uuid, $queryBody, $restEntity = false)
         $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
-            'db' => 'datahub'
+            'db' => $DBNAME
         ]);
         $db = $client->datahub;
         $collection = $db->$uuid;

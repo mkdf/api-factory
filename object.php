@@ -14,16 +14,17 @@ require 'apif_functions.php';
 $config = include('config.php');
 
 $DBCONNECTIONSTRING = 'mongodb://'.$config['mongodb']['host'].':'.$config['mongodb']['port'].'/'.$config['mongodb']['database'];
+$DBNAME = $config['mongodb']['database'];
 
 function deleteObject($key, $uuid, $docID)
 {
-    global $DBCONNECTIONSTRING;
+    global $DBCONNECTIONSTRING,$DBNAME;
     try {
         //db connection
         $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
-            'db' => 'datahub'
+            'db' => $DBNAME
         ]);
         $db = $client->datahub;
         $collection = $db->$uuid;
@@ -46,7 +47,7 @@ function deleteObject($key, $uuid, $docID)
 
 function updateObject($key, $uuid, $docID, $body)
 {
-    global $DBCONNECTIONSTRING;
+    global $DBCONNECTIONSTRING,$DBNAME;
     if (!json_decode($body)) {
         http_response_code(400);
         print "Bad request, malformed JSON";
@@ -61,7 +62,7 @@ function updateObject($key, $uuid, $docID, $body)
         $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
-            'db' => 'datahub'
+            'db' => $DBNAME
         ]);
         $db = $client->datahub;
         $collection = $db->$uuid;
@@ -87,7 +88,7 @@ function updateObject($key, $uuid, $docID, $body)
 
 function createObject($key, $uuid, $body)
 {
-    global $DBCONNECTIONSTRING;
+    global $DBCONNECTIONSTRING,$DBNAME;
     if (!json_decode($body)) {
         http_response_code(400);
         print "Bad request, malformed JSON";
@@ -100,7 +101,7 @@ function createObject($key, $uuid, $body)
         $client = new MongoDB\Client($DBCONNECTIONSTRING, [
             'username' => $key,
             'password' => $key,
-            'db' => 'datahub'
+            'db' => $DBNAME
         ]);
         $db = $client->datahub;
         $collection = $db->$uuid;

@@ -24,7 +24,7 @@ function createDataset($put_vars) {
 	$pwd = $_SERVER['PHP_AUTH_PW'];
 
 	//db connection
-	$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+	$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']."/".$config['mongodb']['database']);
 	$db = $client->selectDatabase($config['mongodb']['database']);
 
 	//create collection
@@ -147,7 +147,7 @@ function getDatasets($uuid = "-") {
 
 	try {
 		//db connection
-		$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']);
+		$client = new MongoDB\Client("mongodb://${user}:${pwd}@".$config['mongodb']['host'].":".$config['mongodb']['port']."/".$config['mongodb']['database']);
 		$db = $client->selectDatabase($config['mongodb']['database']);
 		if ($uuid == "-"){
 			//GET ALL DATASETS
