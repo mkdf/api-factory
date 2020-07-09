@@ -173,7 +173,7 @@ function getDatasets($uuid = "-") {
 			}
 
 			if ($exist) {
-				$total_docs = $db->$uuid->countDocuments();
+				$total_docs = $db->$uuid->estimatedDocumentCount();
 				$summary = array();
 				$summary['datasetID'] = $uuid;
 				$summary['totalDocs'] = $total_docs;
