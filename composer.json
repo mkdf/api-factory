@@ -10,19 +10,19 @@
         "framework"
     ],
     "require": {
-        "php": "^7.3",
+        "php": "^7.1",
         "laminas/laminas-component-installer": "^1.0 || ^2.1",
         "laminas/laminas-development-mode": "^3.2",
         "laminas/laminas-mvc": "^3.1.1"
     },
     "autoload": {
         "psr-4": {
-            "Application\\": "module/Application/src/"
+            "APIF\\Core\\": "module/apif-core/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ApplicationTest\\": "module/Application/test/"
+            "ApplicationTest\\": "module/apif-core/test/"
         }
     },
     "scripts": {
