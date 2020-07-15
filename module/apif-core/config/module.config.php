@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace APIF\Core;
 
+use APIF\Core\Controller\Factory\ObjectControllerFactory;
 use APIF\Core\Controller\Factory\QueryControllerFactory;
 use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Segment;
@@ -28,24 +29,22 @@ return [
                     ],
                 ],
             ],
-            /*
-            'application' => [
-                'type'    => Segment::class,
-                'options' => [
-                    'route'    => '/application[/:action]',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
-            */
-            'query-query' => [
+            'query' => [
                 'type'    => Segment::class,
                 'options' => [
                     'route'    => '/query[/:id]',
                     'defaults' => [
                         'controller' => Controller\QueryController::class,
+                        //'action'     => 'query',
+                    ],
+                ],
+            ],
+            'object' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/object[/:id[/:doc-id]]',
+                    'defaults' => [
+                        'controller' => Controller\ObjectController::class,
                         //'action'     => 'query',
                     ],
                 ],
@@ -56,6 +55,7 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\QueryController::class  => QueryControllerFactory::class,
+            Controller\ObjectController::class  => ObjectControllerFactory::class,
         ],
     ],
     'view_manager' => [

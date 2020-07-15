@@ -8,7 +8,7 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 
-class QueryController extends AbstractRestfulController
+class ObjectController extends AbstractRestfulController
 {
     private $_config;
 
