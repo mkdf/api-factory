@@ -44,4 +44,8 @@ class ObjectController extends AbstractRestfulController
 
         return new JsonModel(['data' => $data]);
     }
+
+    public function create($data) {
+        return new JsonModel();
+    }
 }
