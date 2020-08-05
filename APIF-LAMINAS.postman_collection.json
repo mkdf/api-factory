@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "0b6ab962-b00b-40df-8877-3799a47719c0",
+		"name": "APIF-LAMINAS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OBJECT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1?data=p",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT POST",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1?data=p",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT PUT",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1?data=p",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p"
+						}
+					]
+				},
+				"description": "update"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
