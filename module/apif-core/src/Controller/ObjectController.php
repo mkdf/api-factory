@@ -165,7 +165,7 @@ class ObjectController extends AbstractRestfulController
         if ($response == "UPDATED") {
             $this->getResponse()->setStatusCode(204);
         }
-        elseif ($repsonse == "CREATED") {
+        elseif ($response == "CREATED") {
             $this->getResponse()->setStatusCode(201);
         }
         else {
@@ -173,6 +173,26 @@ class ObjectController extends AbstractRestfulController
         }
 
         return new JsonModel($annotated);
+    }
+
+    public function delete($id)  {
+        $key = $this->_getAuth();
+        $docID = $this->params()->fromRoute('doc-id', null);
+        if (!$docID) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing document id';
+            exit();
+        }
+        $response = $this->_repository->deleteDoc($id,$docID,$key);
+        if ($response == "DELETED") {
+            $this->getResponse()->setStatusCode(204);
+        }
+        else {
+            $this->getResponse()->setStatusCode(200);
+            echo 'no items to delete';
+        }
+
+        return new JsonModel();
     }
 
 }

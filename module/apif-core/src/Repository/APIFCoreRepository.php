@@ -72,4 +72,16 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
+    public function deleteDoc($datasetId, $docID, $key) {
+        $this->_connectDB($key);
+        $collection = $this->_db->$datasetId;
+        $deleteResult = $collection->deleteOne(['_id' => $docID]);
+
+        if ($deleteResult->getDeletedCount() > 0) {
+            return ("DELETED");
+        } else {
+            return null;
+        }
+    }
+
 }
