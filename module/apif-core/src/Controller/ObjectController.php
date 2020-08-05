@@ -180,19 +180,30 @@ class ObjectController extends AbstractRestfulController
         $docID = $this->params()->fromRoute('doc-id', null);
         if (!$docID) {
             $this->getResponse()->setStatusCode(400);
-            echo 'Bad request, missing document id';
-            exit();
-        }
-        $response = $this->_repository->deleteDoc($id,$docID,$key);
-        if ($response == "DELETED") {
-            $this->getResponse()->setStatusCode(204);
+            $this->getResponse()->setContent('Bad request, missing document id');
+            //echo 'Bad request, missing document id';
+            $response = [
+                "message" => "Bad request, missing document id",
+            ];
+            //exit();
         }
         else {
-            $this->getResponse()->setStatusCode(200);
-            echo 'no items to delete';
+            $result = $this->_repository->deleteDoc($id,$docID,$key);
+            if ($result == "DELETED") {
+                $this->getResponse()->setStatusCode(204);
+                $response = [
+                    "message" => "Object deleted",
+                ];
+            }
+            else {
+                $this->getResponse()->setStatusCode(200);
+                $response = [
+                    "message" => "No items to delete",
+                ];
+                //echo 'no items to delete';
+            }
         }
-
-        return new JsonModel();
+        return new JsonModel($response);
     }
 
 }
