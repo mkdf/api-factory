@@ -107,7 +107,7 @@ class ObjectController extends AbstractRestfulController
         $key = $this->_getAuth();
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (!$datasetUUID) {
-            http_response_code(400);
+            $this->getResponse()->setStatusCode(400);
             echo 'Bad request, missing dataset id';
             exit();
         }
@@ -115,15 +115,55 @@ class ObjectController extends AbstractRestfulController
         //$object = json_decode($data);
         $object = $data;
         if ($object == null) {
-            http_response_code(400);
+            $this->getResponse()->setStatusCode(400);
             echo 'Bad request, malformed JSON';
             exit();
         }
         $annotated = $this->_annotateObject($object, $datasetUUID);
         $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key);
+        $this->getResponse()->setStatusCode(201);
 
         return new JsonModel($annotated);
     }
 
+    //Handling a PUT request
+    public function update($id, $data) {
+        $key = $this->_getAuth();
+        $docID = $this->params()->fromRoute('doc-id', null);
+        if (!$docID) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing document id';
+            exit();
+        }
+        $datasetUUID = $id;
+        if (!$datasetUUID) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing dataset id';
+            exit();
+        }
+        $object = $data;
+        if ($object == null) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, malformed JSON';
+            exit();
+        }
+        //Any _id supplied in the JSON is ignored/overwritten with the one passed in the URL path
+        $object['_id'] = $docID;
+        $annotated = $this->_annotateObject($object, $datasetUUID);
+        $annotated['_updated'] = true;
+
+        $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key);
+        if ($response == "UPDATED") {
+            $this->getResponse()->setStatusCode(204);
+        }
+        elseif ($repsonse == "CREATED") {
+            $this->getResponse()->setStatusCode(201);
+        }
+        else {
+            //something went wrong
+        }
+
+        return new JsonModel($annotated);
+    }
 
 }

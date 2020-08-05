@@ -61,4 +61,15 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return $object;
     }
 
+    public function updateDoc($datasetId, $docID, $object, $key) {
+        $this->_connectDB($key);
+        $collection = $this->_db->$datasetId;
+        $replaceOneResult = $collection->replaceOne(['_id' => $docID], $object, ['upsert' => true]);
+        if ($replaceOneResult->getModifiedCount() > 0) {
+            return ("UPDATED");
+        } else {
+            return ("CREATED");
+        }
+    }
+
 }
