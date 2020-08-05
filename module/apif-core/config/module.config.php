@@ -32,7 +32,7 @@ return [
             'query' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/query[/:id]',
+                    'route'    => '/query/:id',
                     'defaults' => [
                         'controller' => Controller\QueryController::class,
                         //'action'     => 'query',
@@ -42,7 +42,7 @@ return [
             'object' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/object[/:id[/:doc-id]]',
+                    'route'    => '/object/:id[/:doc-id]',
                     'defaults' => [
                         'controller' => Controller\ObjectController::class,
                         //'action'     => 'query',
@@ -57,6 +57,14 @@ return [
             Controller\QueryController::class  => QueryControllerFactory::class,
             Controller\ObjectController::class  => ObjectControllerFactory::class,
         ],
+    ],
+    'service_manager' => [
+        'aliases' => [
+            Repository\APIFCoreRepositoryInterface::class => Repository\APIFCoreRepository::class
+        ],
+        'factories' => [
+            Repository\APIFCoreRepository::class => Repository\Factory\APIFCoreRepositoryFactory::class
+        ]
     ],
     'view_manager' => [
         'display_not_found_reason' => true,
