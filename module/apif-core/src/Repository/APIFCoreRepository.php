@@ -45,15 +45,6 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function testDB () {
-        $this->_connectDB('test');
-        $collection = $this->_db->collection1;
-        $result = $collection->find([], $this->_queryOptions);
-        $resultArray = $result->toArray();
-        print_r($resultArray);
-        return true;
-    }
-
     public function findDocs($datasetId, $key, $query) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
@@ -61,6 +52,13 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         $result = $collection->find($query, $this->_queryOptions);
         $data = $result->toArray();
         return $data;
+    }
+
+    public function insertDoc($datasetId, $object, $key) {
+        $this->_connectDB($key);
+        $collection = $this->_db->$datasetId;
+        $insertOneResult = $collection->insertOne($object);
+        return $object;
     }
 
 }
