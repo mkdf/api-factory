@@ -35,39 +35,6 @@ class ObjectController extends AbstractRestfulController
         }
     }
 
-    public function get($id) {
-        //$id is the dataset-id (mongodb collection)
-        //TODO - Check for existence of a doc-id...
-        //TODO - get query from request
-        $key = $this->_getAuth();
-
-        //Get URL params
-        $queryParam = $this->params()->fromQuery('query', "");
-        $limitParam = $this->params()->fromQuery('limit', "");
-        $sortParam = $this->params()->fromQuery('sort', "");
-
-        //Assign params to query options
-        if ($queryParam == ""){
-            $query = [];
-        }
-        else{
-            $query = json_decode($queryParam);
-            if ($query == null) {
-                http_response_code(400);
-                echo 'Bad request, malformed JSON query';
-                exit();
-            }
-        }
-
-        $data = $this->_repository->findDocs($id,$key,$query);
-        return new JsonModel(['data' => $data]);
-    }
-
-    public function getList() {
-        //not used
-        return new JsonModel([]);
-    }
-
     private function _annotateObject($input, $uuid){
         /*
          * add extra metadata and return new annotated object
@@ -102,7 +69,47 @@ class ObjectController extends AbstractRestfulController
         return $object;
     }
 
-    //Handling POST requests
+    /*
+     * GET - Handling a GET request
+     * brings back all docs from a dataset (subject to limit), or a query
+     * if query param is provided
+     */
+    public function get($id) {
+        //$id is the dataset-id (mongodb collection)
+        //TODO - Check for existence of a doc-id...
+        //TODO - get query from request
+        $key = $this->_getAuth();
+
+        //Get URL params
+        $queryParam = $this->params()->fromQuery('query', "");
+        $limitParam = $this->params()->fromQuery('limit', "");
+        $sortParam = $this->params()->fromQuery('sort', "");
+
+        //Assign params to query options
+        if ($queryParam == ""){
+            $query = [];
+        }
+        else{
+            $query = json_decode($queryParam);
+            if ($query == null) {
+                http_response_code(400);
+                echo 'Bad request, malformed JSON query';
+                exit();
+            }
+        }
+
+        $data = $this->_repository->findDocs($id,$key,$query);
+        return new JsonModel(['data' => $data]);
+    }
+
+    public function getList() {
+        //not used
+        return new JsonModel([]);
+    }
+
+    /*
+     * CREATE - Handling a POST request
+     */
     public function create($data) {
         $key = $this->_getAuth();
         $datasetUUID = $this->params()->fromRoute('id', null);
@@ -126,7 +133,9 @@ class ObjectController extends AbstractRestfulController
         return new JsonModel($annotated);
     }
 
-    //Handling a PUT request
+    /*
+     * UPDATE - Handling a PUT request
+     */
     public function update($id, $data) {
         $key = $this->_getAuth();
         $docID = $this->params()->fromRoute('doc-id', null);
