@@ -19,7 +19,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         $this->_config = $config;
     }
 
-    private function _connectDB($accessKey) {
+    private function _connectDB($user, $pwd = 'none') {
         $DBCONNECTIONSTRING = 'mongodb://'.$this->_config['mongodb']['host'].':'.$this->_config['mongodb']['port'].'/'.$this->_config['mongodb']['database'];
         $DBNAME = $this->_config['mongodb']['database'];
         $this->_queryLimit = $this->_config['mongodb']['queryLimit'];
@@ -30,11 +30,15 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             ],
         ];
 
+        if ($pwd == 'none') {
+            $pwd = $user;
+        }
+
         try {
             //db connection
             $this->_client = new Client($DBCONNECTIONSTRING, [
-                'username' => $accessKey,
-                'password' => $accessKey,
+                'username' => $user,
+                'password' => $pwd,
                 'db' => $DBNAME
             ]);
             $this->_db = $this->_client->$DBNAME;
@@ -82,6 +86,42 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         } else {
             return null;
         }
+    }
+
+    public function getDatasetList($auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $collectionArray = array();
+        foreach ($this->_db->listCollections() as $collectionInfo) {
+            array_push($collectionArray, $collectionInfo["name"]);
+        }
+        return $collectionArray;
+    }
+
+    public function getDataset($id,$auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $id,
+            ],
+        ]);
+        $exist = 0;
+        foreach ($data as $collectionInfo) {
+            $exist = 1;
+        }
+        $summary = [];
+        if ($exist) {
+            $total_docs = $this->_db->$id->estimatedDocumentCount();
+            $summary = array();
+            $summary['datasetID'] = $id;
+            $summary['totalDocs'] = $total_docs;
+        }
+        return $summary;
+    }
+
+    public function createDataset() {
+        $this->_connectDB($key);
+        $data = [];
+        return $data;
     }
 
 }

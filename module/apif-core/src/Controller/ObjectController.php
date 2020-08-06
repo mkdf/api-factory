@@ -31,7 +31,11 @@ class ObjectController extends AbstractRestfulController
             echo 'Dataset key must be provided as HTTP Basic Auth username';
             exit;
         } else {
-            return $_SERVER['PHP_AUTH_USER'];
+            $auth = [
+                'user'  => $_SERVER['PHP_AUTH_USER'],
+                'pwd'   => $_SERVER['PHP_AUTH_PW']
+            ];
+            return $auth;
         }
     }
 
@@ -78,7 +82,7 @@ class ObjectController extends AbstractRestfulController
         //$id is the dataset-id (mongodb collection)
         //TODO - Check for existence of a doc-id...
         //TODO - get query from request
-        $key = $this->_getAuth();
+        $key = $this->_getAuth()['user'];
 
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
@@ -111,7 +115,7 @@ class ObjectController extends AbstractRestfulController
      * CREATE - Handling a POST request
      */
     public function create($data) {
-        $key = $this->_getAuth();
+        $key = $this->_getAuth()['user'];
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (!$datasetUUID) {
             $this->getResponse()->setStatusCode(400);
@@ -137,7 +141,7 @@ class ObjectController extends AbstractRestfulController
      * UPDATE - Handling a PUT request
      */
     public function update($id, $data) {
-        $key = $this->_getAuth();
+        $key = $this->_getAuth()['user'];
         $docID = $this->params()->fromRoute('doc-id', null);
         if (!$docID) {
             $this->getResponse()->setStatusCode(400);
@@ -176,7 +180,7 @@ class ObjectController extends AbstractRestfulController
     }
 
     public function delete($id)  {
-        $key = $this->_getAuth();
+        $key = $this->_getAuth()['user'];
         $docID = $this->params()->fromRoute('doc-id', null);
         if (!$docID) {
             $this->getResponse()->setStatusCode(400);
