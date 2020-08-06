@@ -103,7 +103,7 @@ class ObjectController extends AbstractRestfulController
         }
 
         $data = $this->_repository->findDocs($id,$key,$query);
-        return new JsonModel(['data' => $data]);
+        return new JsonModel($data);
     }
 
     public function getList() {

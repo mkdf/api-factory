@@ -118,10 +118,115 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return $summary;
     }
 
-    public function createDataset() {
-        $this->_connectDB($key);
-        $data = [];
-        return $data;
+    public function createDataset($datasetID, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+
+        //Create dataset
+        try {
+            $result = $this->_db->createCollection($datasetID, []);
+        }
+        catch (Exception $ex) {
+            //Most likely error here is that the collection already exists
+            http_response_code(400);
+            echo 'Fatal error creating MongoDB collection: ' .$ex->getMessage();
+            exit();
+        }
+
+        //Create index(es)
+
+        //Create read role for dataset...
+
+        //check if read role exists exists:
+        $cursor = $this->_db->command([
+            'rolesInfo' => [
+                'role' => $datasetID . "-R",
+                'db' => $this->_config['mongodb']['database']
+            ]
+        ]);
+        $cursorItem = $cursor->toArray()[0];
+        if (sizeof($cursorItem['roles']) > 0) {
+            //role already exists. No need to create it
+        }
+        else {
+            //role doesn't exist, create it
+            $result = $this->_db->command([
+                'createRole' => $datasetID . "-R",
+                'privileges' => [
+                    [
+                        'resource' => [
+                            'db' => $this->_config['mongodb']['database'],
+                            'collection' => $datasetID
+                        ],
+                        'actions' => [ "find" ]
+                    ]
+                ],
+                'roles' => []
+            ]);
+        }
+
+        //Create write role for dataset...
+
+        //check if read role exists exists:
+        $cursor = $this->_db->command([
+            'rolesInfo' => [
+                'role' => $datasetID . "-W",
+                'db' => $this->_config['mongodb']['database']
+            ]
+        ]);
+        $cursorItem = $cursor->toArray()[0];
+        if (sizeof($cursorItem['roles']) > 0) {
+            //role already exists. No need to create it
+        }
+        else {
+            //role doesn't exist, create it
+            $result = $this->_db->command([
+                'createRole' => $datasetID . "-W",
+                'privileges' => [
+                    [
+                        'resource' => [
+                            'db' => $this->_config['mongodb']['database'],
+                            'collection' => $datasetID
+                        ],
+                        'actions' => [ "update", "insert", "remove" ]
+                    ]
+                ],
+                'roles' => []
+            ]);
+        }
+        return true;
+    }
+
+    public function createKey ($key, $datasetID, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+
+        //check if user exists:
+        $cursor = $this->_db->command([
+            'usersInfo' => [
+                'user' => $key,
+                'db' => $this->_config['mongodb']['database']
+            ]
+        ]);
+
+        $cursorItem = $cursor->toArray()[0];
+        if (sizeof($cursorItem['users']) > 0) {
+            //user(key) already exists. No need to create it, just assign it some new additional roles
+            $result = $this->_db->command([
+                'grantRolesToUser' => $key,
+                'roles' => [$datasetID . "-W", $datasetID . "-R"]
+                //'db' => $this->_config['mongodb']['database']
+            ]);
+
+        }
+        else {
+            //user doesn't exist, create it
+            $result = $this->_db->command([
+                'createUser' => $key,
+                'pwd' => $key,
+                'roles' => [$datasetID . "-W", $datasetID . "-R"]
+            ]);
+        }
+
+        return true;
     }
 
 }

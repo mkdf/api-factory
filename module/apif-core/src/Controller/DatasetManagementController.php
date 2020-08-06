@@ -52,7 +52,24 @@ class DatasetManagementController extends AbstractRestfulController
     }
 
     public function create($data) {
+        $auth = $this->_getAuth();
+        //Get URL params
+        $uuidParam = $this->params()->fromQuery('uuid', null);
+        $keyParam = $this->params()->fromQuery('key', null);
+        //Check the datasetUUID and access key have been provided...
+        if (!$uuidParam || !$keyParam) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing dataset id or access key';
+            exit();
+        }
 
+        //Create dataset (and read/write roles for this dataset)
+        $this->_repository->createDataset($uuidParam, $auth);
+
+        //Create key (DB user) and assign to dataset read/write roles
+        $this->_repository->createKey($keyParam, $uuidParam, $auth);
+
+        return new JsonModel([]);
     }
 
     public function update($id, $data) {
