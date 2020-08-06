@@ -51,6 +51,7 @@ class DatasetManagementController extends AbstractRestfulController
         return new JsonModel($datasetInfo);
     }
 
+    //POST
     public function create($data) {
         $auth = $this->_getAuth();
         //Get URL params
@@ -72,8 +73,28 @@ class DatasetManagementController extends AbstractRestfulController
         return new JsonModel([]);
     }
 
+    //PUT
     public function update($id, $data) {
+        //Build a replication of POST/create() here, only with PUT the dataset ID is passed
+        //in the URL, so only the key needs to be passed as a param
+        $auth = $this->_getAuth();
+        //Get URL params
+        $uuidParam = $id; //this comes from the URL in a PUT
+        $keyParam = $this->params()->fromQuery('key', null);
+        //Check the datasetUUID and access key have been provided...
+        if (!$uuidParam || !$keyParam) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing dataset id or access key';
+            exit();
+        }
 
+        //Create dataset (and read/write roles for this dataset)
+        $this->_repository->createDataset($uuidParam, $auth);
+
+        //Create key (DB user) and assign to dataset read/write roles
+        $this->_repository->createKey($keyParam, $uuidParam, $auth);
+
+        return new JsonModel([]);
     }
 
     public function delete($id) {

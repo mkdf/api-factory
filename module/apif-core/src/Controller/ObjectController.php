@@ -1,6 +1,5 @@
 <?php
 
-
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
