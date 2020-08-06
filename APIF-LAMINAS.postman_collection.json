@@ -6,56 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "OBJECT GET",
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "key1",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "key1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://apif-beta.local/object/uuid1?data=p",
-					"protocol": "http",
-					"host": [
-						"apif-beta",
-						"local"
-					],
-					"path": [
-						"object",
-						"uuid1"
-					],
-					"query": [
-						{
-							"key": "data",
-							"value": "p"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "OBJECT POST",
 			"request": {
 				"auth": {
@@ -127,7 +77,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173\n}",
+					"raw": "{\n  \"_id\": \"12345\",\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173999\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -135,7 +85,103 @@
 					}
 				},
 				"url": {
-					"raw": "http://apif-beta.local/object/uuid1?data=p",
+					"raw": "http://apif-beta.local/object/uuid1/717qqqqqz",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1",
+						"717qqqqqz"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p",
+							"disabled": true
+						}
+					]
+				},
+				"description": "update"
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT DELETE",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"_id\": \"12345\",\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173999\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1/jason",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1",
+						"jason"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1",
 					"protocol": "http",
 					"host": [
 						"apif-beta",
@@ -147,12 +193,12 @@
 					],
 					"query": [
 						{
-							"key": "data",
-							"value": "p"
+							"key": "query",
+							"value": "{\"_id\":\"1071\"}",
+							"disabled": true
 						}
 					]
-				},
-				"description": "update"
+				}
 			},
 			"response": []
 		}

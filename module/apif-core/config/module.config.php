@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace APIF\Core;
 
+use APIF\Core\Controller\Factory\DatasetManagementControllerFactory;
 use APIF\Core\Controller\Factory\ObjectControllerFactory;
+use APIF\Core\Controller\Factory\PermissionsManagementControllerFactory;
 use APIF\Core\Controller\Factory\QueryControllerFactory;
 use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Segment;
@@ -49,6 +51,26 @@ return [
                     ],
                 ],
             ],
+            'datasetmanagement' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/management/datasets[/:id]',
+                    'defaults' => [
+                        'controller' => Controller\DatasetManagementController::class,
+                        //'action'     => 'query',
+                    ],
+                ],
+            ],
+            'permissionsmanagement' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/management/permissions[/:id]',
+                    'defaults' => [
+                        'controller' => Controller\PermissionsManagementController::class,
+                        //'action'     => 'query',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
@@ -56,6 +78,8 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\QueryController::class  => QueryControllerFactory::class,
             Controller\ObjectController::class  => ObjectControllerFactory::class,
+            Controller\DatasetManagementController::class => DatasetManagementControllerFactory::class,
+            Controller\PermissionsManagementController::class => PermissionsManagementControllerFactory::class,
         ],
     ],
     'service_manager' => [

@@ -1,13 +1,14 @@
 <?php
 
+
 namespace APIF\Core\Controller\Factory;
 
-use APIF\Core\Controller\ObjectController;
+use APIF\Core\Controller\DatasetManagementController;
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class ObjectControllerFactory implements FactoryInterface
+class DatasetManagementControllerFactory implements FactoryInterface
 {
 
     /**
@@ -17,6 +18,6 @@ class ObjectControllerFactory implements FactoryInterface
     {
         $config = $container->get("Config");
         $repository = $container->get(APIFCoreRepositoryInterface::class);
-        return new ObjectController($repository, $config);
+        return new DatasetManagementController($repository, $config);
     }
 }
