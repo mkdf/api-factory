@@ -82,9 +82,9 @@ class DatasetManagementController extends AbstractRestfulController
         $uuidParam = $id; //this comes from the URL in a PUT
         $keyParam = $this->params()->fromQuery('key', null);
         //Check the datasetUUID and access key have been provided...
-        if (!$uuidParam || !$keyParam) {
+        if (!$keyParam) {
             $this->getResponse()->setStatusCode(400);
-            echo 'Bad request, missing dataset id or access key';
+            echo 'Bad request, access key';
             exit();
         }
 
