@@ -47,7 +47,7 @@ function createDataset($put_vars) {
 	$cursor = $db->command([
 		'rolesInfo' => [
 			'role' => $datasetUUID . "-R",
-			'db' => 'datahub'
+			'db' => $config['mongodb']['database']
 		]
 	]);
 	$cursorItem = $cursor->toArray()[0];
@@ -61,7 +61,7 @@ function createDataset($put_vars) {
 			'privileges' => [
 				[
 					'resource' => [
-						'db' => "datahub",
+						'db' => $config['mongodb']['database'],
 						'collection' => $datasetUUID
 					],
 					'actions' => [ "find" ]
@@ -78,7 +78,7 @@ function createDataset($put_vars) {
 	$cursor = $db->command([
 		'rolesInfo' => [
 			'role' => $datasetUUID . "-W",
-			'db' => 'datahub'
+			'db' => $config['mongodb']['database']
 		]
 	]);
 	$cursorItem = $cursor->toArray()[0];
@@ -92,7 +92,7 @@ function createDataset($put_vars) {
 			'privileges' => [
 				[
 					'resource' => [
-						'db' => "datahub",
+						'db' => $config['mongodb']['database'],
 						'collection' => $datasetUUID
 					],
 					'actions' => [ "update", "insert", "remove" ]
