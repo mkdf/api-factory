@@ -110,7 +110,7 @@ function createDataset($put_vars) {
 	$cursor = $db->command([
 		'usersInfo' => [
 			'user' => $key,
-			'db' => 'datahub'
+			'db' => $config['mongodb']['database']
 		]
 	]);
 
