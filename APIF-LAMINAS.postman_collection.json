@@ -201,6 +201,90 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "DATASET MANAGEMENT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://apif-beta.local/management/datasets",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"management",
+						"datasets"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{\"_id\":\"1071\"}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PERMISSIONS MANAGEMENT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://apif-beta.local/management/permissions",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"management",
+						"permissions"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{\"_id\":\"1071\"}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"protocolProfileBehavior": {}
