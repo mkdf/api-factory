@@ -116,7 +116,7 @@ class ObjectController extends AbstractRestfulController
     public function create($data) {
         $key = $this->_getAuth()['user'];
         $datasetUUID = $this->params()->fromRoute('id', null);
-        if (!$datasetUUID) {
+        if (is_null($datasetUUID)) {
             $this->getResponse()->setStatusCode(400);
             echo 'Bad request, missing dataset id';
             exit();
@@ -181,7 +181,7 @@ class ObjectController extends AbstractRestfulController
     public function delete($id)  {
         $key = $this->_getAuth()['user'];
         $docID = $this->params()->fromRoute('doc-id', null);
-        if (!$docID) {
+        if (is_null($docID)) {
             $this->getResponse()->setStatusCode(400);
             $this->getResponse()->setContent('Bad request, missing document id');
             //echo 'Bad request, missing document id';
