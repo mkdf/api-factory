@@ -229,4 +229,32 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return true;
     }
 
+    public function getKey ($key, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+
+        $userArray = array();
+        $result = $this->_db->command([
+            "usersInfo" => $key
+        ]);
+        foreach ($result as $userInfo) {
+            array_push($userArray,$userInfo);
+        }
+
+        return $userArray;
+    }
+
+    public function getAllKeys ($auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+
+        $userArray = array();
+        $result = $this->_db->command([
+            "usersInfo" => 1
+        ]);
+        foreach ($result as $userInfo) {
+            array_push($userArray,$userInfo);
+        }
+
+        return $userArray;
+    }
+
 }

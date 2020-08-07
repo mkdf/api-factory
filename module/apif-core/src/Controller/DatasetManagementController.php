@@ -98,6 +98,7 @@ class DatasetManagementController extends AbstractRestfulController
     }
 
     public function delete($id) {
-
+        //currently not implemented
+        return new JsonModel([]);
     }
 }
