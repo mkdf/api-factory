@@ -54,11 +54,30 @@ class PermissionsManagementController extends AbstractRestfulController
     }
 
     public function create($data) {
-
+        //get the key from the URL and pass to the update() function
+        $key = $this->params()->fromRoute('id', null);
+        if (!$key) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing key in URL';
+            exit();
+        }
+        return $this->update($key);
     }
 
-    public function update($id, $data) {
+    public function update($id) {
+        //set permissions here
+        $auth = $this->_getAuth();
+        $datasetParam = $this->params()->fromQuery('dataset-uuid', null);
+        $readParam = $this->params()->fromQuery('read', null);
+        $writeParam = $this->params()->fromQuery('write', null);
+        if (is_null($datasetParam) || is_null($readParam) || is_null($writeParam)) {
+            $this->getResponse()->setStatusCode(400);
+            echo 'Bad request, missing dataset id or read/write parameters';
+            exit();
+        }
 
+        $this->_repository->setKeyPermissions($id, $datasetParam, $readParam, $writeParam, $auth);
+        return new JsonModel([]);
     }
 
     public function delete($id) {

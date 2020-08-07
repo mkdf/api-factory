@@ -92,7 +92,7 @@ class DatasetManagementController extends AbstractRestfulController
         $this->_repository->createDataset($uuidParam, $auth);
 
         //Create key (DB user) and assign to dataset read/write roles
-        $this->_repository->createKey($keyParam, $uuidParam, $auth);
+        $this->_repository->setKeyPermissions($keyParam, $uuidParam, true, true, $auth);
 
         return new JsonModel([]);
     }

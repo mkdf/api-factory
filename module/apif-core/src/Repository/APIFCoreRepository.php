@@ -196,7 +196,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return true;
     }
 
-    public function createKey ($key, $datasetID, $auth) {
+    public function setKeyPermissions($key, $datasetID, $readAccess, $writeAccess, $auth) {
         $this->_connectDB($auth['user'],$auth['pwd']);
 
         //check if user exists:
@@ -207,22 +207,50 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             ]
         ]);
 
+        //if user(key) not exist, create it
         $cursorItem = $cursor->toArray()[0];
-        if (sizeof($cursorItem['users']) > 0) {
-            //user(key) already exists. No need to create it, just assign it some new additional roles
-            $result = $this->_db->command([
-                'grantRolesToUser' => $key,
-                'roles' => [$datasetID . "-W", $datasetID . "-R"]
-                //'db' => $this->_config['mongodb']['database']
-            ]);
-
-        }
-        else {
+        if (sizeof($cursorItem['users']) == 0) {
             //user doesn't exist, create it
             $result = $this->_db->command([
                 'createUser' => $key,
                 'pwd' => $key,
-                'roles' => [$datasetID . "-W", $datasetID . "-R"]
+                'roles' => []
+            ]);
+        }
+
+        //Assign roles
+        $readRole = $datasetID . "-R";
+        $writeRole = $datasetID . "-W";
+
+        //if read access:
+        if ($readAccess) {
+            $result = $this->_db->command([
+                'grantRolesToUser' => $key,
+                'roles' => [$readRole]
+            ]);
+        }
+        else {
+            //remove read permissions
+            $result = $this->_db->command([
+                'revokeRolesFromUser' => $key,
+                'roles' => [$readRole]
+            ]);
+        }
+
+        //if write access:
+        if ($writeAccess) {
+            $result = $this->_db->command([
+                'grantRolesToUser' => $key,
+                'roles' => [$writeRole]
+                //'db' => 'datahub'
+            ]);
+        }
+        else {
+            //remove write permissions
+            $result = $this->_db->command([
+                'revokeRolesFromUser' => $key,
+                'roles' => [$writeRole]
+                //'db' => 'datahub'
             ]);
         }
 
