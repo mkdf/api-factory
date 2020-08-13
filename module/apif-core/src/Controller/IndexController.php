@@ -17,6 +17,25 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        return new ViewModel();
+        $result = new ViewModel();
+        $result->setTerminal(true);
+
+        return $result;
+    }
+
+    public function swaggerConfigMainAction()
+    {
+        $result = new ViewModel();
+        $result->setTerminal(true);
+
+        return $result;
+    }
+
+    public function swaggerConfigManagementAction()
+    {
+        $result = new ViewModel();
+        $result->setTerminal(true);
+
+        return $result;
     }
 }

@@ -31,6 +31,26 @@ return [
                     ],
                 ],
             ],
+            'swaggerMain' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/swagger-config-main.json',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'swaggerConfigMain',
+                    ],
+                ],
+            ],
+            'swaggerManagement' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/swagger-config-management.json',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'swaggerConfigMain',
+                    ],
+                ],
+            ],
             'query' => [
                 'type'    => Segment::class,
                 'options' => [
