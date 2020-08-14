@@ -31,6 +31,16 @@ return [
                     ],
                 ],
             ],
+            'management' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/management',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'management',
+                    ],
+                ],
+            ],
             'swaggerMain' => [
                 'type'    => Literal::class,
                 'options' => [
@@ -47,7 +57,7 @@ return [
                     'route'    => '/swagger-config-management.json',
                     'defaults' => [
                         'controller' => Controller\IndexController::class,
-                        'action'     => 'swaggerConfigMain',
+                        'action'     => 'swaggerConfigManagement',
                     ],
                 ],
             ],
