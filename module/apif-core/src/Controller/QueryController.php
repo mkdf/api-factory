@@ -44,10 +44,15 @@ class QueryController extends AbstractRestfulController
      * if query body is provided
      *
      * The action is misleadingly called "create" since this is the LAMINAS REST controller action
-     * associated with POST requests.
+     * associats with POST requests.
      */
     public function create($data) {
         $key = $this->_getAuth()['user'];
+
+        //Get URL params
+        $queryParam = $this->params()->fromQuery('query', "");
+        $limitParam = $this->params()->fromQuery('limit', null);
+        $sortParam = $this->params()->fromQuery('sort', "");
 
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (is_null($datasetUUID)) {
@@ -66,7 +71,7 @@ class QueryController extends AbstractRestfulController
         //just gives us a null object
         //TODO - we should differentiate between an empty query that returns all docs and a malformed query
 
-        $response = $this->_repository->findDocs($datasetUUID,$key,$query);
+        $response = $this->_repository->findDocs($datasetUUID,$key,$query,(int)$limitParam);
         return new JsonModel($response);
     }
 
