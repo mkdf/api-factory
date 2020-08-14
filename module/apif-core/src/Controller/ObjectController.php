@@ -79,13 +79,12 @@ class ObjectController extends AbstractRestfulController
      */
     public function get($id) {
         //$id is the dataset-id (mongodb collection)
-        //TODO - Check for existence of a doc-id...
         //TODO - get query from request
         $key = $this->_getAuth()['user'];
 
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
-        $limitParam = $this->params()->fromQuery('limit', "");
+        $limitParam = $this->params()->fromQuery('limit', null);
         $sortParam = $this->params()->fromQuery('sort', "");
 
         //Assign params to query options
@@ -101,14 +100,16 @@ class ObjectController extends AbstractRestfulController
             }
         }
 
-        $data = $this->_repository->findDocs($id,$key,$query);
+        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam);
         return new JsonModel($data);
     }
 
+    /*
     public function getList() {
         //not used
         return new JsonModel([]);
     }
+    */
 
     /*
      * CREATE - Handling a POST request
