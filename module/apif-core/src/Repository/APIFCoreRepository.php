@@ -5,7 +5,6 @@ namespace APIF\Core\Repository;
 
 use  MongoDB\Client;
 
-
 class APIFCoreRepository implements APIFCoreRepositoryInterface
 {
     private $_config;
