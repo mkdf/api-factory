@@ -42,7 +42,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
                 'db' => $DBNAME
             ]);
             $this->_db = $this->_client->$DBNAME;
-        } catch (Exception $ex) {
+        } catch (\Throwable $ex) {
             http_response_code(500);
             echo 'Fatal error connecting to MongoDB: ' . $ex->getMessage();
             exit();
@@ -56,22 +56,43 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         if (!is_null($limit)){
             $this->_queryOptions['limit'] = $limit;
         }
-        $result = $collection->find($query, $this->_queryOptions);
-        $data = $result->toArray();
-        return $data;
+        try {
+            $result = $collection->find($query, $this->_queryOptions);
+            $data = $result->toArray();
+            return $data;
+        }
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error retrieving documents: ' . $ex->getMessage();
+            exit();
+        }
     }
 
     public function insertDoc($datasetId, $object, $key) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
-        $insertOneResult = $collection->insertOne($object);
+        try {
+            $insertOneResult = $collection->insertOne($object);
+        }
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error inserting document: ' . $ex->getMessage();
+            exit();
+        }
         return $object;
     }
 
     public function updateDoc($datasetId, $docID, $object, $key) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
-        $replaceOneResult = $collection->replaceOne(['_id' => $docID], $object, ['upsert' => true]);
+        try {
+            $replaceOneResult = $collection->replaceOne(['_id' => $docID], $object, ['upsert' => true]);
+        }
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error updating document: ' . $ex->getMessage();
+            exit();
+        }
         if ($replaceOneResult->getModifiedCount() > 0) {
             return ("UPDATED");
         } else {
@@ -82,8 +103,14 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
     public function deleteDoc($datasetId, $docID, $key) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
-        $deleteResult = $collection->deleteOne(['_id' => $docID]);
-
+        try {
+            $deleteResult = $collection->deleteOne(['_id' => $docID]);
+        }
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error deleting document: ' . $ex->getMessage();
+            exit();
+        }
         if ($deleteResult->getDeletedCount() > 0) {
             return ("DELETED");
         } else {
@@ -94,29 +121,44 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
     public function getDatasetList($auth) {
         $this->_connectDB($auth['user'],$auth['pwd']);
         $collectionArray = array();
-        foreach ($this->_db->listCollections() as $collectionInfo) {
-            array_push($collectionArray, $collectionInfo["name"]);
+        try {
+            foreach ($this->_db->listCollections() as $collectionInfo) {
+                array_push($collectionArray, $collectionInfo["name"]);
+            }
         }
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error retrieving dataset list: ' . $ex->getMessage();
+            exit();
+        }
+
         return $collectionArray;
     }
 
     public function getDataset($id,$auth) {
         $this->_connectDB($auth['user'],$auth['pwd']);
-        $data = $this->_db->listCollections([
-            'filter' => [
-                'name' => $id,
-            ],
-        ]);
-        $exist = 0;
-        foreach ($data as $collectionInfo) {
-            $exist = 1;
+        try {
+            $data = $this->_db->listCollections([
+                'filter' => [
+                    'name' => $id,
+                ],
+            ]);
+            $exist = 0;
+            foreach ($data as $collectionInfo) {
+                $exist = 1;
+            }
+            $summary = [];
+            if ($exist) {
+                $total_docs = $this->_db->$id->estimatedDocumentCount();
+                $summary = array();
+                $summary['datasetID'] = $id;
+                $summary['totalDocs'] = $total_docs;
+            }
         }
-        $summary = [];
-        if ($exist) {
-            $total_docs = $this->_db->$id->estimatedDocumentCount();
-            $summary = array();
-            $summary['datasetID'] = $id;
-            $summary['totalDocs'] = $total_docs;
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error retrieving dataset info: ' . $ex->getMessage();
+            exit();
         }
         return $summary;
     }
@@ -128,7 +170,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         try {
             $result = $this->_db->createCollection($datasetID, []);
         }
-        catch (Exception $ex) {
+        catch (\Throwable $ex) {
             //Most likely error here is that the collection already exists
             http_response_code(400);
             echo 'Fatal error creating MongoDB collection: ' .$ex->getMessage();
@@ -264,11 +306,19 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         $this->_connectDB($auth['user'],$auth['pwd']);
 
         $userArray = array();
-        $result = $this->_db->command([
-            "usersInfo" => $key
-        ]);
-        foreach ($result as $userInfo) {
-            array_push($userArray,$userInfo);
+        try {
+            $result = $this->_db->command([
+                "usersInfo" => $key
+            ]);
+            foreach ($result as $userInfo) {
+                array_push($userArray,$userInfo);
+            }
+        }
+        catch (\Throwable $ex) {
+            //Most likely error here is that the collection already exists
+            http_response_code(400);
+            echo 'Fatal error retrieving key info: ' .$ex->getMessage();
+            exit();
         }
 
         return $userArray;
@@ -278,12 +328,21 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         $this->_connectDB($auth['user'],$auth['pwd']);
 
         $userArray = array();
-        $result = $this->_db->command([
-            "usersInfo" => 1
-        ]);
-        foreach ($result as $userInfo) {
-            array_push($userArray,$userInfo);
+        try {
+            $result = $this->_db->command([
+                "usersInfo" => 1
+            ]);
+            foreach ($result as $userInfo) {
+                array_push($userArray,$userInfo);
+            }
         }
+        catch (\Throwable $ex) {
+            //Most likely error here is that the collection already exists
+            http_response_code(400);
+            echo 'Fatal error retrieving keys: ' .$ex->getMessage();
+            exit();
+        }
+
 
         return $userArray;
     }

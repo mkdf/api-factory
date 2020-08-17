@@ -44,7 +44,7 @@ class QueryController extends AbstractRestfulController
      * if query body is provided
      *
      * The action is misleadingly called "create" since this is the LAMINAS REST controller action
-     * associats with POST requests.
+     * associated with POST requests.
      */
     public function create($data) {
         $key = $this->_getAuth()['user'];
@@ -57,6 +57,7 @@ class QueryController extends AbstractRestfulController
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (is_null($datasetUUID)) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             echo 'Bad request, missing dataset id';
             exit();
         }

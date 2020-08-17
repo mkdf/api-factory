@@ -119,6 +119,7 @@ class ObjectController extends AbstractRestfulController
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (is_null($datasetUUID)) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             echo 'Bad request, missing dataset id';
             exit();
         }
@@ -127,12 +128,14 @@ class ObjectController extends AbstractRestfulController
         $object = $data;
         if ($object == null) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             echo 'Bad request, malformed JSON';
             exit();
         }
         $annotated = $this->_annotateObject($object, $datasetUUID);
         $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key);
         $this->getResponse()->setStatusCode(201);
+        http_response_code(201);
 
         return new JsonModel($annotated);
     }
@@ -145,18 +148,21 @@ class ObjectController extends AbstractRestfulController
         $docID = $this->params()->fromRoute('doc-id', null);
         if (!$docID) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             echo 'Bad request, missing document id';
             exit();
         }
         $datasetUUID = $id;
         if (!$datasetUUID) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             echo 'Bad request, missing dataset id';
             exit();
         }
         $object = $data;
         if ($object == null) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             echo 'Bad request, malformed JSON';
             exit();
         }
@@ -168,9 +174,11 @@ class ObjectController extends AbstractRestfulController
         $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key);
         if ($response == "UPDATED") {
             $this->getResponse()->setStatusCode(204);
+            http_response_code(204);
         }
         elseif ($response == "CREATED") {
             $this->getResponse()->setStatusCode(201);
+            http_response_code(204);
         }
         else {
             //something went wrong
@@ -184,6 +192,7 @@ class ObjectController extends AbstractRestfulController
         $docID = $this->params()->fromRoute('doc-id', null);
         if (is_null($docID)) {
             $this->getResponse()->setStatusCode(400);
+            http_response_code(400);
             $this->getResponse()->setContent('Bad request, missing document id');
             //echo 'Bad request, missing document id';
             $response = [
@@ -195,6 +204,7 @@ class ObjectController extends AbstractRestfulController
             $result = $this->_repository->deleteDoc($id,$docID,$key);
             if ($result == "DELETED") {
                 $this->getResponse()->setStatusCode(204);
+                http_response_code(204);
                 $response = [
                     "message" => "Object deleted",
                 ];
