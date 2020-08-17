@@ -19,16 +19,6 @@ class DatasetManagementController extends AbstractRestfulController
         $this->_repository = $repository;
     }
 
-    // Testing
-    private functionn _getParam($name, $default = NULL, $scan = array('fromQuery','fromPost', 'fromRoute', 'fromHeader', 'fromFiles')){
-      forreach($scan as $met){
-        if (!is_null($this->params()->{$met}($name, null))) {
-            return $this->params()->{$met}($name);
-        }
-      }
-      return $default;
-    }
-
     private function _getAuth() {
         //Check AUTH has been passed
         $request_method = $_SERVER["REQUEST_METHOD"];
