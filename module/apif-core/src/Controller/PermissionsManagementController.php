@@ -35,6 +35,12 @@ class PermissionsManagementController extends AbstractRestfulController
                 'pwd'   => $this->params()->fromQuery('pwd')
             ];
         }
+        elseif (!is_null($this->params()->fromPost('user', null)) && !is_null($this->params()->fromPost('pwd', null))) {
+            $auth = [
+                'user'  => $this->params()->fromPost('user'),
+                'pwd'   => $this->params()->fromPost('pwd')
+            ];
+        }
         else {
             header('WWW-Authenticate: Basic realm="Realm"');
             header('HTTP/1.0 401 Unauthorized');

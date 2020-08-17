@@ -19,6 +19,16 @@ class DatasetManagementController extends AbstractRestfulController
         $this->_repository = $repository;
     }
 
+    // Testing
+    private functionn _getParam($name, $default = NULL, $scan = array('fromQuery','fromPost', 'fromRoute', 'fromHeader', 'fromFiles')){
+      forreach($scan as $met){
+        if (!is_null($this->params()->{$met}($name, null))) {
+            return $this->params()->{$met}($name);
+        }
+      }
+      return $default;
+    }
+
     private function _getAuth() {
         //Check AUTH has been passed
         $request_method = $_SERVER["REQUEST_METHOD"];
@@ -27,12 +37,17 @@ class DatasetManagementController extends AbstractRestfulController
                 'user'  => $_SERVER['PHP_AUTH_USER'],
                 'pwd'   => $_SERVER['PHP_AUTH_PW']
             ];
-
         }
         elseif (!is_null($this->params()->fromQuery('user', null)) && !is_null($this->params()->fromQuery('pwd', null))) {
             $auth = [
                 'user'  => $this->params()->fromQuery('user'),
                 'pwd'   => $this->params()->fromQuery('pwd')
+            ];
+        }
+        elseif (!is_null($this->params()->fromPost('user', null)) && !is_null($this->params()->fromPost('pwd', null))) {
+            $auth = [
+                'user'  => $this->params()->fromPost('user'),
+                'pwd'   => $this->params()->fromPost('pwd')
             ];
         }
         else {
@@ -62,8 +77,8 @@ class DatasetManagementController extends AbstractRestfulController
     public function create($data) {
         $auth = $this->_getAuth();
         //Get URL params
-        $uuidParam = $this->params()->fromQuery('uuid', null);
-        $keyParam = $this->params()->fromQuery('key', null);
+        $uuidParam = $this->params()->fromPost('uuid', null);
+        $keyParam = $this->params()->fromPost('key', null);
         //Check the datasetUUID and access key have been provided...
         if (is_null($uuidParam) || is_null($keyParam)) {
             $this->getResponse()->setStatusCode(400);
