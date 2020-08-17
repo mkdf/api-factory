@@ -24,7 +24,6 @@ class ObjectController extends AbstractRestfulController
         //Check AUTH has been passed
         $request_method = $_SERVER["REQUEST_METHOD"];
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
-            //TODO - issue these headers via proper LAMINAS protocol
             header('WWW-Authenticate: Basic realm="Realm"');
             header('HTTP/1.0 401 Unauthorized');
             echo 'Dataset key must be provided as HTTP Basic Auth username';
@@ -78,8 +77,6 @@ class ObjectController extends AbstractRestfulController
      * if query param is provided
      */
     public function get($id) {
-        //$id is the dataset-id (mongodb collection)
-        //TODO - get query from request
         $key = $this->_getAuth()['user'];
 
         //Get URL params

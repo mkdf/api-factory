@@ -24,7 +24,6 @@ class QueryController extends AbstractRestfulController
         //Check AUTH has been passed
         $request_method = $_SERVER["REQUEST_METHOD"];
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
-            //TODO - issue these headers via proper LAMINAS protocol
             header('WWW-Authenticate: Basic realm="Realm"');
             header('HTTP/1.0 401 Unauthorized');
             echo 'Dataset key must be provided as HTTP Basic Auth username';
