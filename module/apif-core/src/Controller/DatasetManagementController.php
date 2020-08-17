@@ -22,19 +22,26 @@ class DatasetManagementController extends AbstractRestfulController
     private function _getAuth() {
         //Check AUTH has been passed
         $request_method = $_SERVER["REQUEST_METHOD"];
-        if (!isset($_SERVER['PHP_AUTH_USER'])) {
-            //TODO - issue these headers via proper LAMINAS protocol
-            header('WWW-Authenticate: Basic realm="Realm"');
-            header('HTTP/1.0 401 Unauthorized');
-            echo 'Dataset key must be provided as HTTP Basic Auth username';
-            exit;
-        } else {
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
             $auth = [
                 'user'  => $_SERVER['PHP_AUTH_USER'],
                 'pwd'   => $_SERVER['PHP_AUTH_PW']
             ];
-            return $auth;
+
         }
+        elseif (!is_null($this->params()->fromQuery('user', null)) && !is_null($this->params()->fromQuery('pwd', null))) {
+            $auth = [
+                'user'  => $this->params()->fromQuery('user'),
+                'pwd'   => $this->params()->fromQuery('pwd')
+            ];
+        }
+        else {
+            header('WWW-Authenticate: Basic realm="Realm"');
+            header('HTTP/1.0 401 Unauthorized');
+            echo 'Authentication credentials missing';
+            exit;
+        }
+        return $auth;
     }
 
     public function getList()
