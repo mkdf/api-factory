@@ -82,10 +82,23 @@ class ObjectController extends AbstractRestfulController
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
         $limitParam = $this->params()->fromQuery('limit', null);
-        $sortParam = $this->params()->fromQuery('sort', "");
+        $sortParam = $this->params()->fromQuery('sort', null);
         $pageParam = $this->params()->fromQuery('page', 1);
         $pageSizeParam = $this->params()->fromQuery('pagesize', null);
 
+        //Sorting
+        $sortTerms = [];
+        if (!is_null($sortParam)){
+            $exploded = explode(",",$sortParam);
+            foreach ($exploded as $term){
+                if (substr($term,0,1) == "-") {
+                    $sortTerms[$term] = -1;
+                }
+                else {
+                    $sortTerms[$term] = 1;
+                }
+            }
+        }
 
         //Assign params to query options
         if ($queryParam == ""){
@@ -99,7 +112,7 @@ class ObjectController extends AbstractRestfulController
                 exit();
             }
         }
-        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam);
+        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms);
 
         //TODO - Apply pagination here
         if (!is_null($pageSizeParam)){

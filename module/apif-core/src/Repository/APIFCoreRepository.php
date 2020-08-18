@@ -48,12 +48,15 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function findDocs($datasetId, $key, $query, $limit = null) {
+    public function findDocs($datasetId, $key, $query, $limit = null, $sort = null) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
         $data = [];
         if (!is_null($limit)){
             $this->_queryOptions['limit'] = $limit;
+        }
+        if (!is_null($sort)){
+            $this->_queryOptions['sort'] = array_merge($sort,$this->_queryOptions['sort']);
         }
         try {
             $result = $collection->find($query, $this->_queryOptions);

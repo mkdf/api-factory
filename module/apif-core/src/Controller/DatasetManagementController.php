@@ -90,7 +90,6 @@ class DatasetManagementController extends AbstractRestfulController
     public function update($id, $data) {
         //Build a replication of POST/create() here, only with PUT the dataset ID is passed
         //in the URL, so only the key needs to be passed as a param
-        //TODO - JUST CALL CREATE INSTEAD, FROM HERE...
         $auth = $this->_getAuth();
         //Get URL params
         $uuidParam = $id; //this comes from the URL in a PUT
