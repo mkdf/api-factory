@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace APIF\Core;
 
+use APIF\Core\Controller\Factory\BrowseControllerFactory;
 use APIF\Core\Controller\Factory\DatasetManagementControllerFactory;
 use APIF\Core\Controller\Factory\ObjectControllerFactory;
 use APIF\Core\Controller\Factory\PermissionsManagementControllerFactory;
@@ -81,6 +82,16 @@ return [
                     ],
                 ],
             ],
+            'browse' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/browse/:id',
+                    'defaults' => [
+                        'controller' => Controller\BrowseController::class,
+                        //'action'     => 'query',
+                    ],
+                ],
+            ],
             'datasetmanagement' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -108,6 +119,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\QueryController::class  => QueryControllerFactory::class,
             Controller\ObjectController::class  => ObjectControllerFactory::class,
+            Controller\BrowseController::class => BrowseControllerFactory::class,
             Controller\DatasetManagementController::class => DatasetManagementControllerFactory::class,
             Controller\PermissionsManagementController::class => PermissionsManagementControllerFactory::class,
         ],
