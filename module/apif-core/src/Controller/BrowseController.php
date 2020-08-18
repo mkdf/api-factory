@@ -36,8 +36,9 @@ class BrowseController extends AbstractRestfulController
         }
     }
 
-    private function _wrapMetadata ($input) {
-        $output = $input;
+    private function _wrapMetadata ($input, $metadata) {
+        $output = $metadata;
+        $output['results'] = $input;
         return $output;
     }
 
@@ -49,9 +50,11 @@ class BrowseController extends AbstractRestfulController
     public function get($id) {
         $key = $this->_getAuth()['user'];
 
+        $metadata = [];
+
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
-        $limitParam = $this->params()->fromQuery('limit', null);
+        $limitParam = $this->params()->fromQuery('limit', $this->_config['mongodb']['queryLimit']);
         $sortParam = $this->params()->fromQuery('sort', null);
         $pageParam = $this->params()->fromQuery('page', 1);
         $pageSizeParam = $this->params()->fromQuery('pagesize', null);
@@ -62,7 +65,7 @@ class BrowseController extends AbstractRestfulController
             $exploded = explode(",",$sortParam);
             foreach ($exploded as $term){
                 if (substr($term,0,1) == "-") {
-                    $sortTerms[$term] = -1;
+                    $sortTerms[substr($term,1)] = -1;
                 }
                 else {
                     $sortTerms[$term] = 1;
@@ -82,13 +85,22 @@ class BrowseController extends AbstractRestfulController
                 exit();
             }
         }
+
         $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms);
 
-        //TODO - Apply pagination here
+        //$metadata['query'] = json_encode($query);
+        $metadata['sort'] = $sortTerms;
+        $metadata['limit'] = $limitParam;
+        $metadata['documentCount'] = count($data);
+
         if (!is_null($pageSizeParam)){
             $pageStart = ($pageParam - 1) * $pageSizeParam;
             $data = array_slice($data,$pageStart,$pageSizeParam);
+            $metadata['page'] = $pageParam;
+            $metadata['pageSize'] = (int)$pageSizeParam;
         }
-        return new JsonModel($this->_wrapMetadata($data));
+
+
+        return new JsonModel($this->_wrapMetadata($data, $metadata));
     }
 }

@@ -50,7 +50,7 @@ class QueryController extends AbstractRestfulController
 
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
-        $limitParam = $this->params()->fromQuery('limit', null);
+        $limitParam = $this->params()->fromQuery('limit', $this->_config['mongodb']['queryLimit']);
         $sortParam = $this->params()->fromQuery('sort', "");
 
         $datasetUUID = $this->params()->fromRoute('id', null);

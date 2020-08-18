@@ -81,7 +81,7 @@ class ObjectController extends AbstractRestfulController
 
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
-        $limitParam = $this->params()->fromQuery('limit', null);
+        $limitParam = $this->params()->fromQuery('limit', $this->_config['mongodb']['queryLimit']);
         $sortParam = $this->params()->fromQuery('sort', null);
         $pageParam = $this->params()->fromQuery('page', 1);
         $pageSizeParam = $this->params()->fromQuery('pagesize', null);
