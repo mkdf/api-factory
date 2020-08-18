@@ -83,6 +83,9 @@ class ObjectController extends AbstractRestfulController
         $queryParam = $this->params()->fromQuery('query', "");
         $limitParam = $this->params()->fromQuery('limit', null);
         $sortParam = $this->params()->fromQuery('sort', "");
+        $pageParam = $this->params()->fromQuery('page', 1);
+        $pageSizeParam = $this->params()->fromQuery('pagesize', null);
+
 
         //Assign params to query options
         if ($queryParam == ""){
@@ -96,8 +99,13 @@ class ObjectController extends AbstractRestfulController
                 exit();
             }
         }
-
         $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam);
+
+        //TODO - Apply pagination here
+        if (!is_null($pageSizeParam)){
+            $pageStart = ($pageParam - 1) * $pageSizeParam;
+            $data = array_slice($data,$pageStart,$pageSizeParam);
+        }
         return new JsonModel($data);
     }
 

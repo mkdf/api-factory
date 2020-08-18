@@ -16,7 +16,7 @@
 "tags": [
 {
 "name": "query",
-"description": "Query documents - Legacy method for backwards compatibility",
+"description": "Query documents",
 "externalDocs": {
 "description": "Find out more",
 "url": "https://datahub.mksmart.org"
@@ -24,7 +24,7 @@
 },
 {
 "name": "object",
-"description": "Retrieve, create, update and delete documents"
+"description": "Push, update and delete documents"
 }
 ],
 "paths": {
@@ -134,6 +134,24 @@
 "name": "limit",
 "in": "query",
 "description": "Optionally limit the number of documents returned",
+"schema": {
+"minimum": 0,
+"type": "integer"
+}
+},
+{
+"name": "pagesize",
+"in": "query",
+"description": "Optionally enable pagination and specify page size",
+"schema": {
+"minimum": 0,
+"type": "integer"
+}
+},
+{
+"name": "page",
+"in": "query",
+"description": "If using pagination, optionally specify the page number of results to return (defaults to page 1)",
 "schema": {
 "minimum": 0,
 "type": "integer"
