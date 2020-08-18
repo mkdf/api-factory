@@ -85,6 +85,7 @@ class DatasetManagementController extends AbstractRestfulController
         return new JsonModel([]);
     }
 
+    /*
     //PUT
     public function update($id, $data) {
         //Build a replication of POST/create() here, only with PUT the dataset ID is passed
@@ -109,6 +110,7 @@ class DatasetManagementController extends AbstractRestfulController
 
         return new JsonModel([]);
     }
+    */
 
     public function delete($id) {
         //currently not implemented
