@@ -16,15 +16,19 @@
 "tags": [
 {
 "name": "query",
-"description": "Query documents",
+"description": "Query documents (included for backwards compatibility - please use Object or Browse)",
 "externalDocs": {
 "description": "Find out more",
 "url": "https://datahub.mksmart.org"
 }
 },
 {
+"name": "browse",
+"description": "Browse a dataset, with full control over filters, pagination, sorting"
+},
+{
 "name": "object",
-"description": "Push, update and delete documents"
+"description": "retrieve, push, update and delete documents"
 }
 ],
 "paths": {
@@ -104,10 +108,10 @@
 }
 }
 },
-"/object/{dataset-uuid}": {
+"/browse/{dataset-uuid}": {
 "get": {
 "tags": [
-"object"
+"browse"
 ],
 "summary": "Retrieve documents from the dataset",
 "operationId": "getDocuments",
@@ -140,6 +144,14 @@
 }
 },
 {
+"name": "sort",
+"in": "query",
+"description": "Optionally specify fields on which to sort the data. Sort fields should be specified as a comma seperated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')",
+"schema": {
+"type": "string"
+}
+},
+{
 "name": "pagesize",
 "in": "query",
 "description": "Optionally enable pagination and specify page size",
@@ -152,6 +164,55 @@
 "name": "page",
 "in": "query",
 "description": "If using pagination, optionally specify the page number of results to return (defaults to page 1)",
+"schema": {
+"minimum": 0,
+"type": "integer"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+},
+"400": {
+"description": "Bad request, malformed JSON"
+},
+"500": {
+"description": "Fatal error creating object"
+}
+}
+}
+},
+"/object/{dataset-uuid}": {
+"get": {
+"tags": [
+"object"
+],
+"summary": "Retrieve documents from the dataset",
+"operationId": "getDocuments",
+"parameters": [
+{
+"name": "dataset-uuid",
+"in": "path",
+"description": "dataset uuid identifier",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "query",
+"in": "query",
+"description": "The filter query",
+"required": false,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "limit",
+"in": "query",
+"description": "Optionally limit the number of documents returned",
 "schema": {
 "minimum": 0,
 "type": "integer"
