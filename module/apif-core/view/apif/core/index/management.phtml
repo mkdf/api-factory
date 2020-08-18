@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>API FACTORY</title>
+    <!--<script src="../js/swagger-ui-bundle.js"></script>-->
+    <?= $this->headLink()
+        //->prependStylesheet($this->basePath('css/bootstrap-theme.min.css'))
+        ->prependStylesheet($this->basePath('css/swagger-ui.css'));
+    ?>
+
+    <!-- Scripts -->
+    <?= $this->headScript()
+        ->prependFile($this->basePath('js/swagger-ui-bundle.js'));
+    ?>
+
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script>
+    ui = SwaggerUIBundle({
+        url: "<?= $this->url('swaggerManagement'); ?>",
+        dom_id: '#swagger-ui' //,
+        // deepLinking: true,
+//                      presets: [
+//                        // SwaggerUIBundle.presets.apis,
+//                        // SwaggerUIStandalonePreset
+//                      ],
+//                      plugins: [
+//                        SwaggerUIBundle.plugins.DownloadUrl
+//                      ],
+//                      layout: "StandaloneLayout"
+    })
+</script>
+</body><?php

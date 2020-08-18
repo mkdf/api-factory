@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "0b6ab962-b00b-40df-8877-3799a47719c0",
+		"name": "APIF-LAMINAS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OBJECT POST",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1?data=p",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT PUT",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"_id\": \"12345\",\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173999\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1/717qqqqqz",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1",
+						"717qqqqqz"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p",
+							"disabled": true
+						}
+					]
+				},
+				"description": "update"
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT DELETE",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"_id\": \"12345\",\n  \"sensorID\": \"APIF-L\",\n  \"sensorValue\": 7173999\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1/jason",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1",
+						"jason"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "p",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OBJECT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://apif-beta.local/object/uuid1",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"object",
+						"uuid1"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{\"_id\":\"1071\"}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DATASET MANAGEMENT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://apif-beta.local/management/datasets",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"management",
+						"datasets"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{\"_id\":\"1071\"}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PERMISSIONS MANAGEMENT GET",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "key1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "key1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://apif-beta.local/management/permissions",
+					"protocol": "http",
+					"host": [
+						"apif-beta",
+						"local"
+					],
+					"path": [
+						"management",
+						"permissions"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{\"_id\":\"1071\"}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
