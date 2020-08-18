@@ -89,6 +89,7 @@ class BrowseController extends AbstractRestfulController
         $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms);
 
         //$metadata['query'] = json_encode($query);
+        $metadata['messages'] = [];
         $metadata['sort'] = $sortTerms;
         $metadata['limit'] = $limitParam;
         $metadata['documentCount'] = count($data);
