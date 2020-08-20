@@ -58,6 +58,7 @@ class BrowseController extends AbstractRestfulController
         $sortParam = $this->params()->fromQuery('sort', null);
         $pageParam = $this->params()->fromQuery('page', 1);
         $pageSizeParam = $this->params()->fromQuery('pagesize', null);
+        $fieldsParam = $this->params()->fromQuery('fields', null);
 
         //Sorting
         $sortTerms = [];
@@ -69,6 +70,20 @@ class BrowseController extends AbstractRestfulController
                 }
                 else {
                     $sortTerms[$term] = 1;
+                }
+            }
+        }
+
+        //Fields to return
+        $fields = null;
+        if (!is_null($fieldsParam)){
+            $fields = [];
+            $exploded = explode(",",$fieldsParam);
+            foreach ($exploded as $field) {
+                if (substr($field, 0, 1) == "-") {
+                    $fields[substr($field, 1)] = 0;
+                } else {
+                    $fields[$field] = 1;
                 }
             }
         }
@@ -86,7 +101,7 @@ class BrowseController extends AbstractRestfulController
             }
         }
 
-        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms);
+        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms,$fields);
 
         //$metadata['query'] = json_encode($query);
         $metadata['messages'] = [];

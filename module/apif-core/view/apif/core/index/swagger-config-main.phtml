@@ -11,7 +11,7 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-"version": "0.6.4"
+"version": "0.6.0"
 },
 "tags": [
 {
@@ -146,7 +146,15 @@
 {
 "name": "sort",
 "in": "query",
-"description": "Optionally specify fields on which to sort the data. Sort fields should be specified as a comma seperated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')",
+"description": "Optionally specify fields on which to sort the data. Sort fields should be specified as a comma separated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')",
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "fields",
+"in": "query",
+"description": "Optionally specify which fields to return. Fields should be specified as a comma separated list.  Fields preceded with a minus (\"-\") will be excluded from the results. The \"_id\" field is always returned, unless explicitly excluded.",
 "schema": {
 "type": "string"
 }

@@ -48,7 +48,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function findDocs($datasetId, $key, $query, $limit = null, $sort = null) {
+    public function findDocs($datasetId, $key, $query, $limit = null, $sort = null ,$projection = null) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
         $data = [];
@@ -57,6 +57,9 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
         if (!is_null($sort)){
             $this->_queryOptions['sort'] = array_merge($sort,$this->_queryOptions['sort']);
+        }
+        if (!is_null($projection)){
+            $this->_queryOptions['projection'] = $projection;
         }
         try {
             $result = $collection->find($query, $this->_queryOptions);
