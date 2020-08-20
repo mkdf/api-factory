@@ -151,4 +151,38 @@ return [
             'ViewJsonStrategy',
         ],
     ],
+    'log' => [
+        'apifReadLogger' => [
+            'writers' => [
+                'stream' => [
+                    'name' => 'stream',
+                    'priority' => 1,
+                    'options' => [
+                        'stream' => 'log/readLog',
+                        'formatter' => [
+                            'name' => \Laminas\Log\Formatter\Simple::class,
+                            'options' => [
+                                'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
+                                'dateTimeFormat' => 'c',
+                            ],
+                        ],
+                        'filters' => [
+                            'priority' => [
+                                'name' => 'priority',
+                                'options' => [
+                                    'operator' => '<=',
+                                    'priority' => \Laminas\Log\Logger::INFO,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'processors' => [
+                'requestid' => [
+                    'name' => \Laminas\Log\Processor\RequestId::class,
+                ],
+            ],
+        ],
+    ],
 ];

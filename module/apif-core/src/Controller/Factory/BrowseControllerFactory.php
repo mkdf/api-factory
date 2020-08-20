@@ -15,6 +15,7 @@ class BrowseControllerFactory implements FactoryInterface
     {
         $config = $container->get("Config");
         $repository = $container->get(APIFCoreRepositoryInterface::class);
-        return new BrowseController($repository, $config);
+        $readLogger = $container->get('apifReadLogger');
+        return new BrowseController($repository, $config, $readLogger);
     }
 }

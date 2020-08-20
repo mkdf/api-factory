@@ -12,11 +12,13 @@ class BrowseController extends AbstractRestfulController
 {
     private $_config;
     private $_repository;
+    private $_readLogger;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, array $config)
+    public function __construct(APIFCoreRepositoryInterface $repository, array $config, $readLogger)
     {
         $this->_config = $config;
         $this->_repository = $repository;
+        $this->_readLogger = $readLogger;
     }
 
     private function _getAuth() {
@@ -48,6 +50,7 @@ class BrowseController extends AbstractRestfulController
  * if query param is provided
  */
     public function get($id) {
+        $this->_readLogger->info('Doing a GET...');
         $key = $this->_getAuth()['user'];
 
         $metadata = [];
