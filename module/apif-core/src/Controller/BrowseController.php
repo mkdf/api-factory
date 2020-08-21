@@ -50,7 +50,11 @@ class BrowseController extends AbstractRestfulController
  * if query param is provided
  */
     public function get($id) {
-        $this->_readLogger->info('Doing a GET...');
+        $logEntry = [
+            'method' => 'GET',
+            'controller' => 'BROWSE'
+        ];
+        $this->_readLogger->info(json_encode($logEntry));
         $key = $this->_getAuth()['user'];
 
         $metadata = [];
@@ -119,6 +123,9 @@ class BrowseController extends AbstractRestfulController
             $metadata['pageSize'] = (int)$pageSizeParam;
         }
 
+        $logEntry['metadata'] = $metadata;
+
+        $this->_readLogger->info(json_encode($logEntry));
 
         return new JsonModel($this->_wrapMetadata($data, $metadata));
     }

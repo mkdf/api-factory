@@ -41,6 +41,41 @@
 "description": "Success"
 }
 }
+},
+"post": {
+"tags": [
+"datasets"
+],
+"summary": "Create a new dataset",
+"description": "Create a new dataset",
+"operationId": "createDataset",
+"requestBody": {
+"required": true,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"dataset-uuid": {
+"type": "string"
+},
+"key": {
+"type": "integer"
+}
+},
+"required": [
+"dataset-uuid",
+"key"
+]
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Created"
+}
+}
 }
 },
 "/datasets/{dataset-uuid}": {
@@ -55,38 +90,6 @@
 {
 "name": "dataset-uuid",
 "in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-},
-"put": {
-"tags": [
-"datasets"
-],
-"summary": "Create a new dataset",
-"description": "Create a new dataset",
-"operationId": "createDataset",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "key",
-"description": "The master key to assign read and write privileges to",
-"in": "query",
 "required": true,
 "schema": {
 "type": "string"
@@ -204,7 +207,7 @@
 },
 "servers": [
 {
-"url": "<?= $this->basePath().'/management'; ?>"
+"url": "/management"
 }
 ],
 "security": [
