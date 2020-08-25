@@ -35,7 +35,7 @@ return [
             'management' => [
                 'type'    => Literal::class,
                 'options' => [
-                    'route'    => '/management[/]',
+                    'route'    => '/management',
                     'defaults' => [
                         'controller' => Controller\IndexController::class,
                         'action'     => 'management',
