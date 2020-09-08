@@ -79,7 +79,7 @@ class PermissionsManagementController extends AbstractRestfulController
         return $this->update($key);
     }
 
-    public function update($id) {
+    public function update($id, $data) {
         //set permissions here
         $auth = $this->_getAuth();
         $datasetParam = $this->params()->fromQuery('dataset-uuid', null);
