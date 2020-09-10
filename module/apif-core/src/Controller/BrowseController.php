@@ -54,7 +54,7 @@ class BrowseController extends AbstractRestfulController
             'method' => 'GET',
             'controller' => 'BROWSE'
         ];
-        $this->_readLogger->info(json_encode($logEntry));
+        //$this->_readLogger->info(json_encode($logEntry));
         $key = $this->_getAuth()['user'];
 
         $metadata = [];

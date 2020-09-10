@@ -11,8 +11,7 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-"version": "0.6.7"
-},
+"version": "0.6.8
 "tags": [
 {
 "name": "datasets",
@@ -150,6 +149,42 @@
 "summary": "Set/update permissions",
 "description": "Set or update the permissions on a dataset for a given key",
 "operationId": "setPermissions",
+"requestBody": {
+"required": true,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"dataset-uuid": {
+"type": "string"
+},
+"read": {
+"type": "integer",
+"description": "Set read access",
+"enum": [
+0,
+1
+]
+},
+"write": {
+"type": "integer",
+"description": "Set write access",
+"enum": [
+0,
+1
+]
+}
+},
+"required": [
+"dataset-uuid",
+"read",
+"write"
+]
+}
+}
+}
+},
 "parameters": [
 {
 "name": "key",
@@ -158,38 +193,6 @@
 "required": true,
 "schema": {
 "type": "string"
-}
-},
-{
-"name": "dataset-uuid",
-"in": "query",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "read",
-"description": "Set read access",
-"in": "query",
-"required": true,
-"schema": {
-"enum": [
-1,
-0
-]
-}
-},
-{
-"name": "write",
-"description": "Set write access",
-"in": "query",
-"required": true,
-"schema": {
-"enum": [
-1,
-0
-]
 }
 }
 ],

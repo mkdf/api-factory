@@ -3,6 +3,7 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\ViewModel;
@@ -13,11 +14,13 @@ class ObjectController extends AbstractRestfulController
 {
     private $_config;
     private $_repository;
+    private $_activityLog;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, array $config)
+    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, array $config)
     {
         $this->_config = $config;
         $this->_repository = $repository;
+        $this->_activityLog = $activityLog;
     }
 
     private function _getAuth() {
@@ -35,6 +38,38 @@ class ObjectController extends AbstractRestfulController
             ];
             return $auth;
         }
+    }
+
+    private function _assembleLogData ($datasetId, $key) {
+        $timestamp = time();
+        $data = [
+            '@context' => "some context",
+            "type" => "Activity",
+            "summary" => "some summary",
+            "actor" => [
+                'type' => 'Key',
+                'name' => $key
+            ],
+            'dataset' => $datasetId,
+            'uri' =>   $this->getRequest()->getUriString(),
+            'method' =>   $this->getRequest()->getMethod(),
+            'object' =>  [
+                'type' => 'document',
+                'name' => 'name',
+                'content' => json_decode($this->getRequest()->getContent())
+            ]
+        ];
+
+        //Add timestamp data
+        $data['_timestamp'] = $timestamp;
+        $data['_timestamp_year'] = (int)date("Y",$timestamp);
+        $data['_timestamp_month'] = (int)date("m",$timestamp);
+        $data['_timestamp_day'] = (int)date("d",$timestamp);
+        $data['_timestamp_hour'] = (int)date("H",$timestamp);
+        $data['_timestamp_minute'] = (int)date("i",$timestamp);
+        $data['_timestamp_second'] = (int)date("s",$timestamp);
+
+        return $data;
     }
 
     private function _annotateObject($input, $uuid){
@@ -119,6 +154,11 @@ class ObjectController extends AbstractRestfulController
             $pageStart = ($pageParam - 1) * $pageSizeParam;
             $data = array_slice($data,$pageStart,$pageSizeParam);
         }
+
+        //Activity Log
+        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($data);
     }
 
@@ -154,6 +194,10 @@ class ObjectController extends AbstractRestfulController
         $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key);
         $this->getResponse()->setStatusCode(201);
         http_response_code(201);
+
+        //Activity Log
+        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $this->_activityLog->logActivity($logData);
 
         return new JsonModel($annotated);
     }
@@ -202,6 +246,10 @@ class ObjectController extends AbstractRestfulController
             //something went wrong
         }
 
+        //Activity Log
+        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($annotated);
     }
 
@@ -235,6 +283,11 @@ class ObjectController extends AbstractRestfulController
                 //echo 'no items to delete';
             }
         }
+
+        //Activity Log
+        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($response);
     }
 

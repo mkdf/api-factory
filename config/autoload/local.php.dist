@@ -19,4 +19,10 @@ return [
         'database' => 'datahub',
         'queryLimit' => 100
     ],
+    //Specify the dataset and key used for activity logging here
+    'activityLog' => [
+        'enabled' => true,
+        'dataset' => 'activity_log',
+        'key' => 'activity_log_key',
+    ]
 ];
