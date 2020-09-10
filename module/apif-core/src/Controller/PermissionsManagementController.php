@@ -42,6 +42,7 @@ class PermissionsManagementController extends AbstractRestfulController
             ];
         }
         else {
+            // FIXME Throw exception and manage response in the action method
             header('WWW-Authenticate: Basic realm="Realm"');
             header('HTTP/1.0 401 Unauthorized');
             echo 'Authentication credentials missing';
@@ -71,29 +72,29 @@ class PermissionsManagementController extends AbstractRestfulController
         $key = $this->params()->fromRoute('id', null);
         if (!$key) {
             $this->getResponse()->setStatusCode(400);
-            echo 'Bad request, missing key in URL';
-            exit();
+            $jm = new JsonModel();
+            $jm->setVariable("message",'Bad request, missing key in URL');
+            return $jm;
         }
         return $this->update($key,$data);
     }
 
-    public function update($id,$data) {
+
+    public function update($id, $data) {
         //set permissions here
         $auth = $this->_getAuth();
-        //$datasetParam = $this->params()->fromQuery('dataset-uuid', null);
-        //$readParam = $this->params()->fromQuery('read', null);
-        //$writeParam = $this->params()->fromQuery('write', null);
         $datasetParam = $data['dataset-uuid'];
         $readParam = $data['read'];
         $writeParam = $data['write'];
         if (is_null($datasetParam) || is_null($readParam) || is_null($writeParam)) {
             $this->getResponse()->setStatusCode(400);
-            echo 'Bad request, missing dataset id or read/write parameters';
-            exit();
+            $jm = new JsonModel();
+            $jm->setVariable("message",'Bad request, missing dataset id or read/write parameters');
+            return $jm;
         }
 
         $this->_repository->setKeyPermissions($id, $datasetParam, $readParam, $writeParam, $auth);
-        return new JsonModel([]);
+        return new JsonModel();
     }
 
     public function delete($id) {
