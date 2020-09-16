@@ -125,7 +125,7 @@ class BrowseController extends AbstractRestfulController
 
         $logEntry['metadata'] = $metadata;
 
-        $this->_readLogger->info(json_encode($logEntry));
+        //$this->_readLogger->info(json_encode($logEntry));
 
         return new JsonModel($this->_wrapMetadata($data, $metadata));
     }
