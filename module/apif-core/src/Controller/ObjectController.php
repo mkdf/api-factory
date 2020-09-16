@@ -40,23 +40,63 @@ class ObjectController extends AbstractRestfulController
         }
     }
 
-    private function _assembleLogData ($datasetId, $key) {
+    /*
+     *
+     *
+      "@type": ["al:Create", "al:ActivityLogEntry"],
+        "al:datasetId": "datahub__activity_log",
+        "al:documentId": "datahub__activity_log",
+    "al:summary": "short description",
+
+        "al:request": {
+      "@type": "al:HTTPRequest",
+      "al:agent": {
+        "@type": "al:Agent",
+        "al:key": "datahub__activity_log_key123"
+      },
+      "al:endpoint": "http://apif-beta.local/object/datahub__activity_log",
+      "al:httpRequestMethod": "al:POST",
+      "al:parameters": [],
+      "al:payload": "{}"
+    },
+
+     *
+     */
+
+
+    private function _assembleLogData ($datasetId, $key, $action, $summary) {
+        //TODO
+        /**
+         * - docID
+         * - summary - make this like a log entry with a concatenation of other parts
+         * - parameters
+         */
+
         $timestamp = time();
+        $OID = new MongoDB\BSON\ObjectId();
+        $idString = (string)$OID;
+
         $data = [
-            '@context' => "some context",
-            "type" => "Activity",
-            "summary" => "some summary",
-            "actor" => [
-                'type' => 'Key',
-                'name' => $key
+            "_id" => $idString,
+            "@id" => $idString,
+            "@context" => "https://mkdf.github.io/context",
+            "@type" => [
+                "al:".$action,
+                "al:ActivityLogEntry"
             ],
-            'dataset' => $datasetId,
-            'uri' =>   $this->getRequest()->getUriString(),
-            'method' =>   $this->getRequest()->getMethod(),
-            'object' =>  [
-                'type' => 'document',
-                'name' => 'name',
-                'content' => json_decode($this->getRequest()->getContent())
+            "al:datasetId" => $datasetId,
+            "al:documentId" => "docID",
+            "al:summary" => $summary,
+            "al:request" => [
+                "@type" => "al:HTTPRequest",
+                "al:agent" => [
+                    "@type" => "al:Agent",
+                    "al:key" => $key
+                ],
+                "al:endpoint" => $this->getRequest()->getUriString(),
+                "al:httpRequestMethod" => "al:".$this->getRequest()->getMethod(),
+                "al:parameters" => [],
+                "al:payload" => $this->getRequest()->getContent()
             ]
         ];
 
@@ -156,7 +196,10 @@ class ObjectController extends AbstractRestfulController
         }
 
         //Activity Log
-        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $datasetUUID = $id;
+        $action = "RetrieveMany";
+        $summary = "Retrieve multiple documents from dataset";
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($data);
@@ -196,7 +239,9 @@ class ObjectController extends AbstractRestfulController
         http_response_code(201);
 
         //Activity Log
-        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $action = "Create";
+        $summary = "Create new document in dataset";
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($annotated);
@@ -247,7 +292,9 @@ class ObjectController extends AbstractRestfulController
         }
 
         //Activity Log
-        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $action = "Update";
+        $summary = "Update or create a specified documment in dataset";
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($annotated);
@@ -285,7 +332,10 @@ class ObjectController extends AbstractRestfulController
         }
 
         //Activity Log
-        $logData = $this->_assembleLogData($datasetUUID, $key);
+        $datasetUUID = $id;
+        $action = "Delete";
+        $summary = "Remove a document from dataset";
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($response);
