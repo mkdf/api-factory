@@ -64,7 +64,7 @@ class ObjectController extends AbstractRestfulController
      */
 
 
-    private function _assembleLogData ($datasetId, $key, $action, $summary) {
+    private function _assembleLogData ($datasetId, $key, $action, $description, $docID = null) {
         //TODO
         /**
          * - docID
@@ -76,6 +76,8 @@ class ObjectController extends AbstractRestfulController
         $OID = new MongoDB\BSON\ObjectId();
         $idString = (string)$OID;
 
+        $summary = $action."[".$this->getRequest()->getMethod()."] - ".$this->getRequest()->getUriString()." - Dataset:".$datasetId." - Key:".$key." - ".$description;
+
         $data = [
             "_id" => $idString,
             "@id" => $idString,
@@ -85,7 +87,7 @@ class ObjectController extends AbstractRestfulController
                 "al:ActivityLogEntry"
             ],
             "al:datasetId" => $datasetId,
-            "al:documentId" => "docID",
+            //"al:documentId" => "docID",
             "al:summary" => $summary,
             "al:request" => [
                 "@type" => "al:HTTPRequest",
@@ -95,10 +97,13 @@ class ObjectController extends AbstractRestfulController
                 ],
                 "al:endpoint" => $this->getRequest()->getUriString(),
                 "al:httpRequestMethod" => "al:".$this->getRequest()->getMethod(),
-                "al:parameters" => [],
+                "al:parameters" => $this->params()->fromQuery(),
                 "al:payload" => $this->getRequest()->getContent()
             ]
         ];
+        if (!is_null($docID)) {
+            $data["al:documentId"] = $docID;
+        }
 
         //Add timestamp data
         $data['_timestamp'] = $timestamp;
@@ -198,7 +203,7 @@ class ObjectController extends AbstractRestfulController
         //Activity Log
         $datasetUUID = $id;
         $action = "RetrieveMany";
-        $summary = "Retrieve multiple documents from dataset";
+        $summary = "Retrieve multiple documents";
         $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
@@ -240,7 +245,7 @@ class ObjectController extends AbstractRestfulController
 
         //Activity Log
         $action = "Create";
-        $summary = "Create new document in dataset";
+        $summary = "Create new document";
         $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
@@ -293,8 +298,8 @@ class ObjectController extends AbstractRestfulController
 
         //Activity Log
         $action = "Update";
-        $summary = "Update or create a specified documment in dataset";
-        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
+        $summary = "Update or create a specified documment";
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $docID);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($annotated);
