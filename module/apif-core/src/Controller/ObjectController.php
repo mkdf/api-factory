@@ -159,6 +159,11 @@ class ObjectController extends AbstractRestfulController
     public function get($id) {
         $key = $this->_getAuth()['user'];
 
+        $docID = $this->params()->fromRoute('doc-id', null);
+        if ($docID) {
+            return new JsonModel($this->_repository->getSingleDoc($id, $key, $docID));
+        }
+
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
         $limitParam = $this->params()->fromQuery('limit', $this->_config['mongodb']['queryLimit']);
@@ -246,7 +251,7 @@ class ObjectController extends AbstractRestfulController
         //Activity Log
         $action = "Create";
         $summary = "Create new document";
-        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $annotated['_id']);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($annotated);

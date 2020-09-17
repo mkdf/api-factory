@@ -73,6 +73,25 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
+    public function getSingleDoc ($datasetId, $key, $docID) {
+        $this->_connectDB($key);
+        $collection = $this->_db->$datasetId;
+        $query = [
+            "_id" => $docID
+        ];
+        $data = [];
+        try {
+            $result = $collection->find($query);
+            $data = $result->toArray();
+            return $data;
+        }
+        catch (\Throwable $ex) {
+            http_response_code(500);
+            echo 'Fatal error retrieving documents: ' . $ex->getMessage();
+            exit();
+        }
+    }
+
     public function insertDoc($datasetId, $object, $key) {
         $this->_connectDB($key);
         $collection = $this->_db->$datasetId;
