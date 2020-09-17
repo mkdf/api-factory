@@ -11,7 +11,7 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-"version": "0.6.8"
+"version": "0.6.9"
 },
 "tags": [
 {
@@ -32,82 +32,6 @@
 }
 ],
 "paths": {
-"/query/{dataset-uuid}": {
-"post": {
-"tags": [
-"query"
-],
-"summary": "Query a dataset",
-"description": "Pass a MongoDB query in the body of this request to query the dataset, or pass an empty body to return all documents",
-"operationId": "query",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "limit",
-"in": "query",
-"description": "Optionally limit the number of documents returned",
-"schema": {
-"minimum": 0,
-"type": "integer"
-}
-}
-],
-"requestBody": {
-"description": "The filter query",
-"content": {
-"application/json": {
-"schema": {
-"type": "object",
-"example": {
-"sensorID": "42-a"
-}
-}
-}
-},
-"required": false
-},
-"responses": {
-"200": {
-"description": "Success",
-"content": {
-"application/json": {
-"schema": {
-"type": "object",
-"example": {
-"_id": "1067",
-"sensorID": "42-a",
-"sensorValue": 34.7
-}
-}
-}
-}
-},
-"400": {
-"description": "Bad request, dataset uuid not specified",
-"content": {}
-},
-"401": {
-"description": "Unauthorized. Dataset key must be provided as HTTP Basic Auth username",
-"content": {}
-},
-"404": {
-"description": "Object not found",
-"content": {}
-},
-"405": {
-"description": "Method not allowed",
-"content": {}
-}
-}
-}
-},
 "/browse/{dataset-uuid}": {
 "get": {
 "tags": [

@@ -65,13 +65,6 @@ class ObjectController extends AbstractRestfulController
 
 
     private function _assembleLogData ($datasetId, $key, $action, $description, $docID = null) {
-        //TODO
-        /**
-         * - docID
-         * - summary - make this like a log entry with a concatenation of other parts
-         * - parameters
-         */
-
         $timestamp = time();
         $OID = new MongoDB\BSON\ObjectId();
         $idString = (string)$OID;
