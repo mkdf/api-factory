@@ -12,13 +12,11 @@ class ActivityLogManager implements ActivityLogManagerInterface
     private $_db;
     private $_client;
     private $_logDataset;
-    private $_logKey;
 
     public function __construct($config)
     {
         $this->_config = $config;
         $this->_logDataset = $this->_config['activityLog']['dataset'];
-        $this->_logKey = $this->_config['activityLog']['key'];
     }
 
     private function _connectDB() {
@@ -35,8 +33,8 @@ class ActivityLogManager implements ActivityLogManagerInterface
         try {
             //db connection
             $this->_client = new Client($DBCONNECTIONSTRING, [
-                'username' => $this->_logKey,
-                'password' => $this->_logKey,
+                'username' => $this->_config['mongodb']['adminUser'],
+                'password' => $this->_config['mongodb']['adminPwd'],
                 'db' => $DBNAME
             ]);
             $this->_db = $this->_client->$DBNAME;

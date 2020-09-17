@@ -17,12 +17,13 @@ return [
         'host' => 'localhost',
         'port' => '27017',
         'database' => 'datahub',
-        'queryLimit' => 100
+        'queryLimit' => 100,
+        'adminUser' => 'admin-user',
+        'adminPwd' => 'admin-password'
     ],
     //Specify the dataset and key used for activity logging here
     'activityLog' => [
         'enabled' => true,
-        'dataset' => 'activity_log',
-        'key' => 'activity_log_key',
+        'dataset' => 'activity_log'
     ]
 ];
