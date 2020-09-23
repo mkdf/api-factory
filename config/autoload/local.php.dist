@@ -21,7 +21,7 @@ return [
         'adminUser' => 'admin-user',
         'adminPwd' => 'admin-password'
     ],
-    //Specify the dataset and key used for activity logging here
+    //Specify the dataset used for activity logging here
     'activityLog' => [
         'enabled' => true,
         'dataset' => 'activity_log'
