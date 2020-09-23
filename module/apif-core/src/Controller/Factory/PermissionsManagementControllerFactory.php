@@ -5,6 +5,7 @@ namespace APIF\Core\Controller\Factory;
 
 use APIF\Core\Controller\PermissionsManagementController;
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -17,6 +18,7 @@ class PermissionsManagementControllerFactory implements FactoryInterface
     {
         $config = $container->get("Config");
         $repository = $container->get(APIFCoreRepositoryInterface::class);
-        return new PermissionsManagementController($repository, $config);
+        $activityLog = $container->get(ActivityLogManagerInterface::class);
+        return new PermissionsManagementController($repository, $activityLog, $config);
     }
 }

@@ -4,19 +4,23 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
+use MongoDB;
 
 
 class DatasetManagementController extends AbstractRestfulController
 {
     private $_config;
     private $_repository;
+    private $_activityLog;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, array $config)
+    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, array $config)
     {
         $this->_config = $config;
         $this->_repository = $repository;
+        $this->_activityLog = $activityLog;
     }
 
     private function _getAuth() {
@@ -49,10 +53,67 @@ class DatasetManagementController extends AbstractRestfulController
         return $auth;
     }
 
+    private function _assembleLogData ($datasetId, $key, $action, $description, $docID = null) {
+        $timestamp = time();
+        $OID = new MongoDB\BSON\ObjectId();
+        $idString = (string)$OID;
+
+        $summary = $action."[".$this->getRequest()->getMethod()."] - ".$this->getRequest()->getUriString()." - Dataset:".$datasetId." - Key:".$key." - ".$description;
+
+        $data = [
+            "_id" => $idString,
+            "@id" => $idString,
+            "@context" => "https://mkdf.github.io/context",
+            "@type" => [
+                "al:".$action,
+                "al:ActivityLogEntry"
+            ],
+            //"al:datasetId" => $datasetId,
+            //"al:documentId" => "docID",
+            "al:summary" => $summary,
+            "al:request" => [
+                "@type" => "al:HTTPRequest",
+                "al:agent" => [
+                    "@type" => "al:Agent",
+                    "al:key" => $key
+                ],
+                "al:endpoint" => $this->getRequest()->getUriString(),
+                "al:httpRequestMethod" => "al:".$this->getRequest()->getMethod(),
+                "al:parameters" => $this->params()->fromQuery(),
+                "al:payload" => $this->getRequest()->getContent()
+            ]
+        ];
+        if (!is_null($docID)) {
+            $data["al:documentId"] = $docID;
+        }
+        if (!is_null($datasetId)) {
+            $data["al:datasetId"] = $datasetId;
+        }
+
+        //Add timestamp data
+        $data['_timestamp'] = $timestamp;
+        $data['_timestamp_year'] = (int)date("Y",$timestamp);
+        $data['_timestamp_month'] = (int)date("m",$timestamp);
+        $data['_timestamp_day'] = (int)date("d",$timestamp);
+        $data['_timestamp_hour'] = (int)date("H",$timestamp);
+        $data['_timestamp_minute'] = (int)date("i",$timestamp);
+        $data['_timestamp_second'] = (int)date("s",$timestamp);
+
+        return $data;
+    }
+
     public function getList()
     {
         $auth = $this->_getAuth();
         $datasetList = $this->_repository->getDatasetList($auth);
+
+        //Activity Log
+        $datasetUUID = null;
+        $action = "ManagementRetrieveDatasetList";
+        $summary = "Retrieve the list of datasets";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($datasetList);
     }
 
@@ -60,6 +121,14 @@ class DatasetManagementController extends AbstractRestfulController
     {
         $auth = $this->_getAuth();
         $datasetInfo = $this->_repository->getDataset($id,$auth);
+
+        //Activity Log
+        $datasetUUID = $id;
+        $action = "ManagementRetrieveDataset";
+        $summary = "Retrieve single dataset summary";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($datasetInfo);
     }
 
@@ -83,6 +152,14 @@ class DatasetManagementController extends AbstractRestfulController
         $this->_repository->setKeyPermissions($keyParam, $uuidParam, true, true, $auth);
         $this->getResponse()->setStatusCode(201);
         http_response_code(201);
+
+        //Activity Log
+        $datasetUUID = $uuidParam;
+        $action = "CreateDataset";
+        $summary = "Create a new datasets";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel([]);
     }
 

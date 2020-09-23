@@ -5,6 +5,7 @@ namespace APIF\Core\Controller\Factory;
 
 use APIF\Core\Controller\DatasetManagementController;
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -18,6 +19,7 @@ class DatasetManagementControllerFactory implements FactoryInterface
     {
         $config = $container->get("Config");
         $repository = $container->get(APIFCoreRepositoryInterface::class);
-        return new DatasetManagementController($repository, $config);
+        $activityLog = $container->get(ActivityLogManagerInterface::class);
+        return new DatasetManagementController($repository, $activityLog, $config);
     }
 }

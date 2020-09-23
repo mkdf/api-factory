@@ -25,5 +25,9 @@ return [
     'activityLog' => [
         'enabled' => true,
         'dataset' => 'activity_log'
-    ]
+    ],
+    'schema' => [
+        'dataset' => 'schema-dataset',
+    ],
+
 ];

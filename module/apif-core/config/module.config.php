@@ -127,10 +127,12 @@ return [
     'service_manager' => [
         'aliases' => [
             Repository\APIFCoreRepositoryInterface::class => Repository\APIFCoreRepository::class,
+            Repository\SchemaRepositoryInterface::class => Repository\SchemaRepository::class,
             Service\ActivityLogManagerInterface::class => Service\ActivityLogManager::class,
         ],
         'factories' => [
             Repository\APIFCoreRepository::class => Repository\Factory\APIFCoreRepositoryFactory::class,
+            Repository\SchemaRepository::class => Repository\Factory\SchemaRepositoryFactory::class,
             Service\ActivityLogManager::class => Service\Factory\ActivityLogManagerFactory::class,
         ]
     ],

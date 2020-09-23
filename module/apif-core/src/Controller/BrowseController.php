@@ -63,7 +63,7 @@ class BrowseController extends AbstractRestfulController
                 "al:".$action,
                 "al:ActivityLogEntry"
             ],
-            "al:datasetId" => $datasetId,
+            //"al:datasetId" => $datasetId,
             //"al:documentId" => "docID",
             "al:summary" => $summary,
             "al:request" => [
@@ -80,6 +80,9 @@ class BrowseController extends AbstractRestfulController
         ];
         if (!is_null($docID)) {
             $data["al:documentId"] = $docID;
+        }
+        if (!is_null($datasetId)) {
+            $data["al:datasetId"] = $datasetId;
         }
 
         //Add timestamp data

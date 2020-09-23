@@ -4,8 +4,10 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
+use MongoDB;
 
 
 class PermissionsManagementController extends AbstractRestfulController
@@ -13,11 +15,14 @@ class PermissionsManagementController extends AbstractRestfulController
     private $_config;
     private $_repository;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, array $config)
+    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, array $config)
     {
         $this->_config = $config;
         $this->_repository = $repository;
+        $this->_activityLog = $activityLog;
     }
+
+
 
     private function _getAuth() {
         //Check AUTH has been passed
@@ -51,12 +56,68 @@ class PermissionsManagementController extends AbstractRestfulController
         return $auth;
     }
 
+    private function _assembleLogData ($datasetId, $key, $action, $description, $docID = null) {
+        $timestamp = time();
+        $OID = new MongoDB\BSON\ObjectId();
+        $idString = (string)$OID;
+
+        $summary = $action."[".$this->getRequest()->getMethod()."] - ".$this->getRequest()->getUriString()." - Dataset:".$datasetId." - Key:".$key." - ".$description;
+
+        $data = [
+            "_id" => $idString,
+            "@id" => $idString,
+            "@context" => "https://mkdf.github.io/context",
+            "@type" => [
+                "al:".$action,
+                "al:ActivityLogEntry"
+            ],
+            //"al:datasetId" => $datasetId,
+            //"al:documentId" => "docID",
+            "al:summary" => $summary,
+            "al:request" => [
+                "@type" => "al:HTTPRequest",
+                "al:agent" => [
+                    "@type" => "al:Agent",
+                    "al:key" => $key
+                ],
+                "al:endpoint" => $this->getRequest()->getUriString(),
+                "al:httpRequestMethod" => "al:".$this->getRequest()->getMethod(),
+                "al:parameters" => $this->params()->fromQuery(),
+                "al:payload" => $this->getRequest()->getContent()
+            ]
+        ];
+        if (!is_null($docID)) {
+            $data["al:documentId"] = $docID;
+        }
+        if (!is_null($datasetId)) {
+            $data["al:datasetId"] = $datasetId;
+        }
+
+        //Add timestamp data
+        $data['_timestamp'] = $timestamp;
+        $data['_timestamp_year'] = (int)date("Y",$timestamp);
+        $data['_timestamp_month'] = (int)date("m",$timestamp);
+        $data['_timestamp_day'] = (int)date("d",$timestamp);
+        $data['_timestamp_hour'] = (int)date("H",$timestamp);
+        $data['_timestamp_minute'] = (int)date("i",$timestamp);
+        $data['_timestamp_second'] = (int)date("s",$timestamp);
+
+        return $data;
+    }
+
     public function getList()
     {
         //get all keys
         $auth = $this->_getAuth();
         $keys = $this->_repository->getAllKeys($auth);
         return new JsonModel($keys);
+
+        //Activity Log
+        $datasetUUID = null;
+        $action = "ManagementRetrievePermissionsList";
+        $summary = "Retrieve all dataset/key permissions";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
     }
 
     public function get($id)
@@ -64,6 +125,14 @@ class PermissionsManagementController extends AbstractRestfulController
         //get one key
         $auth = $this->_getAuth();
         $key = $this->_repository->getKey($id,$auth);
+
+        //Activity Log
+        $datasetUUID = null;
+        $action = "ManagementRetrievePermission";
+        $summary = "Retrieve single key permissions";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($key);
     }
 
@@ -94,6 +163,14 @@ class PermissionsManagementController extends AbstractRestfulController
         }
 
         $this->_repository->setKeyPermissions($id, $datasetParam, $readParam, $writeParam, $auth);
+
+        //Activity Log
+        $datasetUUID = $datasetParam;
+        $action = "ManagementUpdatePermissions";
+        $summary = "Update or create dataset/key permissions";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel();
     }
 
