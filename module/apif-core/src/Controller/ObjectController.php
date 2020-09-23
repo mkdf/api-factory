@@ -154,10 +154,11 @@ class ObjectController extends AbstractRestfulController
      */
     public function get($id) {
         $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
 
         $docID = $this->params()->fromRoute('doc-id', null);
         if ($docID) {
-            return new JsonModel($this->_repository->getSingleDoc($id, $key, $docID));
+            return new JsonModel($this->_repository->getSingleDoc($id, $key, $pwd, $docID));
         }
 
         //Get URL params
@@ -193,7 +194,7 @@ class ObjectController extends AbstractRestfulController
                 exit();
             }
         }
-        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms);
+        $data = $this->_repository->findDocs($id, $key, $pwd, $query,(int)$limitParam,$sortTerms);
 
         //TODO - Apply pagination here
         if (!is_null($pageSizeParam)){
@@ -223,6 +224,7 @@ class ObjectController extends AbstractRestfulController
      */
     public function create($data) {
         $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (is_null($datasetUUID)) {
             $this->getResponse()->setStatusCode(400);
@@ -240,7 +242,7 @@ class ObjectController extends AbstractRestfulController
             exit();
         }
         $annotated = $this->_annotateObject($object, $datasetUUID);
-        $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key);
+        $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key, $pwd);
         $this->getResponse()->setStatusCode(201);
         http_response_code(201);
 
@@ -258,6 +260,7 @@ class ObjectController extends AbstractRestfulController
      */
     public function update($id, $data) {
         $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
         $docID = $this->params()->fromRoute('doc-id', null);
         if (!$docID) {
             $this->getResponse()->setStatusCode(400);
@@ -284,7 +287,7 @@ class ObjectController extends AbstractRestfulController
         $annotated = $this->_annotateObject($object, $datasetUUID);
         $annotated['_updated'] = true;
 
-        $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key);
+        $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key, $pwd);
         if ($response == "UPDATED") {
             $this->getResponse()->setStatusCode(204);
             http_response_code(204);
@@ -308,6 +311,7 @@ class ObjectController extends AbstractRestfulController
 
     public function delete($id)  {
         $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
         $docID = $this->params()->fromRoute('doc-id', null);
         if (is_null($docID)) {
             $this->getResponse()->setStatusCode(400);
@@ -320,7 +324,7 @@ class ObjectController extends AbstractRestfulController
             //exit();
         }
         else {
-            $result = $this->_repository->deleteDoc($id,$docID,$key);
+            $result = $this->_repository->deleteDoc($id,$docID,$key,$pwd);
             if ($result == "DELETED") {
                 $this->getResponse()->setStatusCode(204);
                 http_response_code(204);

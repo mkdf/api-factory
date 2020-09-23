@@ -48,8 +48,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function findDocs($datasetId, $key, $query, $limit = null, $sort = null ,$projection = null) {
-        $this->_connectDB($key);
+    public function findDocs($datasetId, $key, $pwd, $query, $limit = null, $sort = null ,$projection = null) {
+        $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;
         $data = [];
         if (!is_null($limit)){
@@ -73,15 +73,15 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function getSingleDoc ($datasetId, $key, $docID) {
-        $this->_connectDB($key);
+    public function getSingleDoc ($datasetId, $key, $pwd, $docID) {
+        $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;
         $query = [
-            "_id" => $docID
+            "_id" => strval($docID)
         ];
         $data = [];
         try {
-            $result = $collection->find($query);
+            $result = $collection->find($query,[]);
             $data = $result->toArray();
             return $data;
         }
@@ -92,8 +92,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function insertDoc($datasetId, $object, $key) {
-        $this->_connectDB($key);
+    public function insertDoc($datasetId, $object, $key, $pwd) {
+        $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;
         try {
             $insertOneResult = $collection->insertOne($object);
@@ -106,8 +106,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return $object;
     }
 
-    public function updateDoc($datasetId, $docID, $object, $key) {
-        $this->_connectDB($key);
+    public function updateDoc($datasetId, $docID, $object, $key, $pwd) {
+        $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;
         try {
             $replaceOneResult = $collection->replaceOne(['_id' => $docID], $object, ['upsert' => true]);
@@ -124,8 +124,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
-    public function deleteDoc($datasetId, $docID, $key) {
-        $this->_connectDB($key);
+    public function deleteDoc($datasetId, $docID, $key, $pwd) {
+        $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;
         try {
             $deleteResult = $collection->deleteOne(['_id' => $docID]);

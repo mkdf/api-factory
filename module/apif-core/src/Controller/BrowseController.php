@@ -111,6 +111,7 @@ class BrowseController extends AbstractRestfulController
         */
         //$this->_readLogger->info(json_encode($logEntry));
         $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
 
         $metadata = [];
 
@@ -163,7 +164,7 @@ class BrowseController extends AbstractRestfulController
             }
         }
 
-        $data = $this->_repository->findDocs($id,$key,$query,(int)$limitParam,$sortTerms,$fields);
+        $data = $this->_repository->findDocs($id,$key,$pwd,$query,(int)$limitParam,$sortTerms,$fields);
 
         //$metadata['query'] = json_encode($query);
         $metadata['messages'] = [];
