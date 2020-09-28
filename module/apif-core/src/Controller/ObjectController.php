@@ -147,6 +147,19 @@ class ObjectController extends AbstractRestfulController
         return $object;
     }
 
+    private function _handleException($ex) {
+        if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
+            $this->getResponse()->setStatusCode(401);
+        }elseif(is_a($ex->getPrevious(), MongoDB\Driver\Exception\AuthenticationException::class)){
+            $this->getResponse()->setStatusCode(401);
+        }elseif(is_a($ex, \Throwable::class)){
+            $this->getResponse()->setStatusCode(500);
+        }else{
+            // This will never happen
+            $this->getResponse()->setStatusCode(500);
+        }
+    }
+
     /*
      * GET - Handling a GET request
      * brings back all docs from a dataset (subject to limit), or a query
@@ -158,7 +171,13 @@ class ObjectController extends AbstractRestfulController
 
         $docID = $this->params()->fromRoute('doc-id', null);
         if ($docID) {
-            return new JsonModel($this->_repository->getSingleDoc($id, $key, $pwd, $docID));
+            try {
+                $data = $this->_repository->getSingleDoc($id, $key, $pwd, $docID);
+                return new JsonModel($data);
+            }catch (\Throwable $ex) {
+                $this->_handleException($ex);
+                return new JsonModel(['error' => 'Failed to retrieve document - ' . $ex->getMessage()]);
+            }
         }
 
         //Get URL params
@@ -189,12 +208,16 @@ class ObjectController extends AbstractRestfulController
         else{
             $query = json_decode($queryParam);
             if ($query == null) {
-                http_response_code(400);
-                echo 'Bad request, malformed JSON query';
-                exit();
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, malformed JSON query']);
             }
         }
-        $data = $this->_repository->findDocs($id, $key, $pwd, $query,(int)$limitParam,$sortTerms);
+        try {
+            $data = $this->_repository->findDocs($id, $key, $pwd, $query,(int)$limitParam,$sortTerms);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve documents - ' . $ex->getMessage()]);
+        }
 
         //TODO - Apply pagination here
         if (!is_null($pageSizeParam)){
@@ -228,23 +251,25 @@ class ObjectController extends AbstractRestfulController
         $datasetUUID = $this->params()->fromRoute('id', null);
         if (is_null($datasetUUID)) {
             $this->getResponse()->setStatusCode(400);
-            http_response_code(400);
-            echo 'Bad request, missing dataset id';
-            exit();
+            return new JsonModel(['error' => 'Bad request, missing dataset id']);
         }
 
         //$object = json_decode($data);
         $object = $data;
         if ($object == null) {
             $this->getResponse()->setStatusCode(400);
-            http_response_code(400);
-            echo 'Bad request, malformed JSON';
-            exit();
+            return new JsonModel(['error' => 'Bad request, malformed JSON']);
+
         }
         $annotated = $this->_annotateObject($object, $datasetUUID);
-        $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key, $pwd);
+        try {
+            $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key, $pwd);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve documents - ' . $ex->getMessage()]);
+        }
         $this->getResponse()->setStatusCode(201);
-        http_response_code(201);
+        //http_response_code(201);
 
         //Activity Log
         $action = "Create";
@@ -264,37 +289,34 @@ class ObjectController extends AbstractRestfulController
         $docID = $this->params()->fromRoute('doc-id', null);
         if (!$docID) {
             $this->getResponse()->setStatusCode(400);
-            http_response_code(400);
-            echo 'Bad request, missing document id';
-            exit();
+            return new JsonModel(['error' => 'Bad request, missing document id']);
         }
         $datasetUUID = $id;
         if (!$datasetUUID) {
             $this->getResponse()->setStatusCode(400);
-            http_response_code(400);
-            echo 'Bad request, missing dataset id';
-            exit();
+            return new JsonModel(['error' => 'Bad request, missing dataset id']);
         }
         $object = $data;
         if ($object == null) {
             $this->getResponse()->setStatusCode(400);
-            http_response_code(400);
-            echo 'Bad request, malformed JSON';
-            exit();
+            return new JsonModel(['error' => 'Bad request, malformed JSON']);
         }
         //Any _id supplied in the JSON is ignored/overwritten with the one passed in the URL path
         $object['_id'] = $docID;
         $annotated = $this->_annotateObject($object, $datasetUUID);
         $annotated['_updated'] = true;
 
-        $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key, $pwd);
+        try {
+            $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key, $pwd);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to update document - ' . $ex->getMessage()]);
+        }
         if ($response == "UPDATED") {
             $this->getResponse()->setStatusCode(204);
-            http_response_code(204);
         }
         elseif ($response == "CREATED") {
             $this->getResponse()->setStatusCode(201);
-            http_response_code(204);
         }
         else {
             //something went wrong
@@ -315,19 +337,18 @@ class ObjectController extends AbstractRestfulController
         $docID = $this->params()->fromRoute('doc-id', null);
         if (is_null($docID)) {
             $this->getResponse()->setStatusCode(400);
-            http_response_code(400);
-            $this->getResponse()->setContent('Bad request, missing document id');
-            //echo 'Bad request, missing document id';
-            $response = [
-                "message" => "Bad request, missing document id",
-            ];
-            //exit();
+            return new JsonModel(['error' => 'Bad request, missing document id']);
         }
         else {
-            $result = $this->_repository->deleteDoc($id,$docID,$key,$pwd);
+            try {
+                $result = $this->_repository->deleteDoc($id,$docID,$key,$pwd);
+            }catch (\Throwable $ex) {
+                $this->_handleException($ex);
+                return new JsonModel(['error' => 'Failed to delete document - ' . $ex->getMessage()]);
+            }
+
             if ($result == "DELETED") {
                 $this->getResponse()->setStatusCode(204);
-                http_response_code(204);
                 $response = [
                     "message" => "Object deleted",
                 ];
@@ -337,7 +358,6 @@ class ObjectController extends AbstractRestfulController
                 $response = [
                     "message" => "No items to delete",
                 ];
-                //echo 'no items to delete';
             }
         }
 
