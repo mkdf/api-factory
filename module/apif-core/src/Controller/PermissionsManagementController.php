@@ -105,12 +105,29 @@ class PermissionsManagementController extends AbstractRestfulController
         return $data;
     }
 
+    private function _handleException($ex) {
+        if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
+            $this->getResponse()->setStatusCode(401);
+        }elseif(is_a($ex->getPrevious(), MongoDB\Driver\Exception\AuthenticationException::class)){
+            $this->getResponse()->setStatusCode(401);
+        }elseif(is_a($ex, \Throwable::class)){
+            $this->getResponse()->setStatusCode(500);
+        }else{
+            // This will never happen
+            $this->getResponse()->setStatusCode(500);
+        }
+    }
+
     public function getList()
     {
         //get all keys
         $auth = $this->_getAuth();
-        $keys = $this->_repository->getAllKeys($auth);
-        return new JsonModel($keys);
+        try {
+            $keys = $this->_repository->getAllKeys($auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve permissions - ' . $ex->getMessage()]);
+        }
 
         //Activity Log
         $datasetUUID = null;
@@ -118,13 +135,20 @@ class PermissionsManagementController extends AbstractRestfulController
         $summary = "Retrieve all dataset/key permissions";
         $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
         $this->_activityLog->logActivity($logData);
+
+        return new JsonModel($keys);
     }
 
     public function get($id)
     {
         //get one key
         $auth = $this->_getAuth();
-        $key = $this->_repository->getKey($id,$auth);
+        try {
+            $key = $this->_repository->getKey($id,$auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve key permissions - ' . $ex->getMessage()]);
+        }
 
         //Activity Log
         $datasetUUID = null;
@@ -141,11 +165,14 @@ class PermissionsManagementController extends AbstractRestfulController
         $key = $this->params()->fromRoute('id', null);
         if (!$key) {
             $this->getResponse()->setStatusCode(400);
-            $jm = new JsonModel();
-            $jm->setVariable("message",'Bad request, missing key in URL');
-            return $jm;
+            return new JsonModel(['error' => 'Bad request, missing key in URL']);
         }
-        return $this->update($key,$data);
+        try {
+            return $this->update($key,$data);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to set key permissions - ' . $ex->getMessage()]);
+        }
     }
 
 
@@ -157,12 +184,15 @@ class PermissionsManagementController extends AbstractRestfulController
         $writeParam = $data['write'];
         if (is_null($datasetParam) || is_null($readParam) || is_null($writeParam)) {
             $this->getResponse()->setStatusCode(400);
-            $jm = new JsonModel();
-            $jm->setVariable("message",'Bad request, missing dataset id or read/write parameters');
-            return $jm;
+            return new JsonModel(['error' => 'Bad request, missing dataset id or read/write parameters']);
         }
 
-        $this->_repository->setKeyPermissions($id, $datasetParam, $readParam, $writeParam, $auth);
+        try {
+            $this->_repository->setKeyPermissions($id, $datasetParam, $readParam, $writeParam, $auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to set key permissions - ' . $ex->getMessage()]);
+        }
 
         //Activity Log
         $datasetUUID = $datasetParam;
