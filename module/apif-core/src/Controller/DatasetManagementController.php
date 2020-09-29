@@ -102,10 +102,29 @@ class DatasetManagementController extends AbstractRestfulController
         return $data;
     }
 
+    private function _handleException($ex) {
+        if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
+            $this->getResponse()->setStatusCode(401);
+        }elseif(is_a($ex->getPrevious(), MongoDB\Driver\Exception\AuthenticationException::class)){
+            $this->getResponse()->setStatusCode(401);
+        }elseif(is_a($ex, \Throwable::class)){
+            $this->getResponse()->setStatusCode(500);
+        }else{
+            // This will never happen
+            $this->getResponse()->setStatusCode(500);
+        }
+    }
+
     public function getList()
     {
         $auth = $this->_getAuth();
-        $datasetList = $this->_repository->getDatasetList($auth);
+        try {
+            $datasetList = $this->_repository->getDatasetList($auth);
+        }
+        catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve dataset list - ' . $ex->getMessage()]);
+        }
 
         //Activity Log
         $datasetUUID = null;
@@ -120,7 +139,12 @@ class DatasetManagementController extends AbstractRestfulController
     public function get($id)
     {
         $auth = $this->_getAuth();
-        $datasetInfo = $this->_repository->getDataset($id,$auth);
+        try {
+            $datasetInfo = $this->_repository->getDataset($id,$auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve dataset details - ' . $ex->getMessage()]);
+        }
 
         //Activity Log
         $datasetUUID = $id;
@@ -141,17 +165,25 @@ class DatasetManagementController extends AbstractRestfulController
         //Check the datasetUUID and access key have been provided...
         if (is_null($uuidParam) || is_null($keyParam)) {
             $this->getResponse()->setStatusCode(400);
-            echo 'Bad request, missing dataset id or access key';
-            exit();
+            return new JsonModel(['error' => 'Bad request, missing dataset id or access key']);
         }
 
         //Create dataset (and read/write roles for this dataset)
-        $this->_repository->createDataset($uuidParam, $auth);
+        try {
+            $this->_repository->createDataset($uuidParam, $auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to create dataset - ' . $ex->getMessage()]);
+        }
 
         //Create key (DB user) and assign to dataset read/write roles
-        $this->_repository->setKeyPermissions($keyParam, $uuidParam, true, true, $auth);
+        try {
+            $this->_repository->setKeyPermissions($keyParam, $uuidParam, true, true, $auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to set permissions on new dataset - ' . $ex->getMessage()]);
+        }
         $this->getResponse()->setStatusCode(201);
-        http_response_code(201);
 
         //Activity Log
         $datasetUUID = $uuidParam;
