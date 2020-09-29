@@ -149,9 +149,9 @@ class ObjectController extends AbstractRestfulController
 
     private function _handleException($ex) {
         if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
-            $this->getResponse()->setStatusCode(401);
+            $this->getResponse()->setStatusCode(403);
         }elseif(is_a($ex->getPrevious(), MongoDB\Driver\Exception\AuthenticationException::class)){
-            $this->getResponse()->setStatusCode(401);
+            $this->getResponse()->setStatusCode(403);
         }elseif(is_a($ex, \Throwable::class)){
             $this->getResponse()->setStatusCode(500);
         }else{
