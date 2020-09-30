@@ -4,6 +4,7 @@
 namespace APIF\Core\Repository;
 
 use  MongoDB\Client;
+use MongoDB\Driver\Exception\AuthenticationException;
 
 class APIFCoreRepository implements APIFCoreRepositoryInterface
 {
@@ -42,9 +43,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             ]);
             $this->_db = $this->_client->$DBNAME;
         } catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error connecting to MongoDB: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
     }
 
@@ -67,9 +66,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             return $data;
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error retrieving documents: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
     }
 
@@ -86,9 +83,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             return $data;
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error retrieving documents: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
     }
 
@@ -99,9 +94,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             $insertOneResult = $collection->insertOne($object);
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error inserting document: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
         return $object;
     }
@@ -113,9 +106,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             $replaceOneResult = $collection->replaceOne(['_id' => $docID], $object, ['upsert' => true]);
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error updating document: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
         if ($replaceOneResult->getModifiedCount() > 0) {
             return ("UPDATED");
@@ -131,9 +122,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             $deleteResult = $collection->deleteOne(['_id' => $docID]);
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error deleting document: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
         if ($deleteResult->getDeletedCount() > 0) {
             return ("DELETED");
@@ -151,9 +140,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             }
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error retrieving dataset list: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
 
         return $collectionArray;
@@ -180,9 +167,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             }
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error retrieving dataset info: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
         return $summary;
     }
@@ -196,9 +181,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
         catch (\Throwable $ex) {
             //Most likely error here is that the collection already exists
-            http_response_code(400);
-            echo 'Fatal error creating MongoDB collection: ' .$ex->getMessage();
-            exit();
+            throw $ex;
         }
 
         //Create index(es)
@@ -340,9 +323,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
         catch (\Throwable $ex) {
             //Most likely error here is that the collection already exists
-            http_response_code(400);
-            echo 'Fatal error retrieving key info: ' .$ex->getMessage();
-            exit();
+            throw $ex;
         }
 
         return $userArray;
@@ -362,9 +343,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
         catch (\Throwable $ex) {
             //Most likely error here is that the collection already exists
-            http_response_code(400);
-            echo 'Fatal error retrieving keys: ' .$ex->getMessage();
-            exit();
+            throw $ex;
         }
 
 

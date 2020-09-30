@@ -97,6 +97,19 @@ class BrowseController extends AbstractRestfulController
         return $data;
     }
 
+    private function _handleException($ex) {
+        if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
+            $this->getResponse()->setStatusCode(403);
+        }elseif(is_a($ex->getPrevious(), MongoDB\Driver\Exception\AuthenticationException::class)){
+            $this->getResponse()->setStatusCode(403);
+        }elseif(is_a($ex, \Throwable::class)){
+            $this->getResponse()->setStatusCode(500);
+        }else{
+            // This will never happen
+            $this->getResponse()->setStatusCode(500);
+        }
+    }
+
     /*
  * GET - Handling a GET request
  * brings back all docs from a dataset (subject to limit), or a query
@@ -158,15 +171,18 @@ class BrowseController extends AbstractRestfulController
         else{
             $query = json_decode($queryParam);
             if ($query == null) {
-                http_response_code(400);
-                echo 'Bad request, malformed JSON query';
-                exit();
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, malformed JSON query']);
             }
         }
 
-        $data = $this->_repository->findDocs($id,$key,$pwd,$query,(int)$limitParam,$sortTerms,$fields);
+        try {
+            $data = $this->_repository->findDocs($id,$key,$pwd,$query,(int)$limitParam,$sortTerms,$fields);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve documents - ' . $ex->getMessage()]);
+        }
 
-        //$metadata['query'] = json_encode($query);
         $metadata['messages'] = [];
         $metadata['sort'] = $sortTerms;
         $metadata['limit'] = $limitParam;

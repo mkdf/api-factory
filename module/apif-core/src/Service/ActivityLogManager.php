@@ -39,9 +39,7 @@ class ActivityLogManager implements ActivityLogManagerInterface
             ]);
             $this->_db = $this->_client->$DBNAME;
         } catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error connecting to MongoDB: ' . $ex->getMessage();
-            exit();
+            throw $ex;
         }
     }
 
@@ -65,9 +63,7 @@ class ActivityLogManager implements ActivityLogManagerInterface
                 $insertOneResult = $collection->insertOne($data);
             }
             catch (\Throwable $ex) {
-                http_response_code(500);
-                echo 'Fatal error inserting document: ' . $ex->getMessage();
-                exit();
+                throw $ex;
             }
             return true;
         }
