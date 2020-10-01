@@ -16,7 +16,7 @@
 "tags": [
 {
 "name": "datasets",
-"description": "Query documents",
+"description": "Manage datasets",
 "externalDocs": {
 "description": "Find out more",
 "url": "http://datahub.mksmart.org"
@@ -24,7 +24,11 @@
 },
 {
 "name": "permissions",
-"description": "Push, update and delete documents"
+"description": "Manage permissions"
+},
+{
+"name": "schemas",
+"description": "Manage schemas"
 }
 ],
 "paths": {
@@ -200,6 +204,129 @@
 "responses": {
 "200": {
 "description": "OK"
+}
+}
+}
+},
+"/schemas": {
+"get": {
+"tags": [
+"schemas"
+],
+"summary": "Retrieve all schemas",
+"description": "Retrieves a full list of schemas",
+"operationId": "getAllSchemas",
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
+"post": {
+"tags": [
+"schemas"
+],
+"summary": "Create a new schema",
+"description": "Create a new schema",
+"operationId": "createSchema",
+"requestBody": {
+"required": true,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"schema-id": {
+"type": "string"
+},
+"schema": {
+"type": "string"
+}
+},
+"required": [
+"schema-id",
+"schema"
+]
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Created"
+}
+}
+}
+},
+"/schemas/{schema-id}": {
+"get": {
+"tags": [
+"schemas"
+],
+"summary": "Retrieve full details for a single schema",
+"description": "Retrieves full details for a single schema, including metadata",
+"operationId": "getOneSchema",
+"parameters": [
+{
+"name": "schema-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
+"put": {
+"tags": [
+"schemas"
+],
+"summary": "Update an existing schema",
+"description": "Update an existing schema. Schema will be created if it does not already exist",
+"operationId": "updateSchema",
+"parameters": [
+{
+"name": "schema-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"schema-id": {
+"type": "string"
+},
+"schema": {
+"type": "string"
+}
+},
+"required": [
+"schema-id",
+"schema"
+]
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Created"
+},
+"204": {
+"description": "Updated"
 }
 }
 }

@@ -52,14 +52,14 @@ class SchemaManagementController extends AbstractRestfulController
 
     public function getList() {
         //get all schemas
+        $auth = $this->_getAuth();
         try {
-            $auth = $this->_getAuth();
+            $schemas = $this->_repository->findSchemas();
         }
-        catch (Exception $e) {
-            echo 'Error: ',  $e->getMessage(), "\n";
+        catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve schema list - ' . $ex->getMessage()]);
         }
-
-        $schemas = $this->_repository->findSchemas();
         return new JsonModel($schemas);
     }
 
