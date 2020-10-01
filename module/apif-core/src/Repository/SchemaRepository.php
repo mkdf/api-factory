@@ -48,9 +48,7 @@ class SchemaRepository implements SchemaRepositoryInterface
             ]);
             $this->_db = $this->_client->$DBNAME;
         } catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error connecting to MongoDB: ' . $ex->getMessage();
-            exit();
+            throw ($ex);
         }
     }
 
@@ -72,9 +70,7 @@ class SchemaRepository implements SchemaRepositoryInterface
             return $data;
         }
         catch (\Throwable $ex) {
-            http_response_code(500);
-            echo 'Fatal error retrieving documents: ' . $ex->getMessage();
-            exit();
+            throw ($ex);
         }
     }
 
