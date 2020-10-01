@@ -46,15 +46,37 @@ class SchemaManagementController extends AbstractRestfulController
         return $auth;
     }
 
-    public function get($id) {
+    private function _handleException($ex) {
+        if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
+            $this->getResponse()->setStatusCode(403);
+        }elseif(is_a($ex->getPrevious(), MongoDB\Driver\Exception\AuthenticationException::class)){
+            $this->getResponse()->setStatusCode(403);
+        }elseif(is_a($ex, \Throwable::class)){
+            $this->getResponse()->setStatusCode(500);
+        }else{
+            // This will never happen
+            $this->getResponse()->setStatusCode(500);
+        }
+    }
 
+    public function get($id) {
+        //get a single schema details, with metadata (not simply the schema alone)
+        try {
+            $auth = $this->_getAuth();
+            $schema = $this->_repository->findSingleSchemaDetails($id, $auth);
+        }
+        catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve schema details - ' . $ex->getMessage()]);
+        }
+        return new JsonModel($schema);
     }
 
     public function getList() {
         //get all schemas
-        $auth = $this->_getAuth();
         try {
-            $schemas = $this->_repository->findSchemas();
+            $auth = $this->_getAuth();
+            $schemas = $this->_repository->findSchemas($auth);
         }
         catch (\Throwable $ex) {
             $this->_handleException($ex);

@@ -52,21 +52,44 @@ class SchemaRepository implements SchemaRepositoryInterface
         }
     }
 
-    public function findSchemas($query = [], $limit = null, $sort = null) {
-        $this->_connectDB($this->_adminUser, $this->_adminPassword);
+    //Remove double backslashes from $ symbols
+    private function _cleanDollars($input) {
+        $inputJson = json_encode($input);
+        return json_decode(str_replace('\\\\$','$',$inputJson));
+    }
+
+    public function findSchemas($auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
         $sd = $this->_schemaDataset;
         $collection = $this->_db->$sd;
         $data = [];
-        if (!is_null($limit)){
-            $this->_queryOptions['limit'] = $limit;
-        }
-        if (!is_null($sort)){
-            $this->_queryOptions['sort'] = array_merge($sort,$this->_queryOptions['sort']);
-        }
-
+        $query = [];
         try {
             $result = $collection->find($query, $this->_queryOptions);
             $data = $result->toArray();
+            foreach ($data as &$item) {
+                $item = $this->_cleanDollars($item);
+            }
+            return $data;
+        }
+        catch (\Throwable $ex) {
+            throw ($ex);
+        }
+    }
+
+    public function findSingleSchemaDetails($id,$auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $sd = $this->_schemaDataset;
+        $collection = $this->_db->$sd;
+        $query = [
+            "_id" => strval($id)
+        ];
+        try {
+            $result = $collection->find($query, []);
+            $data = $result->toArray();
+            foreach ($data as &$item) {
+                $item = $this->_cleanDollars($item);
+            }
             return $data;
         }
         catch (\Throwable $ex) {
