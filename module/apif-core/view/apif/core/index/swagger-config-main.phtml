@@ -15,20 +15,16 @@
 },
 "tags": [
 {
-"name": "query",
-"description": "Query documents (included for backwards compatibility - please use Object or Browse)",
-"externalDocs": {
-"description": "Find out more",
-"url": "https://datahub.mksmart.org"
-}
-},
-{
 "name": "browse",
 "description": "Browse a dataset, with full control over filters, pagination, sorting"
 },
 {
 "name": "object",
-"description": "retrieve, push, update and delete documents"
+"description": "Retrieve, push, update and delete documents"
+},
+{
+"name": "schemas",
+"description": "Retrieve a schema"
 }
 ],
 "paths": {
@@ -38,7 +34,7 @@
 "browse"
 ],
 "summary": "Retrieve documents from the dataset",
-"operationId": "getDocuments",
+"operationId": "browseDocuments",
 "parameters": [
 {
 "name": "dataset-uuid",
@@ -343,6 +339,38 @@
 }
 }
 }
+},
+"/schemas/{schema-id}": {
+"get": {
+"tags": [
+"schemas"
+],
+"summary": "Retrieve schema",
+"operationId": "getSchema",
+"parameters": [
+{
+"name": "schema-id",
+"in": "path",
+"description": "Schema name",
+"example": "person.json",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+},
+"404": {
+"description": "Schema not found"
+},
+"500": {
+"description": "Fatal error retrieving schema"
+}
+}
+}
 }
 },
 "externalDocs": {
@@ -351,7 +379,7 @@
 },
 "servers": [
 {
-"url": "<?= $this->basePath() ?>"
+"url": ""
 }
 ],
 "security": [
