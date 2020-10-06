@@ -241,11 +241,20 @@
 },
 "schema": {
 "type": "string"
+},
+"external": {
+"type": "integer",
+"description": "Is this an external schema?",
+"enum": [
+0,
+1
+]
 }
 },
 "required": [
 "schema-id",
-"schema"
+"schema",
+"external"
 ]
 }
 }

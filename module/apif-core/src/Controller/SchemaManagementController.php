@@ -59,6 +59,11 @@ class SchemaManagementController extends AbstractRestfulController
         }
     }
 
+    private function _rewriteSchemaId ($schema, $id) {
+        $schema['@id'] = $id;
+        return $schema;
+    }
+
     public function get($id) {
         //get a single schema details, with metadata (not simply the schema alone)
         try {
@@ -86,7 +91,57 @@ class SchemaManagementController extends AbstractRestfulController
     }
 
     public function create($data) {
+        //Get URL params
+        $schemaIdParam = $this->params()->fromPost('schema-id', null);
+        $schemaParam = $this->params()->fromPost('schema', null);
+        $externalParam = $this->params()->fromPost('external', null);
+        //Check the schemaId and schema have been provided...
+        if (is_null($schemaIdParam) || is_null($schemaParam) || is_null($externalParam)) {
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel(['error' => 'Bad request, missing schema id, schema or external flag']);
+        }
 
+        try {
+            $schemaObj = json_decode($schemaParam);
+            //FIXME - ALSO VALIDATE HERE AGAINST JSON-SCHEMA-SCHEMA
+        }
+        catch (\Throwable $ex) {
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel(['error' => 'Bad request, invalid JSON in schema']);
+        }
+
+        if ($externalParam == 0) {
+            $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
+        }
+
+        $schemaEntry = [
+            "_id" => $schemaIdParam,
+            "schema_type" => "JSON-SCHEMA",
+            "schema" => $schemaObj,
+            "schema_str" => json_encode($schemaObj)
+        ];
+
+        //Create schema
+        try {
+            $auth = $this->_getAuth();
+            $response = $this->_repository->createSchema($schemaEntry, $auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to create schema - ' . $ex->getMessage()]);
+        }
+
+
+
+        $this->getResponse()->setStatusCode(201);
+
+        //Activity Log
+        $datasetUUID = $this->_config['schema']['dataset'];
+        $action = "CreateSchema";
+        $summary = "Create a new schema";
+        //$logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        //$this->_activityLog->logActivity($logData);
+
+        return new JsonModel($response);
     }
 
     public function update($id, $data) {

@@ -52,10 +52,16 @@ class SchemaRepository implements SchemaRepositoryInterface
         }
     }
 
-    //Remove double backslashes from $ symbols
+    //Remove double underscore from $ symbols
     private function _cleanDollars($input) {
         $inputJson = json_encode($input);
-        return json_decode(str_replace('\\\\$','$',$inputJson));
+        return json_decode(str_replace('__$','$',$inputJson),true);
+    }
+
+    //Add double underscore to $ symbols
+    private function _escapeDollars($input) {
+        $inputJson = json_encode($input);
+        return json_decode(str_replace('$', '__$', $inputJson),true);
     }
 
     public function findSchemas($auth) {
@@ -95,6 +101,20 @@ class SchemaRepository implements SchemaRepositoryInterface
         catch (\Throwable $ex) {
             throw ($ex);
         }
+    }
+
+    public function createSchema($schemaEntry, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $sd = $this->_schemaDataset;
+        $collection = $this->_db->$sd;
+        $escaped = $this->_escapeDollars($schemaEntry);
+        try {
+            //$insertOneResult = $collection->insertOne($escaped);
+        }
+        catch (\Throwable $ex) {
+            throw $ex;
+        }
+        return $escaped;
     }
 
 }
