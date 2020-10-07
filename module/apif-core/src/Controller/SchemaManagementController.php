@@ -179,6 +179,7 @@ class SchemaManagementController extends AbstractRestfulController
 
         $this->getResponse()->setStatusCode(201);
 
+        //FIXME - ENABLE ACTIVITY LOGGING IN THIS CONTROLLER
         //Activity Log
         $datasetUUID = $this->_config['schema']['dataset'];
         $action = "CreateSchema";

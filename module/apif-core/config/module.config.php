@@ -16,6 +16,7 @@ use APIF\Core\Controller\Factory\ObjectControllerFactory;
 use APIF\Core\Controller\Factory\PermissionsManagementControllerFactory;
 use APIF\Core\Controller\Factory\QueryControllerFactory;
 use APIF\Core\Controller\Factory\SchemaManagementControllerFactory;
+use APIF\Core\Controller\Factory\SchemaRetrievalControllerFactory;
 use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Segment;
 use Laminas\ServiceManager\Factory\InvokableFactory;
@@ -123,6 +124,15 @@ return [
                     ],
                 ],
             ],
+            'schemaretrieval' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/schemas[/:id]',
+                    'defaults' => [
+                        'controller' => Controller\SchemaRetrievalController::class,
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
@@ -133,6 +143,7 @@ return [
             Controller\BrowseController::class => BrowseControllerFactory::class,
             Controller\DatasetManagementController::class => DatasetManagementControllerFactory::class,
             Controller\PermissionsManagementController::class => PermissionsManagementControllerFactory::class,
+            Controller\SchemaRetrievalController::class => SchemaRetrievalControllerFactory::class,
             Controller\SchemaManagementController::class => SchemaManagementControllerFactory::class,
         ],
     ],

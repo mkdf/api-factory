@@ -103,6 +103,7 @@ class SchemaRepository implements SchemaRepositoryInterface
         }
     }
 
+
     public function createSchema($schemaEntry, $auth) {
         $this->_connectDB($auth['user'],$auth['pwd']);
         $sd = $this->_schemaDataset;
