@@ -46,6 +46,40 @@ class SchemaManagementController extends AbstractRestfulController
         return $auth;
     }
 
+    private function _annotateObject($input){
+        /*
+         * add extra metadata and return new annotated object
+         * Also add an _id field if one hasn't been submitted
+         */
+        //$object = json_decode($input, true);
+        $object = $input;
+
+        $timestamp = time();
+        //echo date("d/m/Y H:i:s",$timestamp);
+
+        //if no _id supplied, generate a string version of a Mongo ObjectID
+        if (!array_key_exists('_id',$object)){
+            $OID = new MongoDB\BSON\ObjectId();
+            $idString = (string)$OID;
+            $object['_id'] = $idString;
+        }
+        //convert _id to string if necessary
+        $object['_id'] = (string)$object['_id'];
+
+        //$object['_datasetid'] = $uuid;
+        $object['_timestamp'] = $timestamp;
+
+        #explode timestamp and add additional attributes for year, month, dat, hour, second.
+        $object['_timestamp_year'] = (int)date("Y",$timestamp);
+        $object['_timestamp_month'] = (int)date("m",$timestamp);
+        $object['_timestamp_day'] = (int)date("d",$timestamp);
+        $object['_timestamp_hour'] = (int)date("H",$timestamp);
+        $object['_timestamp_minute'] = (int)date("i",$timestamp);
+        $object['_timestamp_second'] = (int)date("s",$timestamp);
+
+        return $object;
+    }
+
     private function _handleException($ex) {
         if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
             $this->getResponse()->setStatusCode(403);
@@ -60,7 +94,7 @@ class SchemaManagementController extends AbstractRestfulController
     }
 
     private function _rewriteSchemaId ($schema, $id) {
-        $schema['@id'] = $id;
+        $schema['$id'] = $id;
         return $schema;
     }
 
@@ -102,7 +136,7 @@ class SchemaManagementController extends AbstractRestfulController
         }
 
         try {
-            $schemaObj = json_decode($schemaParam);
+            $schemaObj = json_decode($schemaParam, true);
             //FIXME - ALSO VALIDATE HERE AGAINST JSON-SCHEMA-SCHEMA
         }
         catch (\Throwable $ex) {
@@ -120,17 +154,17 @@ class SchemaManagementController extends AbstractRestfulController
             "schema" => $schemaObj,
             "schema_str" => json_encode($schemaObj)
         ];
+        $annotated = $this->_annotateObject($schemaEntry);
 
         //Create schema
         try {
             $auth = $this->_getAuth();
-            $response = $this->_repository->createSchema($schemaEntry, $auth);
+            $response = $this->_repository->createSchema($annotated, $auth);
         }catch (\Throwable $ex) {
             $this->_handleException($ex);
             return new JsonModel(['error' => 'Failed to create schema - ' . $ex->getMessage()]);
+            //FIXME - Duplicate key error (schema ID already exists) should be handled here more gracefully
         }
-
-
 
         $this->getResponse()->setStatusCode(201);
 

@@ -109,7 +109,7 @@ class SchemaRepository implements SchemaRepositoryInterface
         $collection = $this->_db->$sd;
         $escaped = $this->_escapeDollars($schemaEntry);
         try {
-            //$insertOneResult = $collection->insertOne($escaped);
+            $insertOneResult = $collection->insertOne($escaped);
         }
         catch (\Throwable $ex) {
             throw $ex;
