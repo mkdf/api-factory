@@ -145,7 +145,18 @@ class SchemaManagementController extends AbstractRestfulController
         }
 
         if ($externalParam == 0) {
-            $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
+            //IF THIS IS A LOCAL SCHEMA (NOT EXTERNAL), CHECK FOR VALID ID & REWRITE "$id" ATTRIBUTE
+            //ID SHOULD BE ALPHA-NUMERIC ONLY (inc hyphen and underscore), NO SPECIAL CHARS, DOTS, SLASHES... AND WITHOUT .JSON APPENDED
+            if(preg_match('/^[a-zA-Z_\-0-9]+$/', $schemaIdParam)) {
+                $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
+            }
+            else {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, Schema ID may only contain alphanumeric characters, hyphens(-) and underscores(_)']);
+            }
+        }
+        else {
+            //Processing for external schemas...
         }
 
         $schemaEntry = [
