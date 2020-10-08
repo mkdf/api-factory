@@ -62,6 +62,7 @@ class SchemaRetrievalController extends AbstractRestfulController
 
     public function get($id) {
         //get a single schema (schema body only, no metadata)
+        //FIXME - HANDLE REMOVAL OF .json EXTENSION
         try {
             $auth = $this->_getAuth();
             $response = $this->_repository->findSingleSchemaDetails($id, $auth);

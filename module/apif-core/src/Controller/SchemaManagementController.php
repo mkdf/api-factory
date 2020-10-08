@@ -149,6 +149,8 @@ class SchemaManagementController extends AbstractRestfulController
             //ID SHOULD BE ALPHA-NUMERIC ONLY (inc hyphen and underscore), NO SPECIAL CHARS, DOTS, SLASHES... AND WITHOUT .JSON APPENDED
             if(preg_match('/^[a-zA-Z_\-0-9]+$/', $schemaIdParam)) {
                 $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
+                $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
+                $schemaURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $schemaObj['$id'] . ".json";
             }
             else {
                 $this->getResponse()->setStatusCode(400);
@@ -157,6 +159,7 @@ class SchemaManagementController extends AbstractRestfulController
         }
         else {
             //Processing for external schemas...
+            $schemaURI = $schemaObj['$id'];
         }
 
         $schemaEntry = [
@@ -187,7 +190,8 @@ class SchemaManagementController extends AbstractRestfulController
         //$logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
         //$this->_activityLog->logActivity($logData);
 
-        return new JsonModel($response);
+        //return new JsonModel($response);
+        return new JsonModel(['schemaURI' => $schemaURI]);
     }
 
     public function update($id, $data) {
