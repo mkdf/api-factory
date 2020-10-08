@@ -187,24 +187,38 @@ class SchemaManagementController extends AbstractRestfulController
                 return new JsonModel(['error' => 'Supplied external schema ID is not a valid URL']);
             }
             //Retrieve schema body from remote URL...
-            //FIXME - DO THIS BIT NEXT, CURL...
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => $schemaIdParam,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_HTTPHEADER => array(
-                    "Accept: application/json"
-                ),
-            ));
-            $response = curl_exec($curl);
-            curl_close($curl);
-            $schemaBody = $response;
+            try {
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => $schemaIdParam,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => array(
+                        "Accept: application/json"
+                    ),
+                ));
+                $response = curl_exec($curl);
+                $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                if (!json_decode($response)) {
+                    throw new \Exception("Error: Unable to parse JSON");
+                }
+                if ($httpCode != 200) {
+                    throw new \Exception("Error: HTTP response ".$httpCode);
+                }
+                curl_close($curl);
+                $schemaBody = $response;
+            }
+            catch (\Throwable $ex) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Unable to retrieve and parse valid JSON schema from the supplied URL']);
+            }
+
+
 
             $schemaEntry = [
                 "_id" => $newSchemaID,
