@@ -130,18 +130,9 @@ class SchemaManagementController extends AbstractRestfulController
         $schemaParam = $this->params()->fromPost('schema', null);
         $externalParam = $this->params()->fromPost('external', null);
         //Check the schemaId and schema have been provided...
-        if (is_null($schemaIdParam) || is_null($schemaParam) || is_null($externalParam)) {
+        if (is_null($schemaIdParam) || is_null($externalParam)) {
             $this->getResponse()->setStatusCode(400);
             return new JsonModel(['error' => 'Bad request, missing schema id, schema or external flag']);
-        }
-
-        try {
-            $schemaObj = json_decode($schemaParam, true);
-            //FIXME - ALSO VALIDATE HERE AGAINST JSON-SCHEMA-SCHEMA
-        }
-        catch (\Throwable $ex) {
-            $this->getResponse()->setStatusCode(400);
-            return new JsonModel(['error' => 'Bad request, invalid JSON in schema']);
         }
 
         if ($externalParam == 0) {
@@ -156,6 +147,19 @@ class SchemaManagementController extends AbstractRestfulController
                 $this->getResponse()->setStatusCode(400);
                 return new JsonModel(['error' => 'Bad request, Schema ID may only contain alphanumeric characters, hyphens(-) and underscores(_)']);
             }
+
+            try {
+                $schemaObj = json_decode($schemaParam, true);
+                if (!$schemaObj) {
+                    throw new \Exception("Error: unable to parse JSON schema");
+                }
+                //FIXME - ALSO VALIDATE HERE AGAINST JSON-SCHEMA-SCHEMA
+            }
+            catch (\Throwable $ex) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, invalid JSON in schema']);
+            }
+
             $newSchemaID = $schemaIdParam;
             $schemaEntry = [
                 "_id" => $newSchemaID,
@@ -181,6 +185,8 @@ class SchemaManagementController extends AbstractRestfulController
                 $search = ['/','.'];
                 $replace = ['-','-'];
                 $newSchemaID = str_replace($search, $replace, $newSchemaID);
+                $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
+                $localURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $newSchemaID . ".json";
 
             } else {
                 $this->getResponse()->setStatusCode(400);
@@ -218,8 +224,6 @@ class SchemaManagementController extends AbstractRestfulController
                 return new JsonModel(['error' => 'Unable to retrieve and parse valid JSON schema from the supplied URL']);
             }
 
-
-
             $schemaEntry = [
                 "_id" => $newSchemaID,
                 "schema_type" => "JSON-SCHEMA",
@@ -228,7 +232,6 @@ class SchemaManagementController extends AbstractRestfulController
                 "schema_str" => $schemaBody
             ];
         }
-
 
         $annotated = $this->_annotateObject($schemaEntry);
 
@@ -253,7 +256,7 @@ class SchemaManagementController extends AbstractRestfulController
         //$this->_activityLog->logActivity($logData);
 
         //return new JsonModel($response);
-        return new JsonModel(['schemaURI' => $annotated['schema']['$id'], 'schemaId' => $newSchemaID]);
+        return new JsonModel(['schemaURI' => $annotated['schema']['$id'], 'schemaId' => $newSchemaID,'localURI' => $localURI]);
     }
 
     public function update($id, $data) {

@@ -237,10 +237,12 @@
 "type": "object",
 "properties": {
 "schema-id": {
-"type": "string"
+"type": "string",
+"description": "For external schemas, use the full schema URI"
 },
 "schema": {
-"type": "string"
+"type": "string",
+"description": "The body of the schema, for local schemas only. Leave this blank for external schemas."
 },
 "external": {
 "type": "integer",
@@ -248,12 +250,12 @@
 "enum": [
 0,
 1
-]
+],
+"default": 1
 }
 },
 "required": [
 "schema-id",
-"schema",
 "external"
 ]
 }
