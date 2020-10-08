@@ -103,6 +103,26 @@ class SchemaRepository implements SchemaRepositoryInterface
         }
     }
 
+    public function retrieveSimpleSchema($id) {
+        $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
+        $sd = $this->_schemaDataset;
+        $collection = $this->_db->$sd;
+        $query = [
+            "_id" => strval($id)
+        ];
+        try {
+            $result = $collection->find($query, []);
+            $data = $result->toArray();
+            foreach ($data as &$item) {
+                $item = $this->_cleanDollars($item);
+            }
+            return $data[0]['schema'];
+        }
+        catch (\Throwable $ex) {
+            throw ($ex);
+        }
+    }
+
 
     public function createSchema($schemaEntry, $auth) {
         $this->_connectDB($auth['user'],$auth['pwd']);

@@ -150,24 +150,72 @@ class SchemaManagementController extends AbstractRestfulController
             if(preg_match('/^[a-zA-Z_\-0-9]+$/', $schemaIdParam)) {
                 $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
                 $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
-                $schemaURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $schemaObj['$id'] . ".json";
+                $localURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $schemaObj['$id'] . ".json";
             }
             else {
                 $this->getResponse()->setStatusCode(400);
                 return new JsonModel(['error' => 'Bad request, Schema ID may only contain alphanumeric characters, hyphens(-) and underscores(_)']);
             }
+            $newSchemaID = $schemaIdParam;
+            $schemaEntry = [
+                "_id" => $newSchemaID,
+                "schema_type" => "JSON-SCHEMA",
+                "externalSchema" => false,
+                "schema" => $schemaObj,
+                "schema_str" => json_encode($schemaObj)
+            ];
         }
         else {
             //Processing for external schemas...
-            $schemaURI = $schemaObj['$id'];
+            /*
+             * CREATE AN '_id' ATTRIBUTE FROM THE URI SUPPLIED:
+             * http://example.org/schemas/weather.json becomes...
+             * 'external-weather-123456789', where 123456789 is a random string.
+             */
+            if (filter_var($schemaIdParam, FILTER_VALIDATE_URL)) {
+                $urlParsed = parse_url($schemaIdParam);
+                $newSchemaID = $urlParsed['host'] . $urlParsed['path'];
+                if (substr($newSchemaID, -5) == ".json") {
+                    $newSchemaID = substr($newSchemaID,0,-5);
+                }
+                $search = ['/','.'];
+                $replace = ['-','-'];
+                $newSchemaID = str_replace($search, $replace, $newSchemaID);
+
+            } else {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Supplied external schema ID is not a valid URL']);
+            }
+            //Retrieve schema body from remote URL...
+            //FIXME - DO THIS BIT NEXT, CURL...
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $schemaIdParam,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_HTTPHEADER => array(
+                    "Accept: application/json"
+                ),
+            ));
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $schemaBody = $response;
+
+            $schemaEntry = [
+                "_id" => $newSchemaID,
+                "schema_type" => "JSON-SCHEMA",
+                "externalSchema" => true,
+                "schema" => json_decode($schemaBody, true),
+                "schema_str" => $schemaBody
+            ];
         }
 
-        $schemaEntry = [
-            "_id" => $schemaIdParam,
-            "schema_type" => "JSON-SCHEMA",
-            "schema" => $schemaObj,
-            "schema_str" => json_encode($schemaObj)
-        ];
+
         $annotated = $this->_annotateObject($schemaEntry);
 
         //Create schema
@@ -191,7 +239,7 @@ class SchemaManagementController extends AbstractRestfulController
         //$this->_activityLog->logActivity($logData);
 
         //return new JsonModel($response);
-        return new JsonModel(['schemaURI' => $schemaURI]);
+        return new JsonModel(['schemaURI' => $annotated['schema']['$id'], 'schemaId' => $newSchemaID]);
     }
 
     public function update($id, $data) {

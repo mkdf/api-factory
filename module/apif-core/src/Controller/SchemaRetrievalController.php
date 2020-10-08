@@ -62,18 +62,29 @@ class SchemaRetrievalController extends AbstractRestfulController
 
     public function get($id) {
         //get a single schema (schema body only, no metadata)
-        //FIXME - HANDLE REMOVAL OF .json EXTENSION
+
+        //remove '.json' from schema ID if supplied.
+        if (substr($id, -5) == ".json") {
+            $id = substr($id,0,-5);
+        }
+
         try {
-            $auth = $this->_getAuth();
-            $response = $this->_repository->findSingleSchemaDetails($id, $auth);
+            $response = $this->_repository->retrieveSimpleSchema($id);
         }
         catch (\Throwable $ex) {
             $this->_handleException($ex);
             return new JsonModel(['error' => 'Failed to retrieve schema details - ' . $ex->getMessage()]);
         }
-        $schemaBody = $response[0]['schema'];
         //FIXME - REWRITE SCHEMA ID/URI HERE...
-        return new JsonModel($schemaBody);
+        if (!(substr($response['$id'],0,4) == "http")) {
+            $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
+            $response['$id'] = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $response['$id'] . ".json";
+
+        }
+        //FIXME - Give 404 on empty $response
+        $jsonModel = new JsonModel($response);
+        $jsonModel->setOption('prettyPrint',true);
+        return $jsonModel;
     }
 
 }
