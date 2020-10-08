@@ -138,16 +138,6 @@ class SchemaManagementController extends AbstractRestfulController
         if ($externalParam == 0) {
             //IF THIS IS A LOCAL SCHEMA (NOT EXTERNAL), CHECK FOR VALID ID & REWRITE "$id" ATTRIBUTE
             //ID SHOULD BE ALPHA-NUMERIC ONLY (inc hyphen and underscore), NO SPECIAL CHARS, DOTS, SLASHES... AND WITHOUT .JSON APPENDED
-            if(preg_match('/^[a-zA-Z_\-0-9]+$/', $schemaIdParam)) {
-                $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
-                $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
-                $localURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $schemaObj['$id'] . ".json";
-            }
-            else {
-                $this->getResponse()->setStatusCode(400);
-                return new JsonModel(['error' => 'Bad request, Schema ID may only contain alphanumeric characters, hyphens(-) and underscores(_)']);
-            }
-
             try {
                 $schemaObj = json_decode($schemaParam, true);
                 if (!$schemaObj) {
@@ -158,6 +148,16 @@ class SchemaManagementController extends AbstractRestfulController
             catch (\Throwable $ex) {
                 $this->getResponse()->setStatusCode(400);
                 return new JsonModel(['error' => 'Bad request, invalid JSON in schema']);
+            }
+
+            if(preg_match('/^[a-zA-Z_\-0-9]+$/', $schemaIdParam)) {
+                $schemaObj = $this->_rewriteSchemaId($schemaObj, $schemaIdParam);
+                $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
+                $localURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $schemaObj['$id'] . ".json";
+            }
+            else {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, Schema ID may only contain alphanumeric characters, hyphens(-) and underscores(_)']);
             }
 
             $newSchemaID = $schemaIdParam;
