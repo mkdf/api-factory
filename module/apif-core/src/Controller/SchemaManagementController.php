@@ -287,9 +287,6 @@ class SchemaManagementController extends AbstractRestfulController
             'datasetId' => $datasetId
         ];
         switch ($_SERVER['REQUEST_METHOD']) {
-            case "GET":
-                $message['message'] = "You sent a GET";
-                break;
             case "POST":
                 try {
                     if ($this->_repository->assignSchemaToDataset($schemaId, $datasetId, $auth) == 201) {
@@ -323,7 +320,8 @@ class SchemaManagementController extends AbstractRestfulController
                 }
                 break;
             default:
-                $message['message'] = "HTTP method not supported: ".$_SERVER['REQUEST_METHOD'];
+                $this->getResponse()->setStatusCode(201);
+                $message['message'] = "Bad request - HTTP method not supported: ".$_SERVER['REQUEST_METHOD'];
         }
 
         return new JsonModel($message);
