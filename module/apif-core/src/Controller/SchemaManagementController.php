@@ -291,8 +291,22 @@ class SchemaManagementController extends AbstractRestfulController
                 $message['message'] = "You sent a GET";
                 break;
             case "POST":
-                $message['message'] = "You sent a POST";
-                break;
+                try {
+                    if ($this->_repository->assignSchemaToDataset($schemaId, $datasetId, $auth) == 201) {
+                        $message['message'] = "Schema successfully assigned to dataset";
+                        $this->getResponse()->setStatusCode(201);
+                    }
+                    else {
+                        $message['message'] = "Schema already assigned to dataset";
+                        $this->getResponse()->setStatusCode(200);
+                    }
+                    break;
+                }
+                catch (\Exception $ex) {
+                    $this->_handleException($ex);
+                    return new JsonModel(['error' => 'Failed to assign schema to dataset - ' . $ex->getMessage()]);
+                }
+
             case "DELETE":
                 $message['message'] = "You sent a DELETE";
                 break;

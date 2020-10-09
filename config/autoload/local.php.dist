@@ -21,13 +21,14 @@ return [
         'adminUser' => 'admin-user',
         'adminPwd' => 'admin-password'
     ],
-    //Specify the dataset used for activity logging here
+    'metadata' => [
+        'dataset' => 'metadata-dataset'
+    ],
     'activityLog' => [
         'enabled' => true,
-        'dataset' => 'activity_log'
+        'dataset' => 'activity_log-dataset'
     ],
     'schema' => [
         'dataset' => 'schema-dataset',
     ],
-
 ];

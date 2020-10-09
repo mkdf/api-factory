@@ -125,17 +125,69 @@ class SchemaRepository implements SchemaRepositoryInterface
 
 
     public function createSchema($schemaEntry, $auth) {
-        $this->_connectDB($auth['user'],$auth['pwd']);
-        $sd = $this->_schemaDataset;
-        $collection = $this->_db->$sd;
-        $escaped = $this->_escapeDollars($schemaEntry);
         try {
+            $this->_connectDB($auth['user'],$auth['pwd']);
+            $sd = $this->_schemaDataset;
+            $collection = $this->_db->$sd;
+            $escaped = $this->_escapeDollars($schemaEntry);
             $insertOneResult = $collection->insertOne($escaped);
         }
         catch (\Throwable $ex) {
             throw $ex;
         }
         return $escaped;
+    }
+
+    public function assignSchemaToDataset($schemaId, $datasetId, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $md = $this->_config['metadata']['dataset'];
+        $sd = $this->_schemaDataset;
+        $metadataCollection = $this->_db->$md;
+        $schemaCollection = $this->_db->$sd;
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetId,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetId);
+        }
+
+        //Check schema exists
+        $data = $schemaCollection->findOne(['_id' => $schemaId], []);
+        if (is_null($data)) {
+            throw new \Exception("No such schema: ".$schemaId);
+        }
+
+        //Retrieve dataset metadata (if exists), first
+        $result = $metadataCollection->findOne(['_id' => $datasetId], []);
+        if (is_null($result)){
+            $result = [
+                '_id' => $datasetId,
+                'schemaValidation' => true,
+                'schemas' => []
+            ];
+            $result['schemas'][] = $schemaId;
+            //Write record back to dataset
+            $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+            $response = 201;
+        }
+        else {
+            //Add schema to schema list, if not already there
+            if (in_array($schemaId, iterator_to_array($result['schemas']))) {
+                $response = 200;
+            }
+            else {
+                $result['schemas'][] = $schemaId;
+                //Write record back to dataset
+                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+                $response = 201;
+            }
+        }
+
+        return $response;
     }
 
 }
