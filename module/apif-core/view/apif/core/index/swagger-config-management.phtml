@@ -341,6 +341,104 @@
 }
 }
 }
+},
+"/schemas/{schema-id}/{dataset-id}": {
+"get": {
+"tags": [
+"schemas"
+],
+"summary": "Check for schema-dataset association",
+"description": "Check to see if a schema is assigned to a dataset",
+"operationId": "getSchemaDatasetAssoc",
+"parameters": [
+{
+"name": "schema-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
+"post": {
+"tags": [
+"schemas"
+],
+"summary": "Create schema/dataset association",
+"description": "Assign a schema to a dataset",
+"operationId": "setSchemaDatasetAssoc",
+"parameters": [
+{
+"name": "schema-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"201": {
+"description": "Created"
+}
+}
+},
+"delete": {
+"tags": [
+"schemas"
+],
+"summary": "Delete schema/dataset association",
+"description": "Remove a schema from a dataset",
+"operationId": "deleteSchemaDatasetAssoc",
+"parameters": [
+{
+"name": "schema-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "No association to delete"
+},
+"204": {
+"description": "Association deleted"
+}
+}
+}
 }
 },
 "externalDocs": {

@@ -124,6 +124,16 @@ return [
                     ],
                 ],
             ],
+            'schemaassignment' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/management/schemas/:id/:datasetid',
+                    'defaults' => [
+                        'controller' => Controller\SchemaManagementController::class,
+                        'action'     => 'assignment',
+                    ],
+                ],
+            ],
             'schemaretrieval' => [
                 'type'    => Segment::class,
                 'options' => [

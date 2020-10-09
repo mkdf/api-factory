@@ -267,4 +267,41 @@ class SchemaManagementController extends AbstractRestfulController
 
     }
 
+    public function assignmentAction () {
+        try {
+            $auth = $this->_getAuth();
+        }catch (\Throwable $ex) {
+            $this->getResponse()->setStatusCode(401);
+            return new JsonModel(['error' => 'Authentication required']);
+        }
+        $schemaId = $this->params()->fromRoute('id', null);
+        $datasetId = $this->params()->fromRoute('datasetid', null);
+        if (is_null($schemaId) || is_null($datasetId)) {
+            //This should never happen
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel(['error' => 'Bad request, schema id or dataset id missing']);
+        }
+        $message = [
+            'message' => "",
+            'schemaId' => $schemaId,
+            'datasetId' => $datasetId
+        ];
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case "GET":
+                $message['message'] = "You sent a GET";
+                break;
+            case "POST":
+                $message['message'] = "You sent a POST";
+                break;
+            case "DELETE":
+                $message['message'] = "You sent a DELETE";
+                break;
+            default:
+                $message['message'] = "HTTP method not supported: ".$_SERVER['REQUEST_METHOD'];
+        }
+
+        return new JsonModel($message);
+
+    }
+
 }
