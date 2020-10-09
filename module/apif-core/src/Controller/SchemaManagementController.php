@@ -300,22 +300,33 @@ class SchemaManagementController extends AbstractRestfulController
                         $message['message'] = "Schema already assigned to dataset";
                         $this->getResponse()->setStatusCode(200);
                     }
-                    break;
                 }
                 catch (\Exception $ex) {
                     $this->_handleException($ex);
                     return new JsonModel(['error' => 'Failed to assign schema to dataset - ' . $ex->getMessage()]);
                 }
-
+                break;
             case "DELETE":
-                $message['message'] = "You sent a DELETE";
+                try {
+                    if ($this->_repository->deleteSchemaFromDataset($schemaId, $datasetId, $auth) == 204) {
+                        $message['message'] = "Schema successfully removed from dataset";
+                        $this->getResponse()->setStatusCode(204);
+                    }
+                    else {
+                        $message['message'] = "No such schema assigned to dataset";
+                        $this->getResponse()->setStatusCode(200);
+                    }
+                }
+                catch (\Exception $ex) {
+                    $this->_handleException($ex);
+                    return new JsonModel(['error' => 'Failed to remove schema from dataset - ' . $ex->getMessage()]);
+                }
                 break;
             default:
                 $message['message'] = "HTTP method not supported: ".$_SERVER['REQUEST_METHOD'];
         }
 
         return new JsonModel($message);
-
     }
 
 }

@@ -186,8 +186,57 @@ class SchemaRepository implements SchemaRepositoryInterface
                 $response = 201;
             }
         }
-
         return $response;
+    }
+
+    public function deleteSchemaFromDataset($schemaId, $datasetId, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $md = $this->_config['metadata']['dataset'];
+        $sd = $this->_schemaDataset;
+        $metadataCollection = $this->_db->$md;
+        $schemaCollection = $this->_db->$sd;
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetId,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetId);
+        }
+
+        //Check schema exists
+        $data = $schemaCollection->findOne(['_id' => $schemaId], []);
+        if (is_null($data)) {
+            throw new \Exception("No such schema: ".$schemaId);
+        }
+
+        //Retrieve dataset metadata (if exists), first
+        $result = $metadataCollection->findOne(['_id' => $datasetId], []);
+        if (is_null($result)){
+            //No metadata record for this dataset and, hence, no schema associated with it. Do nothing
+            $response = 200;
+        }
+        else {
+            //Check if schema is associated with dataset
+            if (in_array($schemaId, iterator_to_array($result['schemas']))) {
+                //delete from array and write back to DB
+                $newSchemasArray = iterator_to_array($result['schemas']);
+                foreach (array_keys($newSchemasArray, $schemaId) as $key) {
+                    unset($newSchemasArray[$key]);
+                }
+                $result['schemas'] = $newSchemasArray;
+                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+                $response = 204;
+            }
+            else {
+                //no schema in list. Do nothing
+                $response = 200;
+            }
+        }
+        return $response;
+
     }
 
 }
