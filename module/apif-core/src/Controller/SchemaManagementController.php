@@ -4,8 +4,8 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\SchemaRepositoryInterface;
+use APIF\Core\Service\JsonModel;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class SchemaManagementController extends AbstractRestfulController
 {
