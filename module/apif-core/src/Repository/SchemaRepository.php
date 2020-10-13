@@ -138,6 +138,20 @@ class SchemaRepository implements SchemaRepositoryInterface
         return $escaped;
     }
 
+    public function updateSchema($id, $annotated, $auth) {
+        try {
+            $this->_connectDB($auth['user'],$auth['pwd']);
+            $sd = $this->_schemaDataset;
+            $collection = $this->_db->$sd;
+            $escaped = $this->_escapeDollars($annotated);
+            $updateOneResult = $collection->replaceOne(['_id' => $id], $escaped, ['upsert' => true]);
+        }
+        catch (\Throwable $ex) {
+            throw $ex;
+        }
+        return $escaped;
+    }
+
     public function assignSchemaToDataset($schemaId, $datasetId, $auth) {
         $this->_connectDB($auth['user'],$auth['pwd']);
         $md = $this->_config['metadata']['dataset'];

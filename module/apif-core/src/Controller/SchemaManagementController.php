@@ -164,7 +164,7 @@ class SchemaManagementController extends AbstractRestfulController
             $schemaEntry = [
                 "_id" => $newSchemaID,
                 "schema_type" => "JSON-SCHEMA",
-                "externalSchema" => false,
+                "external" => false,
                 "schema" => $schemaObj,
                 "schema_str" => json_encode($schemaObj)
             ];
@@ -227,7 +227,7 @@ class SchemaManagementController extends AbstractRestfulController
             $schemaEntry = [
                 "_id" => $newSchemaID,
                 "schema_type" => "JSON-SCHEMA",
-                "externalSchema" => true,
+                "external" => true,
                 "schema" => json_decode($schemaBody, true),
                 "schema_str" => $schemaBody
             ];
@@ -260,7 +260,93 @@ class SchemaManagementController extends AbstractRestfulController
     }
 
     public function update($id, $data) {
+        //if schema is external, no need to take any form input, just re-request the schema from the remote address
+        $schemaParam = $data['schema'];
 
+        //First, retrieve the schema
+        try {
+            $auth = $this->_getAuth();
+            $schema = $this->_repository->findSingleSchemaDetails($id, $auth);
+            if (count($schema) == 0) {
+                throw new \Exception("Schema not found");
+            }
+        }
+        catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to retrieve schema - ' . $ex->getMessage()]);
+        }
+        if ($schema[0]['external']) {
+            //Schema is external, just re-request the schema body from the remote address
+            try {
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => $schema[0]['schema']['$id'],
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => array(
+                        "Accept: application/json"
+                    ),
+                ));
+                $response = curl_exec($curl);
+                $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                if (!json_decode($response)) {
+                    throw new \Exception("Error retrieving remote schema: Unable to parse JSON");
+                }
+                if ($httpCode != 200) {
+                    throw new \Exception("Error retrieving remote schema: HTTP response ".$httpCode);
+                }
+                curl_close($curl);
+                $schemaEntry =$schema[0];
+                $schemaEntry['schema'] = json_decode($response, true);
+                $schemaEntry['schema_str'] = $response;
+            }
+            catch (\Throwable $ex) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => $ex]);
+            }
+        }
+        else {
+            //Update local schema with new schema body supplied
+            //Check the schema has been provided...
+            if (is_null($schemaParam)) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, missing schema body for local schema update']);
+            }
+            try {
+                $schemaObj = json_decode($schemaParam, true);
+                if (!$schemaObj) {
+                    throw new \Exception();
+                }
+                //FIXME - ALSO VALIDATE HERE AGAINST JSON-SCHEMA-SCHEMA
+            }
+            catch (\Throwable $ex) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, invalid JSON in schema']);
+            }
+            $schemaObj = $this->_rewriteSchemaId($schemaObj, $id);
+            $schemaEntry =$schema[0];
+            $schemaEntry['schema'] = $schemaObj;
+            $schemaEntry['schema_str'] = json_encode($schemaObj);
+        }
+        $schemaEntry['_updated'] = true;
+        $annotated = $this->_annotateObject($schemaEntry);
+
+        //update schema
+        try {
+            $updateResponse = $this->_repository->updateSchema($id, $annotated, $auth);
+        }catch (\Throwable $ex) {
+            $this->_handleException($ex);
+            return new JsonModel(['error' => 'Failed to update schema - ' . $ex->getMessage()]);
+            //FIXME - Duplicate key error (schema ID already exists) should be handled here more gracefully
+        }
+
+        $this->getResponse()->setStatusCode(204);
+        return new JsonModel();
     }
 
     public function delete($id) {

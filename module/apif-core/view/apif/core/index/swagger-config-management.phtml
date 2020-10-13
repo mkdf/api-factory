@@ -317,9 +317,6 @@
 "schema": {
 "type": "object",
 "properties": {
-"schema-id": {
-"type": "string"
-},
 "schema": {
 "type": "string"
 }
@@ -343,37 +340,6 @@
 }
 },
 "/schemas/{schema-id}/{dataset-id}": {
-"get": {
-"tags": [
-"schemas"
-],
-"summary": "Check for schema-dataset association",
-"description": "Check to see if a schema is assigned to a dataset",
-"operationId": "getSchemaDatasetAssoc",
-"parameters": [
-{
-"name": "schema-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-},
 "post": {
 "tags": [
 "schemas"
