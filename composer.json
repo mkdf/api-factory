@@ -17,7 +17,9 @@
         "mongodb/mongodb": "^1.6",
         "laminas/laminas-log": "^2.12",
         "ext-json": "*",
-      "ext-curl": "*"
+      "ext-curl": "*",
+        "opis/json-schema": "^1.0",
+        "swaggest/json-schema": "^0.12.31"
     },
     "autoload": {
         "psr-4": {

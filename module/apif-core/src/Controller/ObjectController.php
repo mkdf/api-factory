@@ -3,11 +3,12 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Repository\SchemaRepositoryInterface;
 use APIF\Core\Service\ActivityLogManagerInterface;
-use Laminas\Mvc\Controller\AbstractActionController;
+use APIF\Core\Service\SchemaValidatorInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\ViewModel;
-use Laminas\View\Model\JsonModel;
+use APIF\Core\Service\JsonModel;
+
 use MongoDB;
 
 class ObjectController extends AbstractRestfulController
@@ -15,12 +16,16 @@ class ObjectController extends AbstractRestfulController
     private $_config;
     private $_repository;
     private $_activityLog;
+    private $_schemaValidator;
+    private $_schemaRepository;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, array $config)
+    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, SchemaValidatorInterface $schemaValidator, SchemaRepositoryInterface $schemaRepository, array $config)
     {
         $this->_config = $config;
         $this->_repository = $repository;
         $this->_activityLog = $activityLog;
+        $this->_schemaValidator = $schemaValidator;
+        $this->_schemaRepository = $schemaRepository;
     }
 
     private function _getAuth() {
@@ -262,11 +267,30 @@ class ObjectController extends AbstractRestfulController
 
         }
         $annotated = $this->_annotateObject($object, $datasetUUID);
+
+        //CHECK IF SCHEMA VALIDATION ENABLED FOR THIS DATASET...
+        $validationSchemas = $this->_schemaRepository->getValidationSchemas($datasetUUID);
+        if (!is_null($validationSchemas)) {
+            try {
+                if (!$this->_schemaValidator->validate($object, $validationSchemas)) {
+                    //This shouldn't happen as failed validation throws an exception which is caught further below
+                    $this->getResponse()->setStatusCode(400);
+                    return new JsonModel(['error' => 'JSON schema validation failed']);
+                }
+            }
+            catch (\Throwable $ex) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => "JSON Schema validation error", 'details' => json_decode($ex->getMessage())]);
+            }
+
+        }
+
+
         try {
             $response = $this->_repository->insertDoc($datasetUUID, $annotated, $key, $pwd);
         }catch (\Throwable $ex) {
             $this->_handleException($ex);
-            return new JsonModel(['error' => 'Failed to retrieve documents - ' . $ex->getMessage()]);
+            return new JsonModel(['error' => 'Failed to insert documents - ' . $ex->getMessage()]);
         }
         $this->getResponse()->setStatusCode(201);
         //http_response_code(201);

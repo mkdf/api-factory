@@ -162,11 +162,13 @@ return [
             Repository\APIFCoreRepositoryInterface::class => Repository\APIFCoreRepository::class,
             Repository\SchemaRepositoryInterface::class => Repository\SchemaRepository::class,
             Service\ActivityLogManagerInterface::class => Service\ActivityLogManager::class,
+            Service\SchemaValidatorInterface::class => Service\SchemaValidator::class,
         ],
         'factories' => [
             Repository\APIFCoreRepository::class => Repository\Factory\APIFCoreRepositoryFactory::class,
             Repository\SchemaRepository::class => Repository\Factory\SchemaRepositoryFactory::class,
             Service\ActivityLogManager::class => Service\Factory\ActivityLogManagerFactory::class,
+            Service\SchemaValidator::class => Service\Factory\SchemaValidatorFactory::class,
         ]
     ],
     'view_manager' => [

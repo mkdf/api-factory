@@ -298,7 +298,7 @@
 "schemas"
 ],
 "summary": "Update an existing schema",
-"description": "Update an existing schema. Schema will be created if it does not already exist",
+"description": "Update an existing schema. For external schemas no schema body is required - simply provide the schema ID and schema body will be retrieved from the remote origin site",
 "operationId": "updateSchema",
 "parameters": [
 {
@@ -311,7 +311,7 @@
 }
 ],
 "requestBody": {
-"required": true,
+"required": false,
 "content": {
 "application/x-www-form-urlencoded": {
 "schema": {
@@ -322,8 +322,7 @@
 }
 },
 "required": [
-"schema-id",
-"schema"
+"schema-id"
 ]
 }
 }

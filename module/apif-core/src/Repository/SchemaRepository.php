@@ -253,4 +253,41 @@ class SchemaRepository implements SchemaRepositoryInterface
 
     }
 
+    public function getValidationSchemas($datasetId) {
+        $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
+        $md = $this->_config['metadata']['dataset'];
+        $sd = $this->_schemaDataset;
+        $metadataCollection = $this->_db->$md;
+        $schemaCollection = $this->_db->$sd;
+
+        //get metadata for dataset
+        $result = $metadataCollection->findOne(['_id' => $datasetId], []);
+
+        if (is_null($result) || (iterator_to_array($result)['schemaValidation'] == false) || (sizeof(iterator_to_array($result)['schemas']) == 0)) {
+            //no metadata entry for this dataset
+            //echo ("none");
+            return null;
+        }
+        else {
+            $schemaIdList = iterator_to_array($result)['schemas'];
+            $query = [
+                '_id' => [
+                    '$in' => $schemaIdList
+                ]
+            ];
+            $projection = [
+                'schema_str' => 1,
+                'schema' => 1,
+            ];
+
+            $schemasResult = $schemaCollection->find($query, ["projection" => $projection]);
+            $schemas = [];
+            foreach ($schemasResult->toArray() as $item) {
+                $schemas[] = $this->_cleanDollars($item);
+            }
+            return $schemas;
+        }
+
+    }
+
 }
