@@ -264,6 +264,22 @@
 }
 }
 ],
+"requestBody": {
+"required": false,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"schema": {
+"type": "string",
+"description": "The body of the schema, for embedded use with this dataset only. Leave blank if registering an existing schema from the schema catalogue."
+}
+}
+}
+}
+}
+},
 "responses": {
 "201": {
 "description": "Created"

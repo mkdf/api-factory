@@ -181,26 +181,82 @@ class SchemaRepository implements SchemaRepositoryInterface
             $result = [
                 '_id' => $datasetId,
                 'schemaValidation' => true,
-                'schemas' => []
+                'schemas' => [
+                    'catalogue' => [],
+                    'embedded' => []
+                ]
             ];
-            $result['schemas'][] = $schemaId;
+            $result['schemas']['catalogue'][] = $schemaId;
             //Write record back to dataset
             $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
             $response = 201;
         }
         else {
             //Add schema to schema list, if not already there
-            if (in_array($schemaId, iterator_to_array($result['schemas']))) {
+            if (in_array($schemaId, iterator_to_array($result['schemas']['catalogue']))) {
                 $response = 200;
             }
             else {
-                $result['schemas'][] = $schemaId;
+                $result['schemas']['catalogue'][] = $schemaId;
                 //Write record back to dataset
                 $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
                 $response = 201;
             }
         }
         return $response;
+    }
+
+    public function embedSchemaToDataset($embeddedSchemaId, $datasetId, $embeddedSchema, $auth) {
+        $this->_connectDB($auth['user'],$auth['pwd']);
+        $md = $this->_config['metadata']['dataset'];
+        $sd = $this->_schemaDataset;
+        $metadataCollection = $this->_db->$md;
+        $schemaCollection = $this->_db->$sd;
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetId,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetId);
+        }
+
+        //Check schema doesn't exist in catalogue with the same ID
+        $data = $schemaCollection->findOne(['_id' => $embeddedSchemaId], []);
+        if (!is_null($data)) {
+            throw new \Exception("Schema ID already exists in public catalogue, please choose a different ID: ".$embeddedSchemaId);
+        }
+
+        $result = $metadataCollection->findOne(['_id' => $datasetId], []);
+        if (is_null($result)){
+            $result = [
+                '_id' => $datasetId,
+                'schemaValidation' => true,
+                'schemas' => [
+                    'catalogue' => [],
+                    'embedded' => []
+                ]
+            ];
+            $result['schemas']['embedded'][$embeddedSchemaId] = $this->_escapeDollars($embeddedSchema);
+            //Write record back to dataset
+            $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+            $response = 201;
+        }
+        else {
+            //Add schema to schema list, if not already there
+            if (array_key_exists($embeddedSchemaId, iterator_to_array($result['schemas']['embedded']))) {
+                throw new \Exception("Embedded schema id already exists: ".$embeddedSchemaId);
+            }
+            else {
+                $result['schemas']['embedded'][$embeddedSchemaId] = $this->_escapeDollars($embeddedSchema);
+                //Write record back to dataset
+                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+                $response = 201;
+            }
+        }
+
     }
 
     public function deleteSchemaFromDataset($schemaId, $datasetId, $auth) {

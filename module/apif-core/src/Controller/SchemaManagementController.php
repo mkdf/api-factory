@@ -367,6 +367,15 @@ class SchemaManagementController extends AbstractRestfulController
             $this->getResponse()->setStatusCode(400);
             return new JsonModel(['error' => 'Bad request, schema id or dataset id missing']);
         }
+
+        //Check if a schema body was passed...
+        $schemaParam = $this->params()->fromPost('schema', null);
+        if (!is_null($schemaParam)) {
+            $embeddedSchema = json_decode($schemaParam, true);
+        } else {
+            $embeddedSchema = null;
+        }
+
         $message = [
             'message' => "",
             'schemaId' => $schemaId,
@@ -374,20 +383,37 @@ class SchemaManagementController extends AbstractRestfulController
         ];
         switch ($_SERVER['REQUEST_METHOD']) {
             case "POST":
-                try {
-                    if ($this->_repository->assignSchemaToDataset($schemaId, $datasetId, $auth) == 201) {
-                        $message['message'] = "Schema successfully assigned to dataset";
-                        $this->getResponse()->setStatusCode(201);
+                //embed local dataset schema
+                if (!is_null($embeddedSchema)) {
+                    $embeddedSchemaId = $schemaId . "-" . $datasetId;
+                    try {
+                        $this->_repository->embedSchemaToDataset($embeddedSchemaId, $datasetId, $embeddedSchema, $auth);
+                        $message['message'] = "Schema successfully embedded to dataset";
+                        $message['schemaId'] = $embeddedSchemaId;
                     }
-                    else {
-                        $message['message'] = "Schema already assigned to dataset";
-                        $this->getResponse()->setStatusCode(200);
+                    catch (\Exception $ex) {
+                        $this->_handleException($ex);
+                        return new JsonModel(['error' => 'Failed to create embedded dataset schema - ' . $ex->getMessage()]);
                     }
                 }
-                catch (\Exception $ex) {
-                    $this->_handleException($ex);
-                    return new JsonModel(['error' => 'Failed to assign schema to dataset - ' . $ex->getMessage()]);
+                //assign schema from catalogue
+                else {
+                    try {
+                        if ($this->_repository->assignSchemaToDataset($schemaId, $datasetId, $auth) == 201) {
+                            $message['message'] = "Schema successfully assigned to dataset";
+                            $this->getResponse()->setStatusCode(201);
+                        }
+                        else {
+                            $message['message'] = "Schema already assigned to dataset";
+                            $this->getResponse()->setStatusCode(200);
+                        }
+                    }
+                    catch (\Exception $ex) {
+                        $this->_handleException($ex);
+                        return new JsonModel(['error' => 'Failed to assign schema to dataset - ' . $ex->getMessage()]);
+                    }
                 }
+
                 break;
             case "DELETE":
                 try {
