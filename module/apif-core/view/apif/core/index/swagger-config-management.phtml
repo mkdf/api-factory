@@ -32,182 +32,6 @@
 }
 ],
 "paths": {
-"/datasets": {
-"get": {
-"tags": [
-"datasets"
-],
-"summary": "Retrieve all datasets",
-"description": "Retrieves a full list of dataset UUIDs",
-"operationId": "getAllDatasets",
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-},
-"post": {
-"tags": [
-"datasets"
-],
-"summary": "Create a new dataset",
-"description": "Create a new dataset",
-"operationId": "createDataset",
-"requestBody": {
-"required": true,
-"content": {
-"application/x-www-form-urlencoded": {
-"schema": {
-"type": "object",
-"properties": {
-"dataset-uuid": {
-"type": "string"
-},
-"key": {
-"type": "integer"
-}
-},
-"required": [
-"dataset-uuid",
-"key"
-]
-}
-}
-}
-},
-"responses": {
-"201": {
-"description": "Created"
-}
-}
-}
-},
-"/datasets/{dataset-uuid}": {
-"get": {
-"tags": [
-"datasets"
-],
-"summary": "Retrieve single dataset details",
-"description": "Retrieves a single dataset summary, including the number of documents in that dataset",
-"operationId": "getOneDataset",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-}
-},
-"/permissions": {
-"get": {
-"tags": [
-"permissions"
-],
-"summary": "Get all permissions",
-"description": "Get all permissions",
-"operationId": "getAllPermissions",
-"responses": {
-"200": {
-"description": "successful operation"
-}
-}
-}
-},
-"/permissions/{key}": {
-"get": {
-"tags": [
-"permissions"
-],
-"summary": "Get permissions for single key",
-"description": "Get permissions for a given API key",
-"operationId": "getPermissionsByKey",
-"parameters": [
-{
-"name": "key",
-"in": "path",
-"description": "The API key that you require a permissions summary for",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "successful operation"
-}
-}
-},
-"post": {
-"tags": [
-"permissions"
-],
-"summary": "Set/update permissions",
-"description": "Set or update the permissions on a dataset for a given key",
-"operationId": "setPermissions",
-"requestBody": {
-"required": true,
-"content": {
-"application/x-www-form-urlencoded": {
-"schema": {
-"type": "object",
-"properties": {
-"dataset-uuid": {
-"type": "string"
-},
-"read": {
-"type": "integer",
-"description": "Set read access",
-"enum": [
-0,
-1
-]
-},
-"write": {
-"type": "integer",
-"description": "Set write access",
-"enum": [
-0,
-1
-]
-}
-},
-"required": [
-"dataset-uuid",
-"read",
-"write"
-]
-}
-}
-}
-},
-"parameters": [
-{
-"name": "key",
-"in": "path",
-"description": "Key",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "OK"
-}
-}
-}
-},
 "/schemas": {
 "get": {
 "tags": [
@@ -338,9 +162,85 @@
 }
 }
 },
-"/schemas/{schema-id}/{dataset-id}": {
+"/datasets": {
+"get": {
+"tags": [
+"datasets"
+],
+"summary": "Retrieve all datasets",
+"description": "Retrieves a full list of dataset UUIDs",
+"operationId": "getAllDatasets",
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
 "post": {
 "tags": [
+"datasets"
+],
+"summary": "Create a new dataset",
+"description": "Create a new dataset",
+"operationId": "createDataset",
+"requestBody": {
+"required": true,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"dataset-uuid": {
+"type": "string"
+},
+"key": {
+"type": "integer"
+}
+},
+"required": [
+"dataset-uuid",
+"key"
+]
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Created"
+}
+}
+}
+},
+"/datasets/{dataset-id}": {
+"get": {
+"tags": [
+"datasets"
+],
+"summary": "Retrieve single dataset details",
+"description": "Retrieves a single dataset summary, including the number of documents in that dataset",
+"operationId": "getOneDataset",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+}
+},
+"/datasets/{dataset-id}/schemas/{schema-id}": {
+"post": {
+"tags": [
+"datasets",
 "schemas"
 ],
 "summary": "Create schema/dataset association",
@@ -372,6 +272,7 @@
 },
 "delete": {
 "tags": [
+"datasets",
 "schemas"
 ],
 "summary": "Delete schema/dataset association",
@@ -401,6 +302,107 @@
 },
 "204": {
 "description": "Association deleted"
+}
+}
+}
+},
+"/permissions": {
+"get": {
+"tags": [
+"permissions"
+],
+"summary": "Get all permissions",
+"description": "Get all permissions",
+"operationId": "getAllPermissions",
+"responses": {
+"200": {
+"description": "successful operation"
+}
+}
+}
+},
+"/permissions/{key}": {
+"get": {
+"tags": [
+"permissions"
+],
+"summary": "Get permissions for single key",
+"description": "Get permissions for a given API key",
+"operationId": "getPermissionsByKey",
+"parameters": [
+{
+"name": "key",
+"in": "path",
+"description": "The API key that you require a permissions summary for",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "successful operation"
+}
+}
+},
+"post": {
+"tags": [
+"permissions"
+],
+"summary": "Set/update permissions",
+"description": "Set or update the permissions on a dataset for a given key",
+"operationId": "setPermissions",
+"requestBody": {
+"required": true,
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"type": "object",
+"properties": {
+"dataset-id": {
+"type": "string"
+},
+"read": {
+"type": "integer",
+"description": "Set read access",
+"enum": [
+0,
+1
+]
+},
+"write": {
+"type": "integer",
+"description": "Set write access",
+"enum": [
+0,
+1
+]
+}
+},
+"required": [
+"dataset-id",
+"read",
+"write"
+]
+}
+}
+}
+},
+"parameters": [
+{
+"name": "key",
+"in": "path",
+"description": "Key",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK"
 }
 }
 }

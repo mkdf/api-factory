@@ -127,7 +127,7 @@ return [
             'schemaassignment' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/management/schemas/:id/:datasetid',
+                    'route'    => '/management/datasets/:datasetid/schemas/:id',
                     'defaults' => [
                         'controller' => Controller\SchemaManagementController::class,
                         'action'     => 'assignment',
