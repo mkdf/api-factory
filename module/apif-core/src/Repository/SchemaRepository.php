@@ -358,7 +358,6 @@ class SchemaRepository implements SchemaRepositoryInterface
                 ]
             ];
             $projection = [
-                'schema_str' => 1,
                 'schema' => 1,
             ];
             $schemasResult = $schemaCollection->find($query, ["projection" => $projection]);
@@ -374,7 +373,6 @@ class SchemaRepository implements SchemaRepositoryInterface
                 $wrapper = [
                     'id' => "$id",
                     'schema' => $this->_cleanDollars($embeddedSchema),
-                    'schema_str' => json_encode($this->_cleanDollars($embeddedSchema))
                 ];
                 $schemas[] = $wrapper;
             }
