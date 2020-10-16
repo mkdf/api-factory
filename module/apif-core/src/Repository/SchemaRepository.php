@@ -239,23 +239,20 @@ class SchemaRepository implements SchemaRepositoryInterface
                     'embedded' => []
                 ]
             ];
-            $result['schemas']['embedded'][$embeddedSchemaId] = $this->_escapeDollars($embeddedSchema);
-            //Write record back to dataset
-            $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
-            $response = 201;
+
         }
         else {
-            //Add schema to schema list, if not already there
-            if (array_key_exists($embeddedSchemaId, iterator_to_array($result['schemas']['embedded']))) {
+            $result = iterator_to_array($result);
+            $result['schemas']['embedded'] = iterator_to_array($result['schemas']['embedded']);
+            //metadata exists, check the schema is not already there
+            if (array_key_exists($embeddedSchemaId, $result['schemas']['embedded'])) {
                 throw new \Exception("Embedded schema id already exists: ".$embeddedSchemaId);
             }
-            else {
-                $result['schemas']['embedded'][$embeddedSchemaId] = $this->_escapeDollars($embeddedSchema);
-                //Write record back to dataset
-                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
-                $response = 201;
-            }
         }
+        $result['schemas']['embedded'][$embeddedSchemaId] = $this->_escapeDollars($embeddedSchema);
+        //Write record back to dataset
+        $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+        $response = 201;
 
     }
 
@@ -289,6 +286,7 @@ class SchemaRepository implements SchemaRepositoryInterface
         $schemaFoundEmbedded = false;
         $data = $schemaCollection->findOne(['_id' => $schemaId], []);
         if (!is_null($data)) {
+            //CATALOGUE SCHEMA
             $schemaFoundInCatalogue = true;
             if (in_array($schemaId, iterator_to_array($metadataResult['schemas']['catalogue']))) {
                 //delete from array and write back to DB
@@ -307,6 +305,7 @@ class SchemaRepository implements SchemaRepositoryInterface
         }
         else {
             if (array_key_exists($schemaId, iterator_to_array($metadataResult['schemas']['embedded']))) {
+                //EMBEDDED SCHEMA
                 $schemaFoundEmbedded = true;
                 //delete from array and write back to DB
                 //echo "found embedded schema.. ";
