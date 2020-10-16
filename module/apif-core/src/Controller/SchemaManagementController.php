@@ -387,6 +387,7 @@ class SchemaManagementController extends AbstractRestfulController
                 if (!is_null($embeddedSchema)) {
                     $embeddedSchemaId = $schemaId . "-" . $datasetId;
                     try {
+                        $embeddedSchema['$id'] = $embeddedSchemaId;
                         $this->_repository->embedSchemaToDataset($embeddedSchemaId, $datasetId, $embeddedSchema, $auth);
                         $message['message'] = "Schema successfully embedded to dataset";
                         $message['schemaId'] = $embeddedSchemaId;

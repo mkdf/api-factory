@@ -276,28 +276,28 @@ class SchemaRepository implements SchemaRepositoryInterface
             throw new \Exception("No such dataset: ".$datasetId);
         }
 
-        //Check schema exists
-        $data = $schemaCollection->findOne(['_id' => $schemaId], []);
-        if (is_null($data)) {
-            throw new \Exception("No such schema: ".$schemaId);
-        }
-
         //Retrieve dataset metadata (if exists), first
-        $result = $metadataCollection->findOne(['_id' => $datasetId], []);
-        if (is_null($result)){
+        $metadataResult = $metadataCollection->findOne(['_id' => $datasetId], []);
+        if (is_null($metadataResult)){
             //No metadata record for this dataset and, hence, no schema associated with it. Do nothing
             $response = 200;
+            return $response;
         }
-        else {
-            //Check if schema is associated with dataset
-            if (in_array($schemaId, iterator_to_array($result['schemas']))) {
+
+        //Check schema exists
+        $schemaFoundInCatalogue = false;
+        $schemaFoundEmbedded = false;
+        $data = $schemaCollection->findOne(['_id' => $schemaId], []);
+        if (!is_null($data)) {
+            $schemaFoundInCatalogue = true;
+            if (in_array($schemaId, iterator_to_array($metadataResult['schemas']['catalogue']))) {
                 //delete from array and write back to DB
-                $newSchemasArray = iterator_to_array($result['schemas']);
+                $newSchemasArray = iterator_to_array($metadataResult['schemas']['catalogue']);
                 foreach (array_keys($newSchemasArray, $schemaId) as $key) {
                     unset($newSchemasArray[$key]);
                 }
-                $result['schemas'] = $newSchemasArray;
-                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $result, ['upsert' => true]);
+                $metadataResult['schemas']['catalogue'] = $newSchemasArray;
+                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $metadataResult, ['upsert' => true]);
                 $response = 204;
             }
             else {
@@ -305,6 +305,24 @@ class SchemaRepository implements SchemaRepositoryInterface
                 $response = 200;
             }
         }
+        else {
+            if (array_key_exists($schemaId, iterator_to_array($metadataResult['schemas']['embedded']))) {
+                $schemaFoundEmbedded = true;
+                //delete from array and write back to DB
+                //echo "found embedded schema.. ";
+                $newEmbeddedArray = iterator_to_array($metadataResult['schemas']['embedded']);
+                unset($newEmbeddedArray[$schemaId]);
+                $metadataResult['schemas']['embedded'] = $newEmbeddedArray;
+                //echo "writing back to DB... ";
+                $insertOneResult = $metadataCollection->replaceOne(['_id' => $datasetId], $metadataResult, ['upsert' => true]);
+                $response = 204;
+            }
+            else {
+                //no schema in list. Do nothing
+                $response = 200;
+            }
+        }
+
         return $response;
 
     }
@@ -319,31 +337,50 @@ class SchemaRepository implements SchemaRepositoryInterface
         //get metadata for dataset
         $result = $metadataCollection->findOne(['_id' => $datasetId], []);
 
-        if (is_null($result) || (iterator_to_array($result)['schemaValidation'] == false) || (sizeof(iterator_to_array($result)['schemas']) == 0)) {
-            //no metadata entry for this dataset
-            //echo ("none");
-            return null;
+        $schemasInCatalogue = true;
+        if (is_null($result) || (iterator_to_array($result)['schemaValidation'] == false) || (sizeof(iterator_to_array($result)['schemas']['catalogue']) == 0)) {
+            //no catalogue schemas found in metadata.
+            //Check for embedded schemas
+            $schemasInCatalogue = false;
+            if (sizeof(iterator_to_array($result)['schemas']['embedded']) == 0) {
+                //no embedded schemas found either. Return.
+                return null;
+            }
         }
-        else {
-            $schemaIdList = iterator_to_array($result)['schemas'];
+
+        $schemas = [];
+
+        //get schemas from the catalogue
+        if ($schemasInCatalogue) {
+            $schemaIdListCatalogue = iterator_to_array($result)['schemas']['catalogue'];
             $query = [
                 '_id' => [
-                    '$in' => $schemaIdList
+                    '$in' => $schemaIdListCatalogue
                 ]
             ];
             $projection = [
                 'schema_str' => 1,
                 'schema' => 1,
             ];
-
             $schemasResult = $schemaCollection->find($query, ["projection" => $projection]);
-            $schemas = [];
             foreach ($schemasResult->toArray() as $item) {
                 $schemas[] = $this->_cleanDollars($item);
             }
-            return $schemas;
         }
 
+        //get embedded schemas
+        if (sizeof(iterator_to_array($result)['schemas']['embedded']) > 0) {
+            foreach (iterator_to_array($result)['schemas']['embedded'] as $id => $embeddedSchema) {
+                //wrap the schema in the same format that catalogue schemas are retrieved from the DB in, so they can be used interchangeably
+                $wrapper = [
+                    'id' => "$id",
+                    'schema' => $this->_cleanDollars($embeddedSchema),
+                    'schema_str' => json_encode($this->_cleanDollars($embeddedSchema))
+                ];
+                $schemas[] = $wrapper;
+            }
+        }
+        return $schemas;
     }
 
 }

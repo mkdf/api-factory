@@ -20,9 +20,9 @@ class SchemaValidator implements SchemaValidatorInterface
         $validationErrors = [];
         $objJson = json_encode($object);
         foreach ($schemaList as $currentSchema) {
-            $urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
-            $localURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $currentSchema['schema']['$id'] . ".json";
-            $currentSchema['schema']['$id'] = $localURI;
+            //$urlPrefix = ($_SERVER['HTTPS']) ? "https://" : "http://";
+            //$localURI = $urlPrefix . $_SERVER['SERVER_NAME'] . "/schemas/" . $currentSchema['schema']['$id'] . ".json";
+            //$currentSchema['schema']['$id'] = $localURI;
             $schemaJson = json_encode($currentSchema['schema']);
             $schema = Schema::import(json_decode($schemaJson));
 
@@ -33,7 +33,7 @@ class SchemaValidator implements SchemaValidatorInterface
             }
             catch (\Throwable $ex) {
                 $error = [
-                    'schemaId' => $localURI,
+                    'schemaId' => $currentSchema['schema']['$id'],
                     'error' => $ex->getMessage()
                 ];
                 $validationErrors[] = $error;
