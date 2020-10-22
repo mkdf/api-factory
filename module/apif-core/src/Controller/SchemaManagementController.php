@@ -4,18 +4,23 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\SchemaRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use APIF\Core\Service\JsonModel;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+
+use MongoDB;
 
 class SchemaManagementController extends AbstractRestfulController
 {
     private $_config;
     private $_repository;
+    private $_activityLog;
 
-    public function __construct(SchemaRepositoryInterface $repository, array $config)
+    public function __construct(SchemaRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, array $config)
     {
         $this->_config = $config;
         $this->_repository = $repository;
+        $this->_activityLog = $activityLog;
     }
 
     private function _getAuth() {
@@ -80,6 +85,55 @@ class SchemaManagementController extends AbstractRestfulController
         return $object;
     }
 
+    private function _assembleLogData ($datasetId, $key, $action, $description, $docID = null) {
+        $timestamp = time();
+        $OID = new MongoDB\BSON\ObjectId();
+        $idString = (string)$OID;
+
+        $summary = $action."[".$this->getRequest()->getMethod()."] - ".$this->getRequest()->getUriString()." - Dataset:".$datasetId." - Key:".$key." - ".$description;
+
+        $data = [
+            "_id" => $idString,
+            "@id" => $idString,
+            "@context" => "https://mkdf.github.io/context",
+            "@type" => [
+                "al:".$action,
+                "al:ActivityLogEntry"
+            ],
+            //"al:datasetId" => $datasetId,
+            //"al:documentId" => "docID",
+            "al:summary" => $summary,
+            "al:request" => [
+                "@type" => "al:HTTPRequest",
+                "al:agent" => [
+                    "@type" => "al:Agent",
+                    "al:key" => $key
+                ],
+                "al:endpoint" => $this->getRequest()->getUriString(),
+                "al:httpRequestMethod" => "al:".$this->getRequest()->getMethod(),
+                "al:parameters" => $this->params()->fromQuery(),
+                "al:payload" => $this->getRequest()->getContent()
+            ]
+        ];
+        if (!is_null($docID)) {
+            $data["al:documentId"] = $docID;
+        }
+        if (!is_null($datasetId)) {
+            $data["al:datasetId"] = $datasetId;
+        }
+
+        //Add timestamp data
+        $data['_timestamp'] = $timestamp;
+        $data['_timestamp_year'] = (int)date("Y",$timestamp);
+        $data['_timestamp_month'] = (int)date("m",$timestamp);
+        $data['_timestamp_day'] = (int)date("d",$timestamp);
+        $data['_timestamp_hour'] = (int)date("H",$timestamp);
+        $data['_timestamp_minute'] = (int)date("i",$timestamp);
+        $data['_timestamp_second'] = (int)date("s",$timestamp);
+
+        return $data;
+    }
+
     private function _handleException($ex) {
         if (is_a($ex, MongoDB\Driver\Exception\AuthenticationException::class) ){
             $this->getResponse()->setStatusCode(403);
@@ -108,6 +162,14 @@ class SchemaManagementController extends AbstractRestfulController
             $this->_handleException($ex);
             return new JsonModel(['error' => 'Failed to retrieve schema details - ' . $ex->getMessage()]);
         }
+
+        //Activity Log
+        $datasetUUID = $this->_config['schema']['dataset'];
+        $action = "RetrieveSchemaDetails";
+        $summary = "Retrieve full details for a schema";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($schema);
     }
 
@@ -121,6 +183,14 @@ class SchemaManagementController extends AbstractRestfulController
             $this->_handleException($ex);
             return new JsonModel(['error' => 'Failed to retrieve schema list - ' . $ex->getMessage()]);
         }
+
+        //Activity Log
+        $datasetUUID = $this->_config['schema']['dataset'];
+        $action = "RetrieveSchemaList";
+        $summary = "Retrieve full list of schemas";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         return new JsonModel($schemas);
     }
 
@@ -247,13 +317,12 @@ class SchemaManagementController extends AbstractRestfulController
 
         $this->getResponse()->setStatusCode(201);
 
-        //FIXME - ENABLE ACTIVITY LOGGING IN THIS CONTROLLER
         //Activity Log
         $datasetUUID = $this->_config['schema']['dataset'];
         $action = "CreateSchema";
         $summary = "Create a new schema";
-        //$logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
-        //$this->_activityLog->logActivity($logData);
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
 
         //return new JsonModel($response);
         return new JsonModel(['schemaURI' => $annotated['schema']['$id'], 'schemaId' => $newSchemaID,'localURI' => $localURI]);
@@ -345,6 +414,13 @@ class SchemaManagementController extends AbstractRestfulController
             //FIXME - Duplicate key error (schema ID already exists) should be handled here more gracefully
         }
 
+        //Activity Log
+        $datasetUUID = $this->_config['schema']['dataset'];
+        $action = "Update schema";
+        $summary = "Update an existing schema";
+        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+        $this->_activityLog->logActivity($logData);
+
         $this->getResponse()->setStatusCode(204);
         return new JsonModel();
     }
@@ -391,6 +467,13 @@ class SchemaManagementController extends AbstractRestfulController
                         $this->_repository->embedSchemaToDataset($embeddedSchemaId, $datasetId, $embeddedSchema, $auth);
                         $message['message'] = "Schema successfully embedded to dataset";
                         $message['schemaId'] = $embeddedSchemaId;
+
+                        //Activity Log
+                        $datasetUUID = $this->_config['schema']['dataset'];
+                        $action = "AddEmbeddedSchema";
+                        $summary = "Embed a local schema with a dataset";
+                        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+                        $this->_activityLog->logActivity($logData);
                     }
                     catch (\Exception $ex) {
                         $this->_handleException($ex);
@@ -403,6 +486,12 @@ class SchemaManagementController extends AbstractRestfulController
                         if ($this->_repository->assignSchemaToDataset($schemaId, $datasetId, $auth) == 201) {
                             $message['message'] = "Schema successfully assigned to dataset";
                             $this->getResponse()->setStatusCode(201);
+                            //Activity Log
+                            $datasetUUID = $this->_config['schema']['dataset'];
+                            $action = "AddSchemaAssignment";
+                            $summary = "Assign an existing catalogue schema to a dataset";
+                            $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+                            $this->_activityLog->logActivity($logData);
                         }
                         else {
                             $message['message'] = "Schema already assigned to dataset";
@@ -421,6 +510,13 @@ class SchemaManagementController extends AbstractRestfulController
                     if ($this->_repository->deleteSchemaFromDataset($schemaId, $datasetId, $auth) == 204) {
                         $message['message'] = "Schema successfully removed from dataset";
                         $this->getResponse()->setStatusCode(204);
+
+                        //Activity Log
+                        $datasetUUID = $this->_config['schema']['dataset'];
+                        $action = "RemoveSchemaAssignment";
+                        $summary = "Remove a schema assignment from a dataset";
+                        $logData = $this->_assembleLogData($datasetUUID, $auth['user'], $action, $summary);
+                        $this->_activityLog->logActivity($logData);
                     }
                     else {
                         $message['message'] = "No such schema assigned to dataset";
@@ -436,6 +532,8 @@ class SchemaManagementController extends AbstractRestfulController
                 $this->getResponse()->setStatusCode(201);
                 $message['message'] = "Bad request - HTTP method not supported: ".$_SERVER['REQUEST_METHOD'];
         }
+
+
 
         return new JsonModel($message);
     }

@@ -6,6 +6,7 @@ namespace APIF\Core\Controller\Factory;
 
 use APIF\Core\Controller\SchemaManagementController;
 use APIF\Core\Repository\SchemaRepositoryInterface;
+use APIF\Core\Service\ActivityLogManagerInterface;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -15,7 +16,8 @@ class SchemaManagementControllerFactory implements FactoryInterface
     {
         $config = $container->get("Config");
         $repository = $container->get(SchemaRepositoryInterface::class);
-        return new SchemaManagementController($repository, $config);
+        $activityLog = $container->get(ActivityLogManagerInterface::class);
+        return new SchemaManagementController($repository, $activityLog, $config);
     }
 
 }
