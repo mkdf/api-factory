@@ -330,6 +330,23 @@ class ObjectController extends AbstractRestfulController
         $annotated = $this->_annotateObject($object, $datasetUUID);
         $annotated['_updated'] = true;
 
+        //CHECK IF SCHEMA VALIDATION ENABLED FOR THIS DATASET...
+        $validationSchemas = $this->_schemaRepository->getValidationSchemas($datasetUUID);
+        if (!is_null($validationSchemas)) {
+            try {
+                if (!$this->_schemaValidator->validate($object, $validationSchemas)) {
+                    //This shouldn't happen as failed validation throws an exception which is caught further below
+                    $this->getResponse()->setStatusCode(400);
+                    return new JsonModel(['error' => 'JSON schema validation failed']);
+                }
+            }
+            catch (\Throwable $ex) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => "JSON Schema validation error", 'details' => json_decode($ex->getMessage())]);
+            }
+
+        }
+
         try {
             $response = $this->_repository->updateDoc($datasetUUID, $docID, $annotated, $key, $pwd);
         }catch (\Throwable $ex) {
