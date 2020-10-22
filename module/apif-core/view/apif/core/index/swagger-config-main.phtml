@@ -11,20 +11,24 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-"version": "0.7.0"
+"version": "0.6.10"
 },
 "tags": [
+{
+"name": "query",
+"description": "Query documents (included for backwards compatibility - please use Object or Browse)",
+"externalDocs": {
+"description": "Find out more",
+"url": "https://datahub.mksmart.org"
+}
+},
 {
 "name": "browse",
 "description": "Browse a dataset, with full control over filters, pagination, sorting"
 },
 {
 "name": "object",
-"description": "Retrieve, push, update and delete documents"
-},
-{
-"name": "schemas",
-"description": "Retrieve a schema"
+"description": "retrieve, push, update and delete documents"
 }
 ],
 "paths": {
@@ -33,7 +37,7 @@
 "tags": [
 "browse"
 ],
-"summary": "Retrieve documents from the dataset",
+"summary": "Browse documents from the dataset",
 "operationId": "browseDocuments",
 "parameters": [
 {
@@ -291,7 +295,7 @@
 },
 "responses": {
 "201": {
-"description": "Object created"
+"description": "Object creted"
 },
 "204": {
 "description": "Object updated"
@@ -339,47 +343,15 @@
 }
 }
 }
-},
-"/schemas/{schema-id}": {
-"get": {
-"tags": [
-"schemas"
-],
-"summary": "Retrieve schema",
-"operationId": "getSchema",
-"parameters": [
-{
-"name": "schema-id",
-"in": "path",
-"description": "Schema name",
-"example": "person.json",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-},
-"404": {
-"description": "Schema not found"
-},
-"500": {
-"description": "Fatal error retrieving schema"
-}
-}
-}
 }
 },
 "externalDocs": {
 "description": "Find out more about the API Factory",
-"url": "http://datahub.mksmart.org"
+"url": "http://datahu.mksmart.org"
 },
 "servers": [
 {
-"url": ""
+"url": "<?= $this->basePath() ?>"
 }
 ],
 "security": [
