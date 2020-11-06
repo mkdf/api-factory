@@ -337,14 +337,14 @@ class SchemaRepository implements SchemaRepositoryInterface
         $result = $metadataCollection->findOne(['_id' => $datasetId], []);
 
         $schemasInCatalogue = true;
-        if (is_null($result) || (iterator_to_array($result)['schemaValidation'] == false) || (sizeof(iterator_to_array($result)['schemas']['catalogue']) == 0)) {
-            //no catalogue schemas found in metadata.
-            //Check for embedded schemas
-            $schemasInCatalogue = false;
-            if (sizeof(iterator_to_array($result)['schemas']['embedded']) == 0) {
-                //no embedded schemas found either. Return.
-                return null;
-            }
+        if (is_null($result)){
+            return null;
+        }
+        if ((iterator_to_array($result)['schemaValidation'] == false)){
+            return null;
+        }
+        if ((sizeof(iterator_to_array($result)['schemas']['embedded']) == 0) && (sizeof(iterator_to_array($result)['schemas']['catalogue']) == 0)) {
+            return null;
         }
 
         $schemas = [];

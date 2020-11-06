@@ -9,6 +9,7 @@ use APIF\Core\Service\SchemaValidatorInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use APIF\Core\Service\JsonModel;
 
+//This is just used for creating Mongo compatible IDs in activity log packets
 use MongoDB;
 
 class ObjectController extends AbstractRestfulController

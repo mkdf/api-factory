@@ -70,6 +70,37 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
+    public function findDocsPaged($datasetId, $key, $pwd, $query, $limit = null, $sort = null, $projection = null, $page = 1) {
+        $this->_connectDB($key, $pwd);
+        $collection = $this->_db->$datasetId;
+        $data = [];
+
+        if (!is_null($limit)){
+            $this->_queryOptions['limit'] = $limit;
+        }
+        else {
+            $this->_queryOptions['limit'] = $this->_config['mongodb']['queryLimit'];
+        }
+
+        $this->_queryOptions['skip'] = $this->_queryOptions['limit'] * ($page - 1);
+
+        if (!is_null($sort)){
+            $this->_queryOptions['sort'] = array_merge($sort,$this->_queryOptions['sort']);
+        }
+        if (!is_null($projection)){
+            $this->_queryOptions['projection'] = $projection;
+        }
+        try {
+            //print_r($this->_queryOptions);
+            $result = $collection->find($query, $this->_queryOptions);
+            $data = $result->toArray();
+            return $data;
+        }
+        catch (\Throwable $ex) {
+            throw $ex;
+        }
+    }
+
     public function getSingleDoc ($datasetId, $key, $pwd, $docID) {
         $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;

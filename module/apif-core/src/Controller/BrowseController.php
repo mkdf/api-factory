@@ -130,9 +130,9 @@ class BrowseController extends AbstractRestfulController
 
         //Get URL params
         $queryParam = $this->params()->fromQuery('query', "");
-        $limitParam = $this->params()->fromQuery('limit', $this->_config['mongodb']['queryLimit']);
+        $limitParam = $this->params()->fromQuery('limit', null);
         $sortParam = $this->params()->fromQuery('sort', null);
-        $pageParam = $this->params()->fromQuery('page', 1);
+        $pageParam = $this->params()->fromQuery('page', null);
         $pageSizeParam = $this->params()->fromQuery('pagesize', null);
         $fieldsParam = $this->params()->fromQuery('fields', null);
 
@@ -176,8 +176,31 @@ class BrowseController extends AbstractRestfulController
             }
         }
 
+        //Pagination...
+        if (!is_null($pageParam)){
+            if (is_null($pageSizeParam)){
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, page number specified without page size']);
+            }
+            if (!is_null($limitParam)){
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, limit parameter cannot be used with pagination']);
+            }
+            $limitParam = $pageSizeParam;
+        }
+
+        if ((!is_null($pageSizeParam)) && (is_null($pageParam))){
+            $pageParam = 1;
+            if (!is_null($limitParam)){
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request, limit parameter cannot be used with pagination']);
+            }
+            $limitParam = $pageSizeParam;
+        }
+
         try {
-            $data = $this->_repository->findDocs($id,$key,$pwd,$query,(int)$limitParam,$sortTerms,$fields);
+            //$data = $this->_repository->findDocs($id,$key,$pwd,$query,(int)$limitParam,$sortTerms,$fields);
+            $data = $this->_repository->findDocsPaged($id,$key,$pwd,$query,(int)$limitParam,$sortTerms,$fields,(int)$pageParam);
         }catch (\Throwable $ex) {
             $this->_handleException($ex);
             return new JsonModel(['error' => 'Failed to retrieve documents - ' . $ex->getMessage()]);
@@ -188,12 +211,14 @@ class BrowseController extends AbstractRestfulController
         $metadata['limit'] = $limitParam;
         $metadata['documentCount'] = count($data);
 
+        /*
         if (!is_null($pageSizeParam)){
             $pageStart = ($pageParam - 1) * $pageSizeParam;
             $data = array_slice($data,$pageStart,$pageSizeParam);
             $metadata['page'] = $pageParam;
             $metadata['pageSize'] = (int)$pageSizeParam;
         }
+        */
 
         //$logEntry['metadata'] = $metadata;
         //$this->_readLogger->info(json_encode($logEntry));
