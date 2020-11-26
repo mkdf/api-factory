@@ -52,7 +52,7 @@ class ActivityLogManager implements ActivityLogManagerInterface
     }
 
     public function logActivity($data) {
-        if ($this->_config['activityLog']['enabled']) {
+        if ($this->_config['activityLog']['enabled'] && ($this->_config['activityLog']['dataset'] != $data["al:datasetId"])) {
             if (!$this->_loggingInitialised()) {
                 $this->_initialiseLogging();
             }
