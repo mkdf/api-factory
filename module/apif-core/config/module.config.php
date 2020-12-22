@@ -64,6 +64,7 @@ return [
                     ],
                 ],
             ],
+            /*
             'query' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -74,6 +75,7 @@ return [
                     ],
                 ],
             ],
+            */
             'object' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -163,12 +165,22 @@ return [
             Repository\SchemaRepositoryInterface::class => Repository\SchemaRepository::class,
             Service\ActivityLogManagerInterface::class => Service\ActivityLogManager::class,
             Service\SchemaValidatorInterface::class => Service\SchemaValidator::class,
+            Service\SwaggerAddonInterface::class => Service\SwaggerAddonManager::class,
         ],
         'factories' => [
             Repository\APIFCoreRepository::class => Repository\Factory\APIFCoreRepositoryFactory::class,
             Repository\SchemaRepository::class => Repository\Factory\SchemaRepositoryFactory::class,
             Service\ActivityLogManager::class => Service\Factory\ActivityLogManagerFactory::class,
             Service\SchemaValidator::class => Service\Factory\SchemaValidatorFactory::class,
+            Service\SwaggerAddonManager::class => Service\Factory\SwaggerAddonManagerFactory::class,
+        ]
+    ],
+    'controller_plugins' => [
+        'factories' => [
+            Controller\Plugin\SwaggerAddonManagerPlugin::class => Controller\Plugin\Factory\SwaggerAddonManagerPluginFactory::class,
+        ],
+        'aliases' => [
+            'swaggerAddonManager' => Controller\Plugin\SwaggerAddonManagerPlugin::class,
         ]
     ],
     'view_manager' => [
