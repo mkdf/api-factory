@@ -14,7 +14,7 @@
         "laminas/laminas-component-installer": "^1.0 || ^2.1",
         "laminas/laminas-development-mode": "^3.2",
         "laminas/laminas-mvc": "^3.1.1",
-        "mongodb/mongodb": "^1.6",
+        "mongodb/mongodb": "^1.8",
         "laminas/laminas-log": "^2.12",
         "ext-json": "*",
       "ext-curl": "*",
@@ -22,7 +22,8 @@
     },
     "autoload": {
         "psr-4": {
-            "APIF\\Core\\": "module/apif-core/src/"
+            "APIF\\Core\\": "module/apif-core/src/",
+            "APIF\\Sparql\\": "module/apif-sparql/src/"
         }
     },
     "autoload-dev": {

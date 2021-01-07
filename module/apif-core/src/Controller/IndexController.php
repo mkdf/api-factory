@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace APIF\Core\Controller;
 
+use APIF\Core\Service\SwaggerAddonManagerInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
@@ -17,6 +18,7 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
+
         $result = new ViewModel();
         $result->setTerminal(true);
 
@@ -33,7 +35,11 @@ class IndexController extends AbstractActionController
 
     public function swaggerConfigMainAction()
     {
-        $result = new ViewModel();
+        $result = new ViewModel(
+            [
+                'addons' => $this->swaggerAddonManager()->getAddons(),
+            ]
+        );
         $result->setTerminal(true);
 
         return $result;

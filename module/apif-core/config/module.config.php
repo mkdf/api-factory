@@ -165,7 +165,7 @@ return [
             Repository\SchemaRepositoryInterface::class => Repository\SchemaRepository::class,
             Service\ActivityLogManagerInterface::class => Service\ActivityLogManager::class,
             Service\SchemaValidatorInterface::class => Service\SchemaValidator::class,
-            Service\SwaggerAddonInterface::class => Service\SwaggerAddonManager::class,
+            Service\SwaggerAddonManagerInterface::class => Service\SwaggerAddonManager::class,
         ],
         'factories' => [
             Repository\APIFCoreRepository::class => Repository\Factory\APIFCoreRepositoryFactory::class,

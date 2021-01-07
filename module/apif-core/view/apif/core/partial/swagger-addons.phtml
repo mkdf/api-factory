@@ -1,0 +1,16 @@
+<?php
+//echo ("//partial "). PHP_EOL;
+foreach ($addons as $addon) {
+    if ($addon->isActive()) {
+        if ($swaggerComponent == 'tag') {
+            echo '{"name": "'.$addon->getTag().'","description": "'.$addon->getDescription().'"}'. PHP_EOL;
+        }
+        if ($swaggerComponent == 'body') {
+            echo $addon->getBody(). PHP_EOL;
+        }
+    }
+    else {
+        echo ("//***DEBUG*** ".$addon->getLabel()." INACTIVE ***DEBUG***"). PHP_EOL;
+    }
+}
+?>
