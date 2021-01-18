@@ -14,16 +14,16 @@
         "laminas/laminas-component-installer": "^1.0 || ^2.1",
         "laminas/laminas-development-mode": "^3.2",
         "laminas/laminas-mvc": "^3.1.1",
-        "mongodb/mongodb": "^1.8",
+        "mongodb/mongodb": "^1.8.0",
         "laminas/laminas-log": "^2.12",
         "ext-json": "*",
-      "ext-curl": "*",
-        "swaggest/json-schema": "^0.12.31"
+        "ext-curl": "*",
+        "swaggest/json-schema": "^0.12.31",
+        "mkdf/api-factory-sparql": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "APIF\\Core\\": "module/apif-core/src/",
-            "APIF\\Sparql\\": "module/apif-sparql/src/"
+            "APIF\\Core\\": "module/apif-core/src/"
         }
     },
     "autoload-dev": {

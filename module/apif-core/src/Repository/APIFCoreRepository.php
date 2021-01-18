@@ -47,6 +47,21 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
+    public function checkReadAccess($dataset, $key, $pwd) {
+        $this->_connectDB($key, $pwd);
+        $collection = $this->_db->$dataset;
+        $this->_queryOptions['limit'] = 1;
+        try {
+            $result = $collection->find([], $this->_queryOptions);
+            //$data = $result->toArray();
+            return true;
+        }
+        catch (\Throwable $ex) {
+            return false;
+            //throw $ex;
+        }
+    }
+
     public function findDocs($datasetId, $key, $pwd, $query, $limit = null, $sort = null ,$projection = null) {
         $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;
