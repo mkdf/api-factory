@@ -31,4 +31,9 @@ return [
     'schema' => [
         'dataset' => 'schema-dataset',
     ],
+    'sparql' => [
+        'host' => 'localhost',
+        'port' => '9999',
+        'namespacePrefix' => 'prefix_'
+    ],
 ];
