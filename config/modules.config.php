@@ -16,5 +16,5 @@ return [
     'Laminas\Validator',
     'Laminas\Log',
     'APIF\Core',
-    'APIF\Sparql',
+    //'APIF\Sparql',
 ];
