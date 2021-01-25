@@ -1,6 +1,6 @@
 # README #
 
-###Notes for installing SPARQL add-on module
+### Notes for installing SPARQL add-on module
 
 * Ensure you are running **v0.7.4** or later which includes support for add-on modules
 * From the root of your API Factory installation, run: `composer require mkdf/api-factory-sparql`
