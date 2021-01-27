@@ -12,6 +12,7 @@ namespace APIF\Core;
 
 use APIF\Core\Controller\Factory\BrowseControllerFactory;
 use APIF\Core\Controller\Factory\DatasetManagementControllerFactory;
+use APIF\Core\Controller\Factory\FileControllerFactory;
 use APIF\Core\Controller\Factory\ObjectControllerFactory;
 use APIF\Core\Controller\Factory\PermissionsManagementControllerFactory;
 use APIF\Core\Controller\Factory\QueryControllerFactory;
@@ -96,6 +97,16 @@ return [
                     ],
                 ],
             ],
+            'file' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/file/:id',
+                    'defaults' => [
+                        'controller' => Controller\FileController::class,
+                        //'action'     => 'query',
+                    ],
+                ],
+            ],
             'datasetmanagement' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -153,6 +164,7 @@ return [
             Controller\QueryController::class  => QueryControllerFactory::class,
             Controller\ObjectController::class  => ObjectControllerFactory::class,
             Controller\BrowseController::class => BrowseControllerFactory::class,
+            Controller\FileController::class => FileControllerFactory::class,
             Controller\DatasetManagementController::class => DatasetManagementControllerFactory::class,
             Controller\PermissionsManagementController::class => PermissionsManagementControllerFactory::class,
             Controller\SchemaRetrievalController::class => SchemaRetrievalControllerFactory::class,
