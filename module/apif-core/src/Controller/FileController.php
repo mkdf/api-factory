@@ -47,7 +47,7 @@ class FileController extends AbstractRestfulController
     public function get($id) {
         $docID = $this->params()->fromRoute('id', null);
         $datasetID = $this->params()->fromRoute('dataset-id', null);
-        return new JsonModel(['message' => 'file controller GET doc '.$docID]);
+        return new JsonModel(['message' => 'file controller GET single file: '.$docID]);
     }
 
     /*
@@ -55,13 +55,14 @@ class FileController extends AbstractRestfulController
      */
     public function getList() {
         $datasetID = $this->params()->fromRoute('dataset-id', null);
-        return new JsonModel(['message' => 'file controller GET dataset '.$datasetID]);
+        return new JsonModel(['message' => 'file controller GET dataset file list for dataset: '.$datasetID]);
     }
 
     /*
      * CREATE - Handling a POST request
      */
     public function create($data) {
+        $datasetID = $this->params()->fromRoute('dataset-id', null);
         return new JsonModel(['message' => 'file controller POST (create file)']);
     }
 
@@ -69,6 +70,8 @@ class FileController extends AbstractRestfulController
      * UPDATE - Handling a PUT request
      */
     public function update($id, $data) {
+        $docID = $this->params()->fromRoute('id', null);
+        $datasetID = $this->params()->fromRoute('dataset-id', null);
         return new JsonModel(['message' => 'file controller PUT (overwrite file)']);
     }
 
@@ -76,6 +79,8 @@ class FileController extends AbstractRestfulController
      * DELETE - Handling a DELETE request
      */
     public function delete($id) {
+        $docID = $this->params()->fromRoute('id', null);
+        $datasetID = $this->params()->fromRoute('dataset-id', null);
         return new JsonModel(['message' => 'file controller DELETE (delete file)']);
     }
 
