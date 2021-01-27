@@ -21,6 +21,10 @@ return [
         'adminUser' => 'admin-user',
         'adminPwd' => 'admin-password'
     ],
+    'file' => [
+        'destination' => 'data/filestore/',
+        'metadata_dataset' => 'metadata_dataset'
+    ],
     'metadata' => [
         'dataset' => 'metadata-dataset'
     ],
