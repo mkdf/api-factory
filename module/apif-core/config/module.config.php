@@ -100,7 +100,7 @@ return [
             'file' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/file/:id',
+                    'route'    => '/file/:dataset-id[/:id]',
                     'defaults' => [
                         'controller' => Controller\FileController::class,
                         //'action'     => 'query',

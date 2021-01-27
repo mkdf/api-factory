@@ -41,8 +41,42 @@ class FileController extends AbstractRestfulController
         }
     }
 
+    /*
+     * GET SINGLE FILE
+     */
     public function get($id) {
-        return new JsonModel(['message' => 'file controller working']);
+        $docID = $this->params()->fromRoute('id', null);
+        $datasetID = $this->params()->fromRoute('dataset-id', null);
+        return new JsonModel(['message' => 'file controller GET doc '.$docID]);
+    }
+
+    /*
+     * GET LIST OF ALL FILES IN DATASET
+     */
+    public function getList() {
+        $datasetID = $this->params()->fromRoute('dataset-id', null);
+        return new JsonModel(['message' => 'file controller GET dataset '.$datasetID]);
+    }
+
+    /*
+     * CREATE - Handling a POST request
+     */
+    public function create($data) {
+        return new JsonModel(['message' => 'file controller POST (create file)']);
+    }
+
+    /*
+     * UPDATE - Handling a PUT request
+     */
+    public function update($id, $data) {
+        return new JsonModel(['message' => 'file controller PUT (overwrite file)']);
+    }
+
+    /*
+     * DELETE - Handling a DELETE request
+     */
+    public function delete($id) {
+        return new JsonModel(['message' => 'file controller DELETE (delete file)']);
     }
 
 }
