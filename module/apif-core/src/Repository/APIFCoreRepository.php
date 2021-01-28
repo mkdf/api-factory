@@ -62,6 +62,25 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
     }
 
+    public function checkWriteAccess($dataset, $key, $pwd) {
+        $this->_connectDB($key, $pwd);
+        $collection = $this->_db->$dataset;
+        $this->_queryOptions['limit'] = 1;
+        $id = "write-test-".strval(rand(1000000000,9999999999));
+        $data = [
+            "_id" => $id
+        ];
+        try {
+            $insertOneResult = $collection->insertOne($data);
+            $deleteResult = $collection->deleteOne(['_id' => $id]);
+            return true;
+        }
+        catch (\Throwable $ex) {
+            return false;
+            //throw $ex;
+        }
+    }
+
     public function findDocs($datasetId, $key, $pwd, $query, $limit = null, $sort = null ,$projection = null) {
         $this->_connectDB($key, $pwd);
         $collection = $this->_db->$datasetId;

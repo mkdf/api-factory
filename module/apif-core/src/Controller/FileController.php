@@ -5,6 +5,7 @@ namespace APIF\Core\Controller;
 
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Repository\FileRepositoryInterface;
 use APIF\Core\Service\ActivityLogManagerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
@@ -12,14 +13,16 @@ use Laminas\View\Model\JsonModel;
 class FileController extends AbstractRestfulController
 {
     private $_config;
-    private $_repository;
+    private $_coreRepository;
+    private $_fileRepository;
     private $_readLogger;
     private $_activityLog;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, array $config, $readLogger)
+    public function __construct(APIFCoreRepositoryInterface $coreRepository, FileRepositoryInterface $fileRepository, ActivityLogManagerInterface $activityLog, array $config, $readLogger)
     {
         $this->_config = $config;
-        $this->_repository = $repository;
+        $this->_coreRepository = $coreRepository;
+        $this->_fileRepository = $fileRepository;
         $this->_readLogger = $readLogger;
         $this->_activityLog = $activityLog;
     }
@@ -62,8 +65,53 @@ class FileController extends AbstractRestfulController
      * CREATE - Handling a POST request
      */
     public function create($data) {
+        $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
         $datasetID = $this->params()->fromRoute('dataset-id', null);
+
+        //check valid submission
+        $request = $this->getRequest();
+        // Make certain to merge the $_FILES info!
+        $post = array_merge_recursive(
+            $request->getPost()->toArray(),
+            $request->getFiles()->toArray()
+        );
+        if (is_null($post['title']) || is_null($post['description'])) {
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel(['error' => 'Bad request. Missing title or description']);
+        }
+        if (is_null($post['file'])) {
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel(['error' => 'Bad request. Missing file']);
+        }
+
+        /*
+         * Process:
+         *  - check permissions
+         *  - write file to store (or fail)
+         *  - create metadata (or fail and remove stored file)
+         *  - return metadata entry
+         */
+
+        //check write access
+        if (!$this->_coreRepository->checkWriteAccess($datasetID, $key, $pwd)) {
+            $this->getResponse()->setStatusCode(403);
+            return new JsonModel(['error' => 'You do not have write access on this dataset']);
+        }
+
+        print_r($post);
+        //move file into correct location
+        if (!$this->_fileRepository->writeFile($post['file'],$datasetID)) {
+            $this->getResponse()->setStatusCode(500);
+            return new JsonModel(['error' => 'Error occurred during file upload']);
+        }
+
+        //create metadata
+
+        //return metadata
+
         return new JsonModel(['message' => 'file controller POST (create file)']);
+
     }
 
     /*

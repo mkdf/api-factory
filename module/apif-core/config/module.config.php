@@ -175,6 +175,7 @@ return [
         'aliases' => [
             Repository\APIFCoreRepositoryInterface::class => Repository\APIFCoreRepository::class,
             Repository\SchemaRepositoryInterface::class => Repository\SchemaRepository::class,
+            Repository\FileRepositoryInterface::class => Repository\FileRepository::class,
             Service\ActivityLogManagerInterface::class => Service\ActivityLogManager::class,
             Service\SchemaValidatorInterface::class => Service\SchemaValidator::class,
             Service\SwaggerAddonManagerInterface::class => Service\SwaggerAddonManager::class,
@@ -182,6 +183,7 @@ return [
         'factories' => [
             Repository\APIFCoreRepository::class => Repository\Factory\APIFCoreRepositoryFactory::class,
             Repository\SchemaRepository::class => Repository\Factory\SchemaRepositoryFactory::class,
+            Repository\FileRepository::class => Repository\Factory\FileRepositoryFactory::class,
             Service\ActivityLogManager::class => Service\Factory\ActivityLogManagerFactory::class,
             Service\SchemaValidator::class => Service\Factory\SchemaValidatorFactory::class,
             Service\SwaggerAddonManager::class => Service\Factory\SwaggerAddonManagerFactory::class,
