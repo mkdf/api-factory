@@ -107,6 +107,24 @@ class FileController extends AbstractRestfulController
         }
 
         //create metadata
+        $metaItem = [
+            'title' => $post['title'],
+            'description' => $post['description'],
+            'filename' => basename($post['file']['tmp_name']),
+            'filenameOriginal' => $post['file']['name'],
+            'type' => $post['file']['type'],
+            'size' => $post['file']['size']
+        ];
+        //try {
+            $metaSuccess = $this->_coreRepository->writeFileMetadata($metaItem, $datasetID);
+        //}catch (\Throwable $ex) {
+            //$this->_handleException($ex);
+            //return new JsonModel(['error' => 'Failed to create metadata - ' . $ex->getMessage()]);
+        //}
+
+        if (!$metaSuccess) {
+            //there was a problem creating the metadata, remove teh file from the file store and inform user.
+        }
 
         //return metadata
 

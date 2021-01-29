@@ -411,8 +411,63 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             throw $ex;
         }
 
-
         return $userArray;
+    }
+
+    /*
+      * **********************
+      * FILE HANDLING METADATA
+      * **********************
+    */
+
+    public function writeFileMetadata($metaItem, $datasetID){
+        $metadataCollection = $this->_config['metadata']['dataset'];
+        $md = $this->_db->$metadataCollection;
+        $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetID,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetID);
+        }
+
+        //file metadata entry id:
+        $mdID = $metaItem['filenameOriginal']."-".$metaItem['filename'];
+        $mdID = str_replace(".","",$mdID);
+        //Retrieve dataset metadata (if exists), first
+        $result = $md->findOne(['_id' => $datasetID], []);
+        if (is_null($result)){
+            $result = [
+                '_id' => $datasetID,
+                'files' => [
+                    $mdID => $metaItem
+                ]
+            ];
+            //Write record back to dataset
+            $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
+            $response = 201;
+        }
+        else {
+            //Add entry to file list, if not already there
+            if (array_key_exists($mdID, $result['schemas']['files'])) {
+                //it's already there, overwrite it
+                $result['schemas']['files'][$mdID] = $metaItem;
+                $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
+                $response = 204;
+            }
+            else {
+                $result['schemas']['files'][$mdID] = $metaItem;
+                //Write record back to dataset
+                $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
+                $response = 201;
+            }
+        }
+        return $response;
+
     }
 
 }
