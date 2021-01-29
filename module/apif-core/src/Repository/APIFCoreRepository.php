@@ -420,7 +420,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
       * **********************
     */
 
-    public function writeFileMetadata($metaItem, $datasetID){
+    public function writeFileMetadata($metaItem, $datasetID, $overwrite = false){
         $metadataCollection = $this->_config['metadata']['dataset'];
         $md = $this->_db->$metadataCollection;
         $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
@@ -435,9 +435,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             throw new \Exception("No such dataset: ".$datasetID);
         }
 
-        //file metadata entry id:
-        $mdID = $metaItem['filenameOriginal']."-".$metaItem['filename'];
-        $mdID = str_replace(".","",$mdID);
+        //file metadata entry id (original filename, with '.' replaced with '_'
+        $mdID = str_replace(".","_",$metaItem['filenameOriginal']);
         //Retrieve dataset metadata (if exists), first
         $result = $md->findOne(['_id' => $datasetID], []);
         if (is_null($result)){
@@ -447,27 +446,17 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
                     $mdID => $metaItem
                 ]
             ];
-            //Write record back to dataset
-            $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
-            $response = 201;
         }
         else {
-            //Add entry to file list, if not already there
-            if (array_key_exists($mdID, $result['schemas']['files'])) {
-                //it's already there, overwrite it
-                $result['schemas']['files'][$mdID] = $metaItem;
-                $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
-                $response = 204;
+            //Add entry to existing metadata
+            if (array_key_exists($mdID,$result['files']) && !$overwrite) {
+                throw new \Exception("File ".$metaItem['filenameOriginal']." already exists. Use PUT if you wish to overwrite");
             }
-            else {
-                $result['schemas']['files'][$mdID] = $metaItem;
-                //Write record back to dataset
-                $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
-                $response = 201;
-            }
+            $result['files'][$mdID] = $metaItem;
         }
-        return $response;
-
+        //Write record back to dataset
+        $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
+        return true;
     }
 
 }
