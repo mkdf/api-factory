@@ -9,6 +9,8 @@ use APIF\Core\Repository\FileRepositoryInterface;
 use APIF\Core\Service\ActivityLogManagerInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
+use Laminas\Http\Response\Stream;
+use Laminas\Http\Headers;
 
 class FileController extends AbstractRestfulController
 {
@@ -48,23 +50,77 @@ class FileController extends AbstractRestfulController
      * GET SINGLE FILE
      */
     public function get($id) {
-        $docID = $this->params()->fromRoute('id', null);
+        $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
+        $filename = $this->params()->fromRoute('id', null);
         $datasetID = $this->params()->fromRoute('dataset-id', null);
-        return new JsonModel(['message' => 'file controller GET single file: '.$docID]);
+
+        //check read access
+        if (!$this->_coreRepository->checkReadAccess($datasetID, $key, $pwd)) {
+            $this->getResponse()->setStatusCode(403);
+            return new JsonModel(['error' => 'You do not have read access on this dataset']);
+        }
+
+
+        $result = $this->_coreRepository->getDatasetFile($datasetID, $filename);
+        if (is_null($result)) {
+            $this->getResponse()->setStatusCode(404);
+            return new JsonModel(['error' => 'File not found in this dataset']);
+        }
+        else {
+            $fullpath = $this->_fileRepository->getFileLocation($result, $datasetID);
+
+            $response = new Stream();
+            $response->setStream(fopen($fullpath, 'r'));
+            $response->setStatusCode(200);
+            $response->setStreamName($result['filenameOriginal']);
+            $headers = new Headers();
+            $headers->addHeaders(array(
+                'Content-Disposition' => 'attachment; filename="' . $result['filenameOriginal'] .'"',
+                'Content-Type' => $result['type'],
+                //'Content-Length' => filesize($fullpath),
+                'Content-Length' => $result['size'],
+                'Expires' => '@0', // @0, because zf2 parses date as string to \DateTime() object
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' => 'public'
+            ));
+            $response->setHeaders($headers);
+            return $response;
+        }
     }
 
     /*
      * GET LIST OF ALL FILES IN DATASET
      */
     public function getList() {
+        $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
         $datasetID = $this->params()->fromRoute('dataset-id', null);
-        return new JsonModel(['message' => 'file controller GET dataset file list for dataset: '.$datasetID]);
+
+        //check read access
+        if (!$this->_coreRepository->checkReadAccess($datasetID, $key, $pwd)) {
+            $this->getResponse()->setStatusCode(403);
+            return new JsonModel(['error' => 'You do not have read access on this dataset']);
+        }
+
+        $result = $this->_coreRepository->getDatasetFileList($datasetID);
+        if (is_null($result)) {
+            $arrayResponse = [];
+        }
+        else {
+            $arrayResponse = [];
+            foreach ($result as $key => $value){
+                $arrayResponse[] = $value;
+            }
+        }
+
+        return new JsonModel($arrayResponse);
     }
 
     /*
      * CREATE - Handling a POST request
      */
-    public function create($data) {
+    public function create($data, $overwrite = false) {
         $key = $this->_getAuth()['user'];
         $pwd = $this->_getAuth()['pwd'];
         $datasetID = $this->params()->fromRoute('dataset-id', null);
@@ -99,7 +155,7 @@ class FileController extends AbstractRestfulController
             return new JsonModel(['error' => 'You do not have write access on this dataset']);
         }
 
-        print_r($post);
+        //print_r($post);
         //move file into correct location
         if (!$this->_fileRepository->writeFile($post['file'],$datasetID)) {
             $this->getResponse()->setStatusCode(500);
@@ -116,7 +172,7 @@ class FileController extends AbstractRestfulController
             'size' => $post['file']['size']
         ];
         try {
-            $metaSuccess = $this->_coreRepository->writeFileMetadata($metaItem, $datasetID, false);
+            $metaSuccess = $this->_coreRepository->writeFileMetadata($metaItem, $datasetID, $overwrite);
         }catch (\Throwable $ex) {
             //$this->_handleException($ex);
             // FIXME - there was a problem creating the metadata, remove the file from the file store and inform user.

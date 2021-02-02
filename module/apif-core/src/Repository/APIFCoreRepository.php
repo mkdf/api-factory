@@ -420,10 +420,52 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
       * **********************
     */
 
-    public function writeFileMetadata($metaItem, $datasetID, $overwrite = false){
+    public function getDatasetFileList($datasetID) {
+        $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
         $metadataCollection = $this->_config['metadata']['dataset'];
         $md = $this->_db->$metadataCollection;
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetID,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetID);
+        }
+
+        $result = $md->findOne(['_id' => $datasetID], []);
+        return $result['files'];
+    }
+
+    public function getDatasetFile($datasetID, $filename) {
         $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
+        $metadataCollection = $this->_config['metadata']['dataset'];
+        $md = $this->_db->$metadataCollection;
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetID,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetID);
+        }
+
+        $result = $md->findOne(['_id' => $datasetID], []);
+        $files = $result['files'];
+        //file metadata entry id (original filename, with '.' replaced with '_'
+        $mdID = str_replace(".","_",$filename);
+        //print(json_encode($files[$mdID]));
+        return $files[$mdID]; //null if entry doesn't exist for this dataset
+    }
+
+    public function writeFileMetadata($metaItem, $datasetID, $overwrite = false){
+        $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
+        $metadataCollection = $this->_config['metadata']['dataset'];
+        $md = $this->_db->$metadataCollection;
 
         //Check dataset exists
         $data = $this->_db->listCollections([

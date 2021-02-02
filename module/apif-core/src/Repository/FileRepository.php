@@ -15,6 +15,12 @@ class FileRepository implements FileRepositoryInterface
         $this->_uploadDestination = $this->_config['file']['destination'];
     }
 
+    public function getFileLocation($fileData, $datasetID) {
+        $destination = $this->_uploadDestination . $datasetID . "/";
+        $fullPath = $destination . $fileData['filename'];
+        return $fullPath;
+    }
+
     public function writeFile($fileData, $datasetID) {
         try {
             $destination = $this->_uploadDestination . $datasetID . "/";
