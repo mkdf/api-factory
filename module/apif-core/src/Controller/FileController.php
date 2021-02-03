@@ -122,7 +122,6 @@ class FileController extends AbstractRestfulController
      * CREATE - Handling a POST request
      */
     public function create($data) {
-        //print_r($data);
         $key = $this->_getAuth()['user'];
         $pwd = $this->_getAuth()['pwd'];
         $datasetID = $this->params()->fromRoute('dataset-id', null);
@@ -135,8 +134,7 @@ class FileController extends AbstractRestfulController
             $request->getPost()->toArray(),
             $request->getFiles()->toArray()
         );
-        //$post = $data;
-        //print_r($post);
+
         //check title and description present
         if (is_null($post['title']) || is_null($post['description'])) {
             $this->getResponse()->setStatusCode(400);
@@ -201,9 +199,29 @@ class FileController extends AbstractRestfulController
      * DELETE - Handling a DELETE request
      */
     public function delete($id) {
-        $docID = $this->params()->fromRoute('id', null);
+        $filename = $this->params()->fromRoute('id', null);
         $datasetID = $this->params()->fromRoute('dataset-id', null);
-        return new JsonModel(['message' => 'file controller DELETE (delete file)']);
+        $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
+
+        if (is_null($datasetID || is_null($filename))) {
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel(['error' => 'Bad request. Missing dataset ID or filename']);
+        }
+
+        //check write access
+        if (!$this->_coreRepository->checkWriteAccess($datasetID, $key, $pwd)) {
+            $this->getResponse()->setStatusCode(403);
+            return new JsonModel(['error' => 'You do not have write access on this dataset']);
+        }
+
+        //Remove metadata
+        $localFilename = $this->_coreRepository->removeFileMetadata($filename, $datasetID);
+        //Remove file
+        $this->_fileRepository->deleteFile($localFilename, $datasetID);
+
+        $this->getResponse()->setStatusCode(204);
+        return new JsonModel(['message' => 'File deleted']);
     }
 
 }

@@ -511,4 +511,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return $overwrittenFile;
     }
 
+    public function removeFileMetadata ($filename, $datasetID) {
+        return null;
+    }
+
 }

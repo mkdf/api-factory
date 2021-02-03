@@ -38,6 +38,8 @@ class FileRepository implements FileRepositoryInterface
 
     }
 
+    //use with caution, will result in orphaned files if not used in conjunction with
+    //removeFileMetadata() in core repository
     public function deleteFile($filename, $datasetID){
         //FIXME - need a function body here
         return true;
