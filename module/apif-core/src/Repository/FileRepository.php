@@ -38,4 +38,9 @@ class FileRepository implements FileRepositoryInterface
 
     }
 
+    public function deleteFile($filename, $datasetID){
+        //FIXME - need a function body here
+        return true;
+    }
+
 }

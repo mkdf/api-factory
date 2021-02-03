@@ -63,9 +63,10 @@ class FileController extends AbstractRestfulController
 
 
         $result = $this->_coreRepository->getDatasetFile($datasetID, $filename);
+
         if (is_null($result)) {
             $this->getResponse()->setStatusCode(404);
-            return new JsonModel(['error' => 'File not found in this dataset']);
+            return new JsonModel(['error' => 'File not found']);
         }
         else {
             $fullpath = $this->_fileRepository->getFileLocation($result, $datasetID);
@@ -120,10 +121,12 @@ class FileController extends AbstractRestfulController
     /*
      * CREATE - Handling a POST request
      */
-    public function create($data, $overwrite = false) {
+    public function create($data) {
+        //print_r($data);
         $key = $this->_getAuth()['user'];
         $pwd = $this->_getAuth()['pwd'];
         $datasetID = $this->params()->fromRoute('dataset-id', null);
+        $overwriteFilename = $this->params()->fromRoute('id', null);
 
         //check valid submission
         $request = $this->getRequest();
@@ -132,32 +135,35 @@ class FileController extends AbstractRestfulController
             $request->getPost()->toArray(),
             $request->getFiles()->toArray()
         );
+        //$post = $data;
+        //print_r($post);
+        //check title and description present
         if (is_null($post['title']) || is_null($post['description'])) {
             $this->getResponse()->setStatusCode(400);
             return new JsonModel(['error' => 'Bad request. Missing title or description']);
         }
+        //Check file is present
         if (is_null($post['file'])) {
             $this->getResponse()->setStatusCode(400);
             return new JsonModel(['error' => 'Bad request. Missing file']);
         }
-
-        /*
-         * Process:
-         *  - check permissions
-         *  - write file to store (or fail)
-         *  - create metadata (or fail and remove stored file)
-         *  - return metadata entry
-         */
-
         //check write access
         if (!$this->_coreRepository->checkWriteAccess($datasetID, $key, $pwd)) {
             $this->getResponse()->setStatusCode(403);
             return new JsonModel(['error' => 'You do not have write access on this dataset']);
         }
 
-        //print_r($post);
-        //move file into correct location
-        if (!$this->_fileRepository->writeFile($post['file'],$datasetID)) {
+        //if this is an update/overwrite
+        if (!is_null($overwriteFilename)){
+            //check filename matches the filename requested for update
+            if (!($post['file']['name'] == $overwriteFilename)) {
+                $this->getResponse()->setStatusCode(400);
+                return new JsonModel(['error' => 'Bad request. Filename does not match the filename requested for update']);
+            }
+        }
+
+        $fileUploadResult = $this->_fileRepository->writeFile($post['file'],$datasetID);
+        if (!$fileUploadResult) {
             $this->getResponse()->setStatusCode(500);
             return new JsonModel(['error' => 'Error occurred during file upload']);
         }
@@ -172,26 +178,23 @@ class FileController extends AbstractRestfulController
             'size' => $post['file']['size']
         ];
         try {
-            $metaSuccess = $this->_coreRepository->writeFileMetadata($metaItem, $datasetID, $overwrite);
+            $overwrittenFile = $this->_coreRepository->writeFileMetadata($metaItem, $datasetID, $overwriteFilename);
         }catch (\Throwable $ex) {
             //$this->_handleException($ex);
             // FIXME - there was a problem creating the metadata, remove the file from the file store and inform user.
             return new JsonModel(['error' => 'Failed to create metadata - ' . $ex->getMessage()]);
         }
 
-        //return metadata
-
-        return new JsonModel(['message' => 'file controller POST (create file)']);
-
-    }
-
-    /*
-     * UPDATE - Handling a PUT request
-     */
-    public function update($id, $data) {
-        $docID = $this->params()->fromRoute('id', null);
-        $datasetID = $this->params()->fromRoute('dataset-id', null);
-        return new JsonModel(['message' => 'file controller PUT (overwrite file)']);
+        if (!is_null($overwrittenFile)) {
+            //FIXME - this function is currently empty and needs a body
+            $this->_fileRepository->deleteFile($overwrittenFile, $datasetID);
+            $this->getResponse()->setStatusCode(204);
+            return new JsonModel(['message' => 'File updated']);
+        }
+        else {
+            $this->getResponse()->setStatusCode(201);
+            return new JsonModel(['message' => 'File created']);
+        }
     }
 
     /*

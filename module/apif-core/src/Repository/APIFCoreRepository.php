@@ -451,7 +451,8 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
             ],
         ]);
         if (iterator_count($data) == 0) {
-            throw new \Exception("No such dataset: ".$datasetID);
+            return null;
+            //throw new \Exception("No such dataset: ".$datasetID);
         }
 
         $result = $md->findOne(['_id' => $datasetID], []);
@@ -462,10 +463,14 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         return $files[$mdID]; //null if entry doesn't exist for this dataset
     }
 
-    public function writeFileMetadata($metaItem, $datasetID, $overwrite = false){
+    /*
+     * write new file metadata. If overwriting existing metadata, return the name of the old file, else return null
+     */
+    public function writeFileMetadata($metaItem, $datasetID, $overwrite = null){
         $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
         $metadataCollection = $this->_config['metadata']['dataset'];
         $md = $this->_db->$metadataCollection;
+        $overwrittenFile = null;
 
         //Check dataset exists
         $data = $this->_db->listCollections([
@@ -491,14 +496,19 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         }
         else {
             //Add entry to existing metadata
-            if (array_key_exists($mdID,$result['files']) && !$overwrite) {
-                throw new \Exception("File ".$metaItem['filenameOriginal']." already exists. Use PUT if you wish to overwrite");
+            if (array_key_exists($mdID,$result['files'])) {
+                if (is_null($overwrite)) {
+                    throw new \Exception("File ".$metaItem['filenameOriginal']." already exists. Specify filename explicitly in URL path if you wish to overwrite");
+                }
+                else {
+                    $overwrittenFile = $result['files'][$mdID]['filename'];
+                }
             }
             $result['files'][$mdID] = $metaItem;
         }
         //Write record back to dataset
         $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
-        return true;
+        return $overwrittenFile;
     }
 
 }
