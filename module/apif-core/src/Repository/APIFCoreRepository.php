@@ -512,7 +512,40 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
     }
 
     public function removeFileMetadata ($filename, $datasetID) {
-        return null;
+        $this->_connectDB($this->_config['mongodb']['adminUser'],$this->_config['mongodb']['adminPwd']);
+        $metadataCollection = $this->_config['metadata']['dataset'];
+        $md = $this->_db->$metadataCollection;
+        $removedFile = null;
+
+        //Check dataset exists
+        $data = $this->_db->listCollections([
+            'filter' => [
+                'name' => $datasetID,
+            ],
+        ]);
+        if (iterator_count($data) == 0) {
+            throw new \Exception("No such dataset: ".$datasetID);
+        }
+
+        //file metadata entry id (original filename, with '.' replaced with '_'
+        $mdID = str_replace(".","_",$filename);
+        //Retrieve dataset metadata (if exists), first
+        $result = $md->findOne(['_id' => $datasetID], []);
+
+        if (is_null($result) || !(array_key_exists($mdID,$result['files']))){
+            throw new \Exception("No such file: ".$datasetID);
+        }
+        else {
+            $removedFile = $result['files'][$mdID]['filename'];
+        }
+
+        //Now remove item from file array
+        unset($result['files'][$mdID]);
+
+        //Write record back to dataset metadata
+        $insertOneResult = $md->replaceOne(['_id' => $datasetID], $result, ['upsert' => true]);
+
+        return $removedFile;
     }
 
 }

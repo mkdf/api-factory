@@ -218,10 +218,17 @@ class FileController extends AbstractRestfulController
         //Remove metadata
         $localFilename = $this->_coreRepository->removeFileMetadata($filename, $datasetID);
         //Remove file
-        $this->_fileRepository->deleteFile($localFilename, $datasetID);
+        $deleteResult = $this->_fileRepository->deleteFile($localFilename, $datasetID);
 
-        $this->getResponse()->setStatusCode(204);
-        return new JsonModel(['message' => 'File deleted']);
+        if ($deleteResult) {
+            $this->getResponse()->setStatusCode(204);
+            return new JsonModel(['message' => 'File deleted']);
+        }
+        else {
+            $this->getResponse()->setStatusCode(500);
+            return new JsonModel(['error' => 'Unable to delete file']);
+        }
+
     }
 
 }

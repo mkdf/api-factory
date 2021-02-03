@@ -35,14 +35,22 @@ class FileRepository implements FileRepositoryInterface
             return false;
             //throw $ex;
         }
-
     }
 
     //use with caution, will result in orphaned files if not used in conjunction with
     //removeFileMetadata() in core repository
     public function deleteFile($filename, $datasetID){
-        //FIXME - need a function body here
-        return true;
+        try {
+            $destination = $this->_uploadDestination . $datasetID . "/";
+
+            $fullPath = $destination . $filename;
+            unlink($fullPath);
+            return true;
+        }
+        catch (\Throwable $ex) {
+            return false;
+            //throw $ex;
+        }
     }
 
 }
