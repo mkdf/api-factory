@@ -533,7 +533,7 @@ class APIFCoreRepository implements APIFCoreRepositoryInterface
         $result = $md->findOne(['_id' => $datasetID], []);
 
         if (is_null($result) || !(array_key_exists($mdID,$result['files']))){
-            throw new \Exception("No such file: ".$datasetID);
+            throw new \Exception("No such file in dataset ".$datasetID);
         }
         else {
             $removedFile = $result['files'][$mdID]['filename'];
