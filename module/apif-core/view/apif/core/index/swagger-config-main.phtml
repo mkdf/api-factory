@@ -20,7 +20,11 @@
 },
 {
 "name": "object",
-"description": "Retrieve, push, update and delete documents"
+"description": "Create, retrieve, update and delete JSON documents"
+},
+{
+"name": "file",
+"description": "Create, retrieve, update and delete files"
 },
 {
 "name": "schemas",
@@ -337,6 +341,218 @@
 },
 "500": {
 "description": "Fatal error deleting object"
+}
+}
+}
+},
+"/file/{dataset-id}": {
+"get": {
+"tags": [
+"file"
+],
+"summary": "Retrieve a list of files for a single dataset",
+"operationId": "getFiles",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
+"post": {
+"tags": [
+"file"
+],
+"summary": "Upload a new file",
+"operationId": "createFile",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"requestBody": {
+"content": {
+"multipart/form-data": {
+"schema": {
+"type": "object",
+"properties": {
+"title": {
+"type": "string"
+},
+"description": {
+"type": "string"
+},
+"file": {
+"type": "string",
+"format": "binary"
+}
+}
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "File uploaded"
+}
+}
+}
+},
+"/file/{dataset-id}/{filename}": {
+"head": {
+"tags": [
+"file"
+],
+"summary": "Retrieve file metadata",
+"operationId": "getFileInfo",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "filename",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
+"get": {
+"tags": [
+"file"
+],
+"summary": "Retrieve a single file",
+"operationId": "getFile",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "filename",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
+}
+}
+},
+"post": {
+"tags": [
+"file"
+],
+"summary": "Update an existing file",
+"description": "Overwrite/update an existing file and correspoinding title and description. Note that the uploaded filename must match the original filename that is being overwritten.",
+"operationId": "updateFile",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "filename",
+"description": "The existing filename to be updated",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"requestBody": {
+"content": {
+"multipart/form-data": {
+"schema": {
+"type": "object",
+"properties": {
+"title": {
+"type": "string"
+},
+"description": {
+"type": "string"
+},
+"file": {
+"type": "string",
+"format": "binary"
+}
+}
+}
+}
+}
+},
+"responses": {
+"204": {
+"description": "File updated"
+}
+}
+},
+"delete": {
+"tags": [
+"file"
+],
+"summary": "Delete a file",
+"operationId": "deleteFile",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "filename",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"204": {
+"description": "File deleted"
 }
 }
 }
