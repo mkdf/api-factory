@@ -179,7 +179,8 @@ class PermissionsManagementController extends AbstractRestfulController
     public function update($id, $data) {
         //set permissions here
         $auth = $this->_getAuth();
-        $datasetParam = $data['dataset-uuid'];
+        //migrate these to dataset-id (not dataset-uuid) where possible
+        $datasetParam = $data['dataset-id'];
         $readParam = $data['read'];
         $writeParam = $data['write'];
         if (is_null($datasetParam) || is_null($readParam) || is_null($writeParam)) {
