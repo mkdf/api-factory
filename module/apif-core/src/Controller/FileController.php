@@ -184,13 +184,14 @@ class FileController extends AbstractRestfulController
         }
 
         if (!is_null($overwrittenFile)) {
-            //FIXME - this function is currently empty and needs a body
             $this->_fileRepository->deleteFile($overwrittenFile, $datasetID);
             $this->getResponse()->setStatusCode(204);
             return new JsonModel(['message' => 'File updated']);
         }
         else {
             $this->getResponse()->setStatusCode(201);
+            $location = "/file/".$datasetID."/".$metaItem['filenameOriginal'];
+            $this->getResponse()->getHeaders()->addHeaderLine('Location',$location);
             return new JsonModel(['message' => 'File created']);
         }
     }
