@@ -178,8 +178,8 @@ class FileController extends AbstractRestfulController
         try {
             $overwrittenFile = $this->_coreRepository->writeFileMetadata($metaItem, $datasetID, $overwriteFilename);
         }catch (\Throwable $ex) {
-            //$this->_handleException($ex);
-            // FIXME - there was a problem creating the metadata, remove the file from the file store and inform user.
+            //remove orphaned file
+            $this->_fileRepository->deleteFile($metaItem['filename'], $datasetID);
             return new JsonModel(['error' => 'Failed to create metadata - ' . $ex->getMessage()]);
         }
 
