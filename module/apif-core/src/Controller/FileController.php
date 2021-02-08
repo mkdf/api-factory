@@ -90,6 +90,28 @@ class FileController extends AbstractRestfulController
         }
     }
 
+    public function fileheadAction($id)
+    {
+        $key = $this->_getAuth()['user'];
+        $pwd = $this->_getAuth()['pwd'];
+        $filename = $this->params()->fromRoute('id', null);
+        $datasetID = $this->params()->fromRoute('dataset-id', null);
+
+        //check read access
+        if (!$this->_coreRepository->checkReadAccess($datasetID, $key, $pwd)) {
+            $this->getResponse()->setStatusCode(403);
+            return new JsonModel(['error' => 'You do not have read access on this dataset']);
+        }
+
+        $result = $this->_coreRepository->getDatasetFile($datasetID, $filename);
+        if (is_null($result)) {
+            $this->getResponse()->setStatusCode(404);
+            return new JsonModel(['error' => 'File not found']);
+        }
+
+        return new JsonModel($result);
+    }
+
     /*
      * GET LIST OF ALL FILES IN DATASET
      */

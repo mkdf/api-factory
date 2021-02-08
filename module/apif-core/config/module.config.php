@@ -20,6 +20,7 @@ use APIF\Core\Controller\Factory\SchemaManagementControllerFactory;
 use APIF\Core\Controller\Factory\SchemaRetrievalControllerFactory;
 use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Segment;
+use Laminas\Router\Http\Method;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
@@ -104,6 +105,20 @@ return [
                     'defaults' => [
                         'controller' => Controller\FileController::class,
                         //'action'     => 'query',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes' => [
+                    'filehead' => [
+                      'type' => Method::class,
+                      'options' => [
+                          'verb' => 'head',
+                          'defaults' => [
+                              'controller' => Controller\FileController::class,
+                              'action'     => 'filehead',
+                          ],
+                      ],
+
                     ],
                 ],
             ],
