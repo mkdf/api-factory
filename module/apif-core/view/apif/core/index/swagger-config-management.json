@@ -1,0 +1,449 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Factory - Management API",
+    "description": "Management API",
+    "termsOfService": "http://datahub.mksmart.org",
+    "contact": {
+      "email": "datahub-support@mksmart.org"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "0.7.0"
+  },
+  "tags": [
+    {
+      "name": "datasets",
+      "description": "Manage datasets",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://datahub.mksmart.org"
+      }
+    },
+    {
+      "name": "permissions",
+      "description": "Manage permissions"
+    },
+    {
+      "name": "schemas",
+      "description": "Manage schemas"
+    }
+  ],
+  "paths": {
+    "/schemas": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Retrieve all schemas",
+        "description": "Retrieves a full list of schemas",
+        "operationId": "getAllSchemas",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Create a new schema",
+        "description": "Create a new schema",
+        "operationId": "createSchema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema-id": {
+                    "type": "string",
+                    "description": "For external schemas, use the full schema URI"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "The body of the schema, for local schemas only. Leave this blank for external schemas."
+                  },
+                  "external": {
+                    "type": "integer",
+                    "description": "Is this an external schema?",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "default": 1
+                  }
+                },
+                "required": [
+                  "schema-id",
+                  "external"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/schemas/{schema-id}": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Retrieve full details for a single schema",
+        "description": "Retrieves full details for a single schema, including metadata",
+        "operationId": "getOneSchema",
+        "parameters": [
+          {
+            "name": "schema-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Update an existing schema",
+        "description": "Update an existing schema. For external schemas no schema body is required - simply provide the schema ID and schema body will be retrieved from the remote origin site",
+        "operationId": "updateSchema",
+        "parameters": [
+          {
+            "name": "schema-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema-id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        }
+      }
+    },
+    "/datasets": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Retrieve all datasets",
+        "description": "Retrieves a full list of dataset UUIDs",
+        "operationId": "getAllDatasets",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Create a new dataset",
+        "description": "Create a new dataset",
+        "operationId": "createDataset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataset-uuid": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "dataset-uuid",
+                  "key"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/datasets/{dataset-id}": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Retrieve single dataset details",
+        "description": "Retrieves a single dataset summary, including the number of documents in that dataset",
+        "operationId": "getOneDataset",
+        "parameters": [
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/datasets/{dataset-id}/schemas/{schema-id}": {
+      "post": {
+        "tags": [
+          "datasets",
+          "schemas"
+        ],
+        "summary": "Create schema/dataset association",
+        "description": "Assign a schema to a dataset",
+        "operationId": "setSchemaDatasetAssoc",
+        "parameters": [
+          {
+            "name": "schema-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "string",
+                    "description": "The body of the schema, for embedded use with this dataset only. Leave blank if registering an existing schema from the schema catalogue."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "datasets",
+          "schemas"
+        ],
+        "summary": "Delete schema/dataset association",
+        "description": "Remove a schema from a dataset",
+        "operationId": "deleteSchemaDatasetAssoc",
+        "parameters": [
+          {
+            "name": "schema-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No association to delete"
+          },
+          "204": {
+            "description": "Association deleted"
+          }
+        }
+      }
+    },
+    "/permissions": {
+      "get": {
+        "tags": [
+          "permissions"
+        ],
+        "summary": "Get all permissions",
+        "description": "Get all permissions",
+        "operationId": "getAllPermissions",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/permissions/{key}": {
+      "get": {
+        "tags": [
+          "permissions"
+        ],
+        "summary": "Get permissions for single key",
+        "description": "Get permissions for a given API key",
+        "operationId": "getPermissionsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "The API key that you require a permissions summary for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "permissions"
+        ],
+        "summary": "Set/update permissions",
+        "description": "Set or update the permissions on a dataset for a given key",
+        "operationId": "setPermissions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataset-id": {
+                    "type": "string"
+                  },
+                  "read": {
+                    "type": "integer",
+                    "description": "Set read access",
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "write": {
+                    "type": "integer",
+                    "description": "Set write access",
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  }
+                },
+                "required": [
+                  "dataset-id",
+                  "read",
+                  "write"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about the API Factory",
+    "url": "http://datahub.mksmart.org"
+  },
+  "servers": [
+    {
+      "url": "/management"
+    }
+  ],
+  "security": [
+    {
+      "DatasetAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "DatasetAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}

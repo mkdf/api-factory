@@ -11,11 +11,7 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-<<<<<<< HEAD
-"version": "0.8.0"
-=======
-"version": "0.7.5"
->>>>>>> master
+"version": "0.7.3"
 },
 "tags": [
 {
@@ -24,17 +20,12 @@
 },
 {
 "name": "object",
-"description": "Create, retrieve, update and delete JSON documents"
-},
-{
-"name": "file",
-"description": "Create, retrieve, update and delete files"
+"description": "Retrieve, push, update and delete documents"
 },
 {
 "name": "schemas",
 "description": "Retrieve a schema"
-},
-<?= $this->partial('apif/core/partial/swagger-addons', ['addons' => $addons, 'swaggerComponent' => 'tag'] ) ?>
+}
 ],
 "paths": {
 "/browse/{dataset-uuid}": {
@@ -349,222 +340,6 @@
 }
 }
 },
-"/file/{dataset-id}": {
-"get": {
-"tags": [
-"file"
-],
-"summary": "Retrieve a list of files for a single dataset",
-"operationId": "getFiles",
-"parameters": [
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-},
-"post": {
-"tags": [
-"file"
-],
-"summary": "Upload a new file",
-"operationId": "createFile",
-"parameters": [
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"requestBody": {
-"content": {
-"multipart/form-data": {
-"schema": {
-"type": "object",
-"properties": {
-"title": {
-"type": "string"
-},
-"description": {
-"type": "string"
-},
-"file": {
-"type": "string",
-"format": "binary"
-}
-}
-}
-}
-}
-},
-"responses": {
-"201": {
-"description": "File uploaded"
-}
-}
-}
-},
-"/file/{dataset-id}/{filename}": {
-<?php
-/*
-"head": {
-"tags": [
-"file"
-],
-"summary": "Retrieve file metadata",
-"operationId": "getFileInfo",
-"parameters": [
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "filename",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-},
-*/
-?>
-"get": {
-"tags": [
-"file"
-],
-"summary": "Retrieve a single file",
-"operationId": "getFile",
-"parameters": [
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "filename",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-}
-}
-},
-"post": {
-"tags": [
-"file"
-],
-"summary": "Update an existing file",
-"description": "Overwrite/update an existing file and correspoinding title and description. Note that the uploaded filename must match the original filename that is being overwritten.",
-"operationId": "updateFile",
-"parameters": [
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "filename",
-"description": "The existing filename to be updated",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"requestBody": {
-"content": {
-"multipart/form-data": {
-"schema": {
-"type": "object",
-"properties": {
-"title": {
-"type": "string"
-},
-"description": {
-"type": "string"
-},
-"file": {
-"type": "string",
-"format": "binary"
-}
-}
-}
-}
-}
-},
-"responses": {
-"204": {
-"description": "File updated"
-}
-}
-},
-"delete": {
-"tags": [
-"file"
-],
-"summary": "Delete a file",
-"operationId": "deleteFile",
-"parameters": [
-{
-"name": "dataset-id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "filename",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"204": {
-"description": "File deleted"
-}
-}
-}
-},
 "/schemas/{schema-id}": {
 "get": {
 "tags": [
@@ -596,8 +371,7 @@
 }
 }
 }
-},
-<?= $this->partial('apif/core/partial/swagger-addons', ['addons' => $addons, 'swaggerComponent' => 'body'] ) ?>
+}
 },
 "externalDocs": {
 "description": "Find out more about the API Factory",
