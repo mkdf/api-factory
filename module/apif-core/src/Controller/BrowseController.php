@@ -207,7 +207,8 @@ class BrowseController extends AbstractRestfulController
 
         $metadata['messages'] = [];
         $metadata['sort'] = $sortTerms;
-        $metadata['limit'] = $limitParam;
+        $metadata['pagesize'] = $limitParam;
+        $metadata['page'] = $pageParam;
         $metadata['documentCount'] = count($data);
 
         /*
