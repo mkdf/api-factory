@@ -132,10 +132,9 @@ class BrowseController extends AbstractRestfulController
         $queryParam = $this->params()->fromQuery('query', "");
         $limitParam = $this->params()->fromQuery('limit', null);
         $sortParam = $this->params()->fromQuery('sort', null);
-        $pageParam = $this->params()->fromQuery('page', null);
-        $pageSizeParam = $this->params()->fromQuery('pagesize', null);
+        $pageParam = $this->params()->fromQuery('page', 1);
+        $pageSizeParam = $this->params()->fromQuery('pagesize', 100);
         $fieldsParam = $this->params()->fromQuery('fields', null);
-
         //Sorting
         $sortTerms = [];
         if (!is_null($sortParam)){
