@@ -12,6 +12,9 @@ use Laminas\View\Model\JsonModel;
 use Laminas\Http\Response\Stream;
 use Laminas\Http\Headers;
 
+//This is just used for creating Mongo compatible IDs in activity log packets
+use MongoDB;
+
 class FileController extends AbstractRestfulController
 {
     private $_config;
@@ -45,6 +48,56 @@ class FileController extends AbstractRestfulController
             return $auth;
         }
     }
+
+    private function _assembleLogData ($datasetId, $key, $action, $description, $filename = null) {
+        $timestamp = time();
+        $OID = new MongoDB\BSON\ObjectId();
+        $idString = (string)$OID;
+
+        $summary = $action."[".$this->getRequest()->getMethod()."] - ".$this->getRequest()->getUriString()." - Dataset:".$datasetId." - Key:".$key." - ".$description;
+
+        $data = [
+            "_id" => $idString,
+            "@id" => $idString,
+            "@context" => "https://mkdf.github.io/context",
+            "@type" => [
+                "al:".$action,
+                "al:ActivityLogEntry"
+            ],
+            //"al:datasetId" => $datasetId,
+            //"al:documentId" => "docID",
+            "al:summary" => $summary,
+            "al:request" => [
+                "@type" => "al:HTTPRequest",
+                "al:agent" => [
+                    "@type" => "al:Agent",
+                    "al:key" => $key
+                ],
+                "al:endpoint" => $this->getRequest()->getUriString(),
+                "al:httpRequestMethod" => "al:".$this->getRequest()->getMethod(),
+                "al:parameters" => $this->params()->fromQuery(),
+                "al:payload" => $this->getRequest()->getContent()
+            ]
+        ];
+        if (!is_null($filename)) {
+            $data["al:filename"] = $filename;
+        }
+        if (!is_null($datasetId)) {
+            $data["al:datasetId"] = $datasetId;
+        }
+
+        //Add timestamp data
+        $data['_timestamp'] = $timestamp;
+        $data['_timestamp_year'] = (int)date("Y",$timestamp);
+        $data['_timestamp_month'] = (int)date("m",$timestamp);
+        $data['_timestamp_day'] = (int)date("d",$timestamp);
+        $data['_timestamp_hour'] = (int)date("H",$timestamp);
+        $data['_timestamp_minute'] = (int)date("i",$timestamp);
+        $data['_timestamp_second'] = (int)date("s",$timestamp);
+
+        return $data;
+    }
+
 
     /*
      * GET SINGLE FILE
@@ -86,6 +139,14 @@ class FileController extends AbstractRestfulController
                 'Pragma' => 'public'
             ));
             $response->setHeaders($headers);
+
+            //Activity Log
+            $datasetUUID = $datasetID;
+            $action = "GetSingleFile";
+            $summary = "Retrieve a single file";
+            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $filename);
+            $this->_activityLog->logActivity($logData);
+
             return $response;
         }
     }
@@ -136,6 +197,13 @@ class FileController extends AbstractRestfulController
                 $arrayResponse[] = $value;
             }
         }
+
+        //Activity Log
+        $datasetUUID = $datasetID;
+        $action = "GetAllFiles";
+        $summary = "Retrieve a list of all files in a dataset";
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
+        $this->_activityLog->logActivity($logData);
 
         return new JsonModel($arrayResponse);
     }
@@ -208,12 +276,28 @@ class FileController extends AbstractRestfulController
         if (!is_null($overwrittenFile)) {
             $this->_fileRepository->deleteFile($overwrittenFile, $datasetID);
             $this->getResponse()->setStatusCode(204);
+
+            //Activity Log
+            $datasetUUID = $datasetID;
+            $action = "OverwriteFile";
+            $summary = "File overwritten";
+            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $metaItem['filenameOriginal']);
+            $this->_activityLog->logActivity($logData);
+
             return new JsonModel(['message' => 'File updated']);
         }
         else {
             $this->getResponse()->setStatusCode(201);
             $location = "/file/".$datasetID."/".$metaItem['filenameOriginal'];
             $this->getResponse()->getHeaders()->addHeaderLine('Location',$location);
+
+            //Activity Log
+            $datasetUUID = $datasetID;
+            $action = "CreateFile";
+            $summary = "File created";
+            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $metaItem['filenameOriginal']);
+            $this->_activityLog->logActivity($logData);
+
             return new JsonModel(['message' => 'File created']);
         }
     }
@@ -251,6 +335,14 @@ class FileController extends AbstractRestfulController
 
         if ($deleteResult) {
             $this->getResponse()->setStatusCode(204);
+
+            //Activity Log
+            $datasetUUID = $datasetID;
+            $action = "DeleteFile";
+            $summary = "File deleted";
+            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $filename);
+            $this->_activityLog->logActivity($logData);
+
             return new JsonModel(['message' => 'File deleted']);
         }
         else {
