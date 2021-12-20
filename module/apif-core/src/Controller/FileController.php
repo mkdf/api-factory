@@ -193,7 +193,7 @@ class FileController extends AbstractRestfulController
         }
         else {
             $arrayResponse = [];
-            foreach ($result as $key => $value){
+            foreach ($result as $keyItem => $value){
                 $arrayResponse[] = $value;
             }
         }
