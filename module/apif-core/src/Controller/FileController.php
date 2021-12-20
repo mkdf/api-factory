@@ -49,7 +49,7 @@ class FileController extends AbstractRestfulController
         }
     }
 
-    private function _assembleLogData ($datasetId, $key, $action, $description, $filename = null) {
+    private function _assembleLogData ($datasetId, $key, $action, $description, $filename = null, $metadata = null) {
         $timestamp = time();
         $OID = new MongoDB\BSON\ObjectId();
         $idString = (string)$OID;
@@ -81,6 +81,9 @@ class FileController extends AbstractRestfulController
         ];
         if (!is_null($filename)) {
             $data["al:filename"] = $filename;
+        }
+        if (!is_null($metadata)) {
+            $data["al:filemetadata"] = $metadata;
         }
         if (!is_null($datasetId)) {
             $data["al:datasetId"] = $datasetId;
@@ -281,7 +284,7 @@ class FileController extends AbstractRestfulController
             $datasetUUID = $datasetID;
             $action = "OverwriteFile";
             $summary = "File overwritten";
-            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $metaItem['filenameOriginal']);
+            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $metaItem['filenameOriginal'], $metaItem);
             $this->_activityLog->logActivity($logData);
 
             return new JsonModel(['message' => 'File updated']);
@@ -295,7 +298,7 @@ class FileController extends AbstractRestfulController
             $datasetUUID = $datasetID;
             $action = "CreateFile";
             $summary = "File created";
-            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $metaItem['filenameOriginal']);
+            $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $metaItem['filenameOriginal'], $metaItem);
             $this->_activityLog->logActivity($logData);
 
             return new JsonModel(['message' => 'File created']);
