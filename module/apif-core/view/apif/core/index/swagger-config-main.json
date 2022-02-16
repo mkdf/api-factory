@@ -1,398 +1,648 @@
 {
-"openapi": "3.0.1",
-"info": {
-"title": "API Factory - Object Stream API",
-"description": "Object Stream API",
-"termsOfService": "http://datahub.mksmart.org",
-"contact": {
-"email": "datahub-support@mksmart.org"
-},
-"license": {
-"name": "Apache 2.0",
-"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-},
-"version": "0.7.3"
-},
-"tags": [
-{
-"name": "browse",
-"description": "Browse a dataset, with full control over filters, pagination, sorting"
-},
-{
-"name": "object",
-"description": "Retrieve, push, update and delete documents"
-},
-{
-"name": "schemas",
-"description": "Retrieve a schema"
-}
-],
-"paths": {
-"/browse/{dataset-uuid}": {
-"get": {
-"tags": [
-"browse"
-],
-"summary": "Retrieve documents from the dataset",
-"operationId": "browseDocuments",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"description": "dataset uuid identifier",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "query",
-"in": "query",
-"description": "The filter query",
-"required": false,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "limit",
-"in": "query",
-"description": "Optionally limit the number of documents returned",
-"schema": {
-"minimum": 0,
-"type": "integer"
-}
-},
-{
-"name": "sort",
-"in": "query",
-"description": "Optionally specify fields on which to sort the data. Sort fields should be specified as a comma separated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')",
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "fields",
-"in": "query",
-"description": "Optionally specify which fields to return. Fields should be specified as a comma separated list.  Fields preceded with a minus (\"-\") will be excluded from the results. The \"_id\" field is always returned, unless explicitly excluded.",
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "pagesize",
-"in": "query",
-"description": "Optionally enable pagination and specify page size",
-"schema": {
-"minimum": 0,
-"type": "integer"
-}
-},
-{
-"name": "page",
-"in": "query",
-"description": "If using pagination, optionally specify the page number of results to return (defaults to page 1)",
-"schema": {
-"minimum": 0,
-"type": "integer"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-},
-"400": {
-"description": "Bad request, malformed JSON"
-},
-"500": {
-"description": "Fatal error creating object"
-}
-}
-}
-},
-"/object/{dataset-uuid}": {
-"get": {
-"tags": [
-"object"
-],
-"summary": "Retrieve documents from the dataset",
-"operationId": "getDocuments",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"description": "dataset uuid identifier",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "query",
-"in": "query",
-"description": "The filter query",
-"required": false,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "limit",
-"in": "query",
-"description": "Optionally limit the number of documents returned",
-"schema": {
-"minimum": 0,
-"type": "integer"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-},
-"400": {
-"description": "Bad request, malformed JSON"
-},
-"500": {
-"description": "Fatal error creating object"
-}
-}
-},
-"post": {
-"tags": [
-"object"
-],
-"summary": "Create a new document in the dataset",
-"operationId": "createDocument",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"description": "dataset uuid identifier",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"requestBody": {
-"description": "The document to be created",
-"content": {
-"application/json": {
-"schema": {
-"type": "object",
-"example": {
-"_id": "1067",
-"sensorID": "42-a",
-"sensorValue": 34.7
-}
-}
-}
-},
-"required": true
-},
-"responses": {
-"201": {
-"description": "Object created"
-},
-"400": {
-"description": "Bad request, malformed JSON"
-},
-"500": {
-"description": "Fatal error creating object"
-}
-}
-}
-},
-"/object/{dataset-uuid}/{doc_id}": {
-"get": {
-"tags": [
-"object"
-],
-"summary": "Retrieve a single document from the dataset",
-"operationId": "getDocument",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"description": "dataset uuid identifier",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "doc_id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "limit",
-"in": "query",
-"description": "Optionally limit the number of documents returned",
-"schema": {
-"minimum": 0,
-"type": "integer"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-},
-"400": {
-"description": "Bad request, malformed JSON"
-},
-"500": {
-"description": "Fatal error creating object"
-}
-}
-},
-"put": {
-"tags": [
-"object"
-],
-"summary": "Update a document by ID",
-"description": "Update an existing document, referenced by ID. Note that the existing document will be overwritten, so a full document should be supplied.",
-"operationId": "updateDocumentById",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"description": "The UUID of the dataset",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "doc_id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"requestBody": {
-"description": "The updated document",
-"content": {
-"application/json": {
-"schema": {
-"type": "object"
-}
-}
-},
-"required": true
-},
-"responses": {
-"201": {
-"description": "Object creted"
-},
-"204": {
-"description": "Object updated"
-},
-"500": {
-"description": "Fatal error creating or updating object"
-}
-}
-},
-"delete": {
-"tags": [
-"object"
-],
-"summary": "Delete a document by ID",
-"description": "Delete an existing document, referenced by ID.",
-"operationId": "deleteDocumentById",
-"parameters": [
-{
-"name": "dataset-uuid",
-"in": "path",
-"description": "The UUID of the dataset",
-"required": true,
-"schema": {
-"type": "string"
-}
-},
-{
-"name": "doc_id",
-"in": "path",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "No items to delete"
-},
-"204": {
-"description": "Object deleted"
-},
-"500": {
-"description": "Fatal error deleting object"
-}
-}
-}
-},
-"/schemas/{schema-id}": {
-"get": {
-"tags": [
-"schemas"
-],
-"summary": "Retrieve schema",
-"operationId": "getSchema",
-"parameters": [
-{
-"name": "schema-id",
-"in": "path",
-"description": "Schema name",
-"example": "person.json",
-"required": true,
-"schema": {
-"type": "string"
-}
-}
-],
-"responses": {
-"200": {
-"description": "Success"
-},
-"404": {
-"description": "Schema not found"
-},
-"500": {
-"description": "Fatal error retrieving schema"
-}
-}
-}
-}
-},
-"externalDocs": {
-"description": "Find out more about the API Factory",
-"url": "http://datahu.mksmart.org"
-},
-"servers": [
-{
-"url": ""
-}
-],
-"security": [
-{
-"DatasetAuth": []
-}
-],
-"components": {
-"securitySchemes": {
-"DatasetAuth": {
-"type": "http",
-"scheme": "basic"
-}
-}
-}
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Factory - Object Stream API",
+    "description": "Object Stream API",
+    "termsOfService": "http://datahub.mksmart.org",
+    "contact": {
+      "email": "datahub-support@mksmart.org"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "0.8.4"
+  },
+  "tags": [
+    {
+      "name": "browse",
+      "description": "Browse a dataset, with full control over filters, pagination, sorting"
+    },
+    {
+      "name": "object",
+      "description": "Create, retrieve, update and delete JSON documents"
+    },
+    {
+      "name": "file",
+      "description": "Create, retrieve, update and delete files"
+    },
+    {
+      "name": "schemas",
+      "description": "Retrieve a schema"
+    },
+    {
+      "name": "sparql",
+      "description": "Perform a SPARQL query against the data"
+    }
+  ],
+  "paths": {
+    "/browse/{dataset-uuid}": {
+      "get": {
+        "tags": [
+          "browse"
+        ],
+        "summary": "Retrieve documents from the dataset",
+        "operationId": "browseDocuments",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "dataset uuid identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The filter query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Optionally specify fields on which to sort the data. Sort fields should be specified as a comma separated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Optionally specify which fields to return. Fields should be specified as a comma separated list. Fields preceded with a minus (\"-\") will be excluded from the results. The \"_id\" field is always returned, unless explicitly excluded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagesize",
+            "in": "query",
+            "description": "Optionally specify page size (defaults to a page size of 100)",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Optionally specify the page number of results to return (defaults to page 1)",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request, malformed JSON"
+          },
+          "500": {
+            "description": "Fatal error creating object"
+          }
+        }
+      }
+    },
+    "/object/{dataset-uuid}": {
+      "get": {
+        "tags": [
+          "object"
+        ],
+        "summary": "Retrieve documents from the dataset",
+        "operationId": "getDocuments",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "dataset uuid identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The filter query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Optionally limit the number of documents returned",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request, malformed JSON"
+          },
+          "500": {
+            "description": "Fatal error creating object"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "object"
+        ],
+        "summary": "Create a new document in the dataset",
+        "operationId": "createDocument",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "dataset uuid identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The document to be created",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "_id": "1067",
+                  "sensorID": "42-a",
+                  "sensorValue": 34.7
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Object created"
+          },
+          "400": {
+            "description": "Bad request, malformed JSON"
+          },
+          "500": {
+            "description": "Fatal error creating object"
+          }
+        }
+      }
+    },
+    "/object/{dataset-uuid}/{doc_id}": {
+      "get": {
+        "tags": [
+          "object"
+        ],
+        "summary": "Retrieve a single document from the dataset",
+        "operationId": "getDocument",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "dataset uuid identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Optionally limit the number of documents returned",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request, malformed JSON"
+          },
+          "500": {
+            "description": "Fatal error creating object"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "object"
+        ],
+        "summary": "Update a document by ID",
+        "description": "Update an existing document, referenced by ID. Note that the existing document will be overwritten, so a full document should be supplied.",
+        "operationId": "updateDocumentById",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "The UUID of the dataset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The updated document",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Object creted"
+          },
+          "204": {
+            "description": "Object updated"
+          },
+          "500": {
+            "description": "Fatal error creating or updating object"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "object"
+        ],
+        "summary": "Delete a document by ID",
+        "description": "Delete an existing document, referenced by ID.",
+        "operationId": "deleteDocumentById",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "The UUID of the dataset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No items to delete"
+          },
+          "204": {
+            "description": "Object deleted"
+          },
+          "500": {
+            "description": "Fatal error deleting object"
+          }
+        }
+      }
+    },
+    "/file/{dataset-id}": {
+      "get": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Retrieve a list of files for a single dataset",
+        "operationId": "getFiles",
+        "parameters": [
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Upload a new file",
+        "operationId": "createFile",
+        "parameters": [
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded"
+          }
+        }
+      }
+    },
+    "/file/{dataset-id}/{filename}": {
+      "get": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Retrieve a single file",
+        "operationId": "getFile",
+        "parameters": [
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Update an existing file",
+        "description": "Overwrite/update an existing file and correspoinding title and description. Note that the uploaded filename must match the original filename that is being overwritten.",
+        "operationId": "updateFile",
+        "parameters": [
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filename",
+            "description": "The existing filename to be updated",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "File updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Delete a file",
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "dataset-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "File deleted"
+          }
+        }
+      }
+    },
+    "/schemas/{schema-id}": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Retrieve schema",
+        "operationId": "getSchema",
+        "parameters": [
+          {
+            "name": "schema-id",
+            "in": "path",
+            "description": "Schema name",
+            "example": "person.json",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Schema not found"
+          },
+          "500": {
+            "description": "Fatal error retrieving schema"
+          }
+        }
+      }
+    },
+    "/query/{dataset-uuid}/sparql": {
+      "get": {
+        "tags": [
+          "sparql"
+        ],
+        "summary": "Retrieve sparql",
+        "operationId": "getSparql",
+        "parameters": [
+          {
+            "name": "dataset-uuid",
+            "in": "path",
+            "description": "Dataset name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The SPARQL query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Query results",
+            "content": {
+              "application/sparql-results+json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/sparql-results+xml": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "example": "subject,predicate,object"
+                }
+              },
+              "text/tab-separated-values": {
+                "schema": {
+                  "type": "string",
+                  "example": "?subject ?predicate ?object"
+                }
+              },
+              "application/x-binary-rdf-results-table": {
+                "schema": {
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request or malformed SPARQL"
+          },
+          "500": {
+            "description": "Fatal error"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about the API Factory",
+    "url": "http://datahub.mksmart.org"
+  },
+  "servers": [
+    {
+      "url": ""
+    }
+  ],
+  "security": [
+    {
+      "DatasetAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "DatasetAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
 }
