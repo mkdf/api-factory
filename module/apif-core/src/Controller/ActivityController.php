@@ -117,25 +117,10 @@ class ActivityController extends AbstractRestfulController
                     ['@type' => 'al:OverwriteFile'],
                 ],
             ];
+            // DO NOT RETURN ANY FIELDS WHICH CONTAIN THE KEY USED IN THE ORIGINAL REQUEST
             $projection = [
-                '_id' => true,
-                '@id' => true,
-                '@context' => true,
-                '@type' => true,
-                //'al:request' => true,
-                'al:request.@type' => true,
-                'al:request.al:endpoint' => true,
-                'al:request.al:httpRequestMethod' => true,
-                'al:request.al:payload' => true,
-                'al:documentId' => true,
-                'al:datasetId' => true,
-                '_timestamp' => true,
-                '_timestamp_year' => true,
-                '_timestamp_month' => true,
-                '_timestamp_day' => true,
-                '_timestamp_hour' => true,
-                '_timestamp_minute' => true,
-                '_timestamp_second' => true,
+                'al:summary' => false,
+                'al:request.al:agent' => false,
             ];
             $docs = $this->_repository->findDocs($activityLogId, $adminUser, $adminPwd, $query, $limit = null, $sort = null ,$projection);
         }
