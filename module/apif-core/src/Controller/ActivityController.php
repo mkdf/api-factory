@@ -104,22 +104,17 @@ class ActivityController extends AbstractRestfulController
         // Access is granted to activity log if user/key has both READ and WRITE permission on this dataset
         // ######
         if ($permissions['read'] AND $permissions['write']) {
-        // TODO - MAKE ACTIVITY LOG REQUEST HERE...
-            // Actions:
-            // - RetrieveMany
-            // - CreateFile
-            // - Create
-
             $activityLogId = $this->_config['activityLog']['dataset'];
+            // ONLY RETRIEVE WRITE ACTIONS, NOT READS.
             $query = [
                 'al:datasetId' => $id,
                 '$or' => [
-                    ['@type' => 'al:CreateFile'],
                     ['@type' => 'al:Create'],
-                    //['@type' => 'al:RetrieveMany'],
                     ['@type' => 'al:Update'],
                     ['@type' => 'al:Delete'],
-                    //['@type' => 'al:Browse'],
+                    ['@type' => 'al:CreateFile'],
+                    ['@type' => 'al:DeleteFile'],
+                    ['@type' => 'al:OverwriteFile'],
                 ],
             ];
             $projection = [
