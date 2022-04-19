@@ -11,7 +11,7 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-"version": "0.8.4"
+"version": "0.9.0"
 },
 "tags": [
 {
@@ -25,6 +25,10 @@
 {
 "name": "file",
 "description": "Create, retrieve, update and delete files"
+},
+{
+"name": "activity",
+"description": "Activity monitoring"
 },
 {
 "name": "schemas",
@@ -548,6 +552,40 @@
 "responses": {
 "204": {
 "description": "File deleted"
+}
+}
+}
+},
+"/activity/{dataset-id}": {
+"get": {
+"tags": [
+"activity"
+],
+"summary": "Retrieve details of write activities on a dataset",
+"operationId": "getActivities",
+"parameters": [
+{
+"name": "dataset-id",
+"in": "path",
+"description": "Dataset ID",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "timestamp",
+"in": "query",
+"description": "Optionally only retrieve entries since this timestamp",
+"required": false,
+"schema": {
+"type": "integer"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Success"
 }
 }
 }
