@@ -105,12 +105,50 @@ class ActivityController extends AbstractRestfulController
         // ######
         if ($permissions['read'] AND $permissions['write']) {
         // TODO - MAKE ACTIVITY LOG REQUEST HERE...
+            // Actions:
+            // - RetrieveMany
+            // - CreateFile
+            // - Create
+
+            $activityLogId = $this->_config['activityLog']['dataset'];
+            $query = [
+                'al:datasetId' => $id,
+                '$or' => [
+                    ['@type' => 'al:CreateFile'],
+                    ['@type' => 'al:Create'],
+                    //['@type' => 'al:RetrieveMany'],
+                    ['@type' => 'al:Update'],
+                    ['@type' => 'al:Delete'],
+                    //['@type' => 'al:Browse'],
+                ],
+            ];
+            $projection = [
+                '_id' => true,
+                '@id' => true,
+                '@context' => true,
+                '@type' => true,
+                //'al:request' => true,
+                'al:request.@type' => true,
+                'al:request.al:endpoint' => true,
+                'al:request.al:httpRequestMethod' => true,
+                'al:request.al:payload' => true,
+                'al:documentId' => true,
+                'al:datasetId' => true,
+                '_timestamp' => true,
+                '_timestamp_year' => true,
+                '_timestamp_month' => true,
+                '_timestamp_day' => true,
+                '_timestamp_hour' => true,
+                '_timestamp_minute' => true,
+                '_timestamp_second' => true,
+            ];
+            $docs = $this->_repository->findDocs($activityLogId, $adminUser, $adminPwd, $query, $limit = null, $sort = null ,$projection);
         }
         else {
             $this->getResponse()->setStatusCode(403);
             return new JsonModel(['error' => 'Authorization failed, you do not have access to activity entries for this dataset']);
         }
 
-        return new JsonModel($permissions);
+        return new JsonModel($docs);
     }
 }

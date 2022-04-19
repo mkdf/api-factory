@@ -407,7 +407,7 @@ class ObjectController extends AbstractRestfulController
         $datasetUUID = $id;
         $action = "Delete";
         $summary = "Remove a document from dataset";
-        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
+        $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary, $docID);
         $this->_activityLog->logActivity($logData);
 
         return new JsonModel($response);
