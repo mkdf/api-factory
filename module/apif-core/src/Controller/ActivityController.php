@@ -81,6 +81,12 @@ class ActivityController extends AbstractRestfulController
         $key = $this->_getAuth()['user'];
         $pwd = $this->_getAuth()['pwd'];
 
+        //Get URL params
+        $timestampParam = $this->params()->fromQuery('timestamp', "");
+        // This should = 0 or 1 if timestamp not supplied or an invalid string supplied.
+        // Either way, all items will be returned.
+        $timestamp = intval($timestampParam);
+
         // Admin credentials for querying the permissions DB
         $adminUser = $this->_config['mongodb']['adminUser'];
         $adminPwd = $this->_config['mongodb']['adminPwd'];
@@ -116,6 +122,7 @@ class ActivityController extends AbstractRestfulController
                     ['@type' => 'al:DeleteFile'],
                     ['@type' => 'al:OverwriteFile'],
                 ],
+                '_timestamp' => ['$gte' => $timestamp]
             ];
             // DO NOT RETURN ANY FIELDS WHICH CONTAIN THE KEY USED IN THE ORIGINAL REQUEST
             $projection = [
