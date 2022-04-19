@@ -73,6 +73,7 @@ class ActivityController extends AbstractRestfulController
                 }
             }
         }
+
         return $permissions;
     }
 
