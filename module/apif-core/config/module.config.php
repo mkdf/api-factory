@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace APIF\Core;
 
+use APIF\Core\Controller\Factory\ActivityControllerFactory;
 use APIF\Core\Controller\Factory\BrowseControllerFactory;
 use APIF\Core\Controller\Factory\DatasetManagementControllerFactory;
 use APIF\Core\Controller\Factory\FileControllerFactory;
@@ -98,6 +99,15 @@ return [
                     ],
                 ],
             ],
+            'activity' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/activity/:id',
+                    'defaults' => [
+                        'controller' => Controller\ActivityController::class,
+                    ],
+                ],
+            ],
             'file' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -180,6 +190,7 @@ return [
             Controller\ObjectController::class  => ObjectControllerFactory::class,
             Controller\BrowseController::class => BrowseControllerFactory::class,
             Controller\FileController::class => FileControllerFactory::class,
+            Controller\ActivityController::class => ActivityControllerFactory::class,
             Controller\DatasetManagementController::class => DatasetManagementControllerFactory::class,
             Controller\PermissionsManagementController::class => PermissionsManagementControllerFactory::class,
             Controller\SchemaRetrievalController::class => SchemaRetrievalControllerFactory::class,
