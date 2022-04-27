@@ -99,10 +99,10 @@ return [
                     ],
                 ],
             ],
-            'activity' => [
+            'changes' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/activity/:id',
+                    'route'    => '/changes/:id',
                     'defaults' => [
                         'controller' => Controller\ActivityController::class,
                     ],

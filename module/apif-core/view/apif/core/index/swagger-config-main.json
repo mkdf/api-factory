@@ -11,7 +11,7 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "version": "0.9.0"
+    "version": "0.9.1"
   },
   "tags": [
     {
@@ -27,8 +27,8 @@
       "description": "Create, retrieve, update and delete files"
     },
     {
-      "name": "activity",
-      "description": "Activity monitoring"
+      "name": "changes",
+      "description": "Monitoring changes to a dataset"
     },
     {
       "name": "schemas",
@@ -525,13 +525,13 @@
         }
       }
     },
-    "/activity/{dataset-id}": {
+    "/changes/{dataset-id}": {
       "get": {
         "tags": [
-          "activity"
+          "changes"
         ],
         "summary": "Retrieve details of write activities on a dataset",
-        "operationId": "getActivities",
+        "operationId": "getChanges",
         "parameters": [
           {
             "name": "dataset-id",
