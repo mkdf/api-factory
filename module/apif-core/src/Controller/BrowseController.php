@@ -175,6 +175,11 @@ class BrowseController extends AbstractRestfulController
             }
         }
 
+        //Do this before any response might happen (including errors)
+        $this->getResponse()->getHeaders()->addHeaders([
+            'Access-Control-Allow-Origin' => '*'
+        ]);
+
         //Assign params to query options
         if ($queryParam == ""){
             $query = [];
@@ -242,9 +247,11 @@ class BrowseController extends AbstractRestfulController
         $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
 
+        /*
         $this->getResponse()->getHeaders()->addHeaders([
             'Access-Control-Allow-Origin' => '*'
         ]);
+        */
         return new JsonModel($this->_wrapMetadata($data, $metadata));
     }
 }
