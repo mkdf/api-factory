@@ -112,9 +112,10 @@ class ActivityController extends AbstractRestfulController
         $permissions = $this->getPermissionsOnDataset($roles, $id);
 
         // ######
-        // Access is granted to activity log if user/key has both READ and WRITE permission on this dataset
+        // Access is granted to activity log if user/key has READ permission on this dataset
         // ######
-        if ($permissions['read'] AND $permissions['write']) {
+        //if ($permissions['read'] AND $permissions['write']) {
+        if ($permissions['read']) {
             $activityLogId = $this->_config['activityLog']['dataset'];
             // ONLY RETRIEVE WRITE ACTIONS, NOT READS.
             $query = [
