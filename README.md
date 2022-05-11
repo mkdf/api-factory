@@ -9,7 +9,7 @@ a combination of the two.
 
 If only the **timestamp** parameter is specified, *all* entries since that timestamp will
 be returned, with no limits. If you wish to limit the amount of data returned whilst 
-also specifying a **timestamp** parameter, simply also specify a **limit** paramter. 
+also specifying a **timestamp** parameter, simply also specify a **limit** parameter. 
 
 *Please take care not to make repeated requests for unlimited change entries. Requesting 
 all entries since the creation of the dataset should generally 
