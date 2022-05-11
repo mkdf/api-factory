@@ -1,5 +1,9 @@
 # README #
 
+### Notes for /changes/ endpoint
+
+/changes/ docs to go here...
+
 ### Notes for installing SPARQL add-on module
 
 * Ensure you are running **v0.7.4** or later which includes support for add-on modules
