@@ -110,17 +110,21 @@ class BrowseController extends AbstractRestfulController
         }
     }
 
+
     public function options() {
+
         $this->getResponse()->getHeaders()->addHeaders([
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Credentials' => 'true',
+            //'Access-Control-Allow-Origin' => '*',
+            //'Access-Control-Allow-Credentials' => 'true',
             'Access-Control-Allow-Headers' => '*',
             'Access-Control-Allow-Methods' => 'GET, OPTIONS',
             'Access-Control-Max-Age' => '86400',
 
         ]);
+
         return new JsonModel([]);
     }
+
 
     /*
  * GET - Handling a GET request
@@ -178,8 +182,8 @@ class BrowseController extends AbstractRestfulController
         //Do this before any response might happen (including errors)
         /*
         $this->getResponse()->getHeaders()->addHeaders([
-            'Access-Control-Allow-Origin' => '*'
-        ]);
+                'Access-Control-Allow-Origin' => '*'
+            ]);
         */
 
         //Assign params to query options
