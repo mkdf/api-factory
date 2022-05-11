@@ -84,9 +84,13 @@ class ActivityController extends AbstractRestfulController
 
         //Get URL params
         $timestampParam = $this->params()->fromQuery('timestamp', "");
+        $limitParam = $this->params()->fromQuery('limit', "");
+        $sortParam = $this->params()->fromQuery('sort', "");
         // This should = 0 or 1 if timestamp not supplied or an invalid string supplied.
         // Either way, all items will be returned.
         $timestamp = intval($timestampParam);
+        $limit = intval($limitParam);
+        $sort = intval($sortParam);
 
         // Admin credentials for querying the permissions DB
         $adminUser = $this->_config['mongodb']['adminUser'];
@@ -130,7 +134,22 @@ class ActivityController extends AbstractRestfulController
                 'al:summary' => false,
                 'al:request.al:agent' => false,
             ];
-            $docs = $this->_repository->findDocs($activityLogId, $adminUser, $adminPwd, $query, $limit = null, $sort = null ,$projection);
+
+            if ($timestamp <= 0) { //no valid timestamp supplied
+                if ($limit <= 0) {
+                    $limit = 100; //if no timestamp or limit specified, limit to 100
+                }
+            }
+            if ($limit <= 0) {
+                $limit = null;
+            }
+            if ($sort != 1) {
+                $sort = null;
+            }
+            else {
+                $sort = '_timestamp';
+            }
+            $docs = $this->_repository->findDocs($activityLogId, $adminUser, $adminPwd, $query, $limit, $sort, $projection);
         }
         else {
             $this->getResponse()->setStatusCode(403);
