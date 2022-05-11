@@ -11,7 +11,7 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "version": "0.9.2"
+    "version": "0.9.3"
   },
   "tags": [
     {
@@ -549,6 +549,27 @@
             "required": false,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Optionally specify a limit on the number of entries returned (defaults to 100)",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Optionally reverse the sort order to retrieve items oldest-first",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
             }
           }
         ],
