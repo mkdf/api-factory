@@ -176,9 +176,11 @@ class BrowseController extends AbstractRestfulController
         }
 
         //Do this before any response might happen (including errors)
+        /*
         $this->getResponse()->getHeaders()->addHeaders([
             'Access-Control-Allow-Origin' => '*'
         ]);
+        */
 
         //Assign params to query options
         if ($queryParam == ""){
