@@ -166,6 +166,7 @@ class ObjectController extends AbstractRestfulController
         }
     }
 
+
     public function options() {
 
         $this->getResponse()->getHeaders()->addHeaders([
@@ -179,6 +180,7 @@ class ObjectController extends AbstractRestfulController
 
         return new JsonModel([]);
     }
+
 
     /*
      * GET - Handling a GET request
