@@ -166,6 +166,20 @@ class ObjectController extends AbstractRestfulController
         }
     }
 
+    public function options() {
+
+        $this->getResponse()->getHeaders()->addHeaders([
+            //'Access-Control-Allow-Origin' => '*',
+            //'Access-Control-Allow-Credentials' => 'true',
+            'Access-Control-Allow-Headers' => '*',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+            'Access-Control-Max-Age' => '86400',
+
+        ]);
+
+        return new JsonModel([]);
+    }
+
     /*
      * GET - Handling a GET request
      * brings back all docs from a dataset (subject to limit), or a query
