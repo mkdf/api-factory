@@ -380,6 +380,76 @@ paths:
       responses:
         '200':
           description: Success
+  /license/dataset/{dataset-id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a dataset
+      operationId: getDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: detail
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [summary, full]
+          description: >
+            Detail level:
+             `summary` - Top level dataset license summary
+             `full` - Full hierarchy of sub policies including for all documents and files where applicable
+      responses:
+        '200':
+          description: Success
+  /license/dataset/{dataset-id}/{doc_id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a single dataset document
+      operationId: getDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /license/dataset/{dataset-id}/{filename}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a single dataset file
+      operationId: getDatasetFileLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: File name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
   /changes/{dataset-id}:
     get:
       tags:
