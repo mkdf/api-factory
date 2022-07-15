@@ -356,6 +356,22 @@ paths:
       responses:
         '200':
           description: Success
+    post:
+      tags:
+        - license
+      summary: Create a new license
+      description: Upload a new license to the catalogue
+      operationId: createLicense
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: License created
   /license/{license-id}:
     get:
       tags:
@@ -406,6 +422,72 @@ paths:
       responses:
         '200':
           description: Success
+    post:
+      tags:
+        - license
+      summary: Assign license information for a dataset
+      description: Assign a new license to a dataset. Note that if this dataset already has license information attached, the license update function (PUT) should be used instead.
+      operationId: createDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: License added
+    put:
+      tags:
+        - license
+      summary: Update license information for a dataset
+      description: Update an existing license for a dataset. Note that if this dataset doesn't already have license information attached, the license creation function (POST) should be used instead.
+      operationId: updateDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: License updated
+    delete:
+      tags:
+        - license
+      summary: Remove license from a dataset
+      description: Remove the master license from a dataset. Note that any policies applied to individual documents and files will remain in place.
+      operationId: deleteFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: File deleted
   /license/dataset/{dataset-id}/{doc_id}:
     get:
       tags:
