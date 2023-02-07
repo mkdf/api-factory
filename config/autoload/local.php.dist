@@ -40,4 +40,7 @@ return [
         'port' => '9999',
         'namespacePrefix' => 'prefix_'
     ],
+    'policies'   => [
+        'dataset' =>    'policies-dataset',
+    ],
 ];

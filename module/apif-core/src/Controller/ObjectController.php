@@ -3,6 +3,7 @@
 namespace APIF\Core\Controller;
 
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Repository\PolicyRepositoryInterface;
 use APIF\Core\Repository\SchemaRepositoryInterface;
 use APIF\Core\Service\ActivityLogManagerInterface;
 use APIF\Core\Service\SchemaValidatorInterface;
@@ -19,14 +20,16 @@ class ObjectController extends AbstractRestfulController
     private $_activityLog;
     private $_schemaValidator;
     private $_schemaRepository;
+    private $_policyRepository;
 
-    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, SchemaValidatorInterface $schemaValidator, SchemaRepositoryInterface $schemaRepository, array $config)
+    public function __construct(APIFCoreRepositoryInterface $repository, ActivityLogManagerInterface $activityLog, SchemaValidatorInterface $schemaValidator, SchemaRepositoryInterface $schemaRepository, PolicyRepositoryInterface  $policyRepository, array $config)
     {
         $this->_config = $config;
         $this->_repository = $repository;
         $this->_activityLog = $activityLog;
         $this->_schemaValidator = $schemaValidator;
         $this->_schemaRepository = $schemaRepository;
+        $this->_policyRepository = $policyRepository;
     }
 
     private function _getAuth() {
@@ -241,7 +244,7 @@ class ObjectController extends AbstractRestfulController
             return new JsonModel(['error' => 'Failed to retrieve documents - ' . $ex->getMessage()]);
         }
 
-        //TODO - Apply pagination here
+        // Apply pagination here
         if (!is_null($pageSizeParam)){
             $pageStart = ($pageParam - 1) * $pageSizeParam;
             $data = array_slice($data,$pageStart,$pageSizeParam);
@@ -253,6 +256,12 @@ class ObjectController extends AbstractRestfulController
         $summary = "Retrieve multiple documents";
         $logData = $this->_assembleLogData($datasetUUID, $key, $action, $summary);
         $this->_activityLog->logActivity($logData);
+
+        $licenses = $this->_policyRepository->getLicenses($datasetUUID, $key);
+        $this->getResponse()->getHeaders()->addHeaders([
+            //'Access-Control-Allow-Origin' => '*',
+            'Licenses' => 'license1, license2',
+        ]);
 
         return new JsonModel($data);
     }

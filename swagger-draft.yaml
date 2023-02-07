@@ -2,12 +2,12 @@ openapi: 3.0.1
 info:
   title: API Factory - Object Stream API
   description: Object Stream API
-  termsOfService: http://datahub.mksmart.org
+  termsOfService: https://datahub.mksmart.org
   contact:
     email: datahub-support@mksmart.org
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.9.4
 tags:
   - name: browse
