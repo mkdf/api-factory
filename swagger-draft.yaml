@@ -1,0 +1,1553 @@
+openapi: 3.0.1
+info:
+  title: API Factory - Object Stream API
+  description: Object Stream API
+  termsOfService: https://datahub.mksmart.org
+  contact:
+    email: datahub-support@mksmart.org
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.9.4
+tags:
+  - name: browse
+    description: Browse a dataset, with full control over filters, pagination, sorting
+  - name: object
+    description: Create, retrieve, update and delete JSON documents
+  - name: file
+    description: Create, retrieve, update and delete files
+  - name: license
+    description: Create, retrieve, set and update licenses
+  - name: changes
+    description: Monitoring changes
+  - name: schemas
+    description: Retrieve a schema
+  - name: sparql
+    description: Perform a SPARQL query against the data
+paths:
+  /browse/{dataset-uuid}:
+    get:
+      tags:
+        - browse
+      summary: Retrieve documents from the dataset
+      operationId: browseDocuments
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: The filter query
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Optionally specify fields on which to sort the data. Sort fields should be specified as a comma separated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Optionally specify which fields to return. Fields should be specified as a comma separated list.  Fields preceded with a minus ("-") will be excluded from the results. The "_id" field is always returned, unless explicitly excluded.
+          schema:
+            type: string
+        - name: pagesize
+          in: query
+          description: Optionally specify page size (defaults to a page size of 100)
+          schema:
+            minimum: 0
+            type: integer
+        - name: page
+          in: query
+          description: Optionally specify the page number of results to return (defaults to page 1)
+          schema:
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+  /object/{dataset-uuid}:
+    get:
+      tags:
+        - object
+      summary: Retrieve documents from the dataset
+      operationId: getDocuments
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: The filter query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Optionally limit the number of documents returned
+          schema:
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+    post:
+      tags:
+        - object
+      summary: Create a new document in the dataset
+      operationId: createDocument
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The document to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                _id: '1067'
+                sensorID: 42-a
+                sensorValue: 34.7
+        required: true
+      responses:
+        '201':
+          description: Object created
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+  /object/{dataset-uuid}/{doc_id}:
+    get:
+      tags:
+        - object
+      summary: Retrieve a single document from the dataset
+      operationId: getDocument
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Optionally limit the number of documents returned
+          schema:
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+    put:
+      tags:
+        - object
+      summary: Update a document by ID
+      description: Update an existing document, referenced by ID. Note that the existing document will be overwritten, so a full document should be supplied.
+      operationId: updateDocumentById
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: The UUID of the dataset
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The updated document
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Object creted
+        '204':
+          description: Object updated
+        '500':
+          description: Fatal error creating or updating object
+    delete:
+      tags:
+        - object
+      summary: Delete a document by ID
+      description: Delete an existing document, referenced by ID.
+      operationId: deleteDocumentById
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: The UUID of the dataset
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: No items to delete
+        '204':
+          description: Object deleted
+        '500':
+          description: Fatal error deleting object
+  /file/{dataset-id}:
+    get:
+      tags:
+        - file
+      summary: Retrieve a list of files for a single dataset
+      operationId: getFiles
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - file
+      summary: Upload a new file
+      operationId: createFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: File uploaded
+  /file/{dataset-id}/{filename}:
+    get:
+      tags:
+        - file
+      summary: Retrieve a single file
+      operationId: getFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - file
+      summary: Update an existing file
+      description: Overwrite/update an existing file and correspoinding title and description. Note that the uploaded filename must match the original filename that is being overwritten.
+      operationId: updateFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          description: The existing filename to be updated
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '204':
+          description: File updated
+    delete:
+      tags:
+        - file
+      summary: Delete a file
+      operationId: deleteFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: File deleted
+  /license:
+    get:
+      tags:
+        - license
+      summary: Retrieve catalogue of licenses
+      operationId: getLicenses
+      parameters:
+        - name: sort
+          in: query
+          description: Optionally reverse the sort order to retrieve items oldest-first
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Create a new license
+      description: Upload a new license to the catalogue
+      operationId: createLicense
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: License created
+  /license/{license-id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve a single license
+      operationId: getLicense
+      parameters:
+        - name: license-id
+          in: path
+          description: License ID
+          required: true
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Optionally reverse the sort order to retrieve items oldest-first
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+      responses:
+        '200':
+          description: Success
+    put:
+      tags:
+        - license
+      summary: Update a license
+      description: Update an existing license by id
+      operationId: updateLicense
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: License updated
+  /license/dataset/{dataset-id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a dataset
+      operationId: getDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: detail
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [summary, full]
+          description: >
+            Detail level:
+             `summary` - Top level dataset license summary
+             `full` - Full hierarchy of sub policies including for all documents and files where applicable
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Assign license information for a dataset
+      description: Assign a new license to a dataset. Note that if this dataset already has license information attached, the license update function (PUT) should be used instead.
+      operationId: createDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Dataset license added
+    put:
+      tags:
+        - license
+      summary: Update license information for a dataset
+      description: Update an existing license for a dataset. Note that if this dataset doesn't already have license information attached, the license creation function (POST) should be used instead.
+      operationId: updateDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: Dataset license updated
+    delete:
+      tags:
+        - license
+      summary: Remove license from a dataset
+      description: Remove the master license from a dataset. Note that any policies applied to individual documents and files will remain in place.
+      operationId: deleteDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset license removed
+  /license/dataset/{dataset-id}/{doc_id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a single dataset document
+      operationId: getDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Assign license information to a single dataset document
+      description: Assign a new license to a dataset document. Note that if this dataset document already has license information attached, the license update function (PUT) should be used instead.
+      operationId: createDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Dataset document license added
+    put:
+      tags:
+        - license
+      summary: Update license information for a dataset document
+      description: Update an existing license for a single dataset document. Note that if this dataset document doesn't already have license information attached, the license creation function (POST) should be used instead.
+      operationId: updateDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: Dataset document license updated
+    delete:
+      tags:
+        - license
+      summary: Remove license from a dataset document
+      description: Remove the license from a single dataset document.
+      operationId: deleteDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset document license removed
+  /license/dataset/{dataset-id}/{filename}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a single dataset file
+      operationId: getDatasetFileLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: File name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /changes/{dataset-id}:
+    get:
+      tags:
+        - changes
+      summary: Retrieve details of write activities on a dataset
+      operationId: getChanges
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          description: Optionally only retrieve entries since this timestamp
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Optionally specify a limit on the number of entries returned (defaults to 100)
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: Optionally reverse the sort order to retrieve items oldest-first
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+      responses:
+        '200':
+          description: Success
+  /schemas/{schema-id}:
+    get:
+      tags:
+        - schemas
+      summary: Retrieve schema
+      operationId: getSchema
+      parameters:
+        - name: schema-id
+          in: path
+          description: Schema name
+          example: person.json
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Schema not found
+        '500':
+          description: Fatal error retrieving schema
+  /query/{dataset-uuid}/sparql:
+    get:
+      tags:
+        - sparql
+      summary: Retrieve sparql
+      operationId: getSparql
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: Dataset name
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: The SPARQL query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Query results
+          content:
+            application/sparql-results+json:
+              schema:
+                type: object
+            application/sparql-results+xml:
+              schema:
+                type: object
+            text/csv:
+              schema:
+                type: string
+                example: subject,predicate,object
+            text/tab-separated-values:openapi: 3.0.1
+info:
+  title: API Factory - Object Stream API
+  description: Object Stream API
+  termsOfService: http://datahub.mksmart.org
+  contact:
+    email: datahub-support@mksmart.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.9.4
+tags:
+  - name: browse
+    description: Browse a dataset, with full control over filters, pagination, sorting
+  - name: object
+    description: Create, retrieve, update and delete JSON documents
+  - name: file
+    description: Create, retrieve, update and delete files
+  - name: license
+    description: Create, retrieve, set and update licenses
+  - name: changes
+    description: Monitoring changes
+  - name: schemas
+    description: Retrieve a schema
+  - name: sparql
+    description: Perform a SPARQL query against the data
+paths:
+  /browse/{dataset-uuid}:
+    get:
+      tags:
+        - browse
+      summary: Retrieve documents from the dataset
+      operationId: browseDocuments
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: The filter query
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Optionally specify fields on which to sort the data. Sort fields should be specified as a comma separated list. Data will be sorted in ascending order. To specify a field to sort in descending order precede that field with a minus ('-')
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: Optionally specify which fields to return. Fields should be specified as a comma separated list.  Fields preceded with a minus ("-") will be excluded from the results. The "_id" field is always returned, unless explicitly excluded.
+          schema:
+            type: string
+        - name: pagesize
+          in: query
+          description: Optionally specify page size (defaults to a page size of 100)
+          schema:
+            minimum: 0
+            type: integer
+        - name: page
+          in: query
+          description: Optionally specify the page number of results to return (defaults to page 1)
+          schema:
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+  /object/{dataset-uuid}:
+    get:
+      tags:
+        - object
+      summary: Retrieve documents from the dataset
+      operationId: getDocuments
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: The filter query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Optionally limit the number of documents returned
+          schema:
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+    post:
+      tags:
+        - object
+      summary: Create a new document in the dataset
+      operationId: createDocument
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The document to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                _id: '1067'
+                sensorID: 42-a
+                sensorValue: 34.7
+        required: true
+      responses:
+        '201':
+          description: Object created
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+  /object/{dataset-uuid}/{doc_id}:
+    get:
+      tags:
+        - object
+      summary: Retrieve a single document from the dataset
+      operationId: getDocument
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: dataset uuid identifier
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Optionally limit the number of documents returned
+          schema:
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request, malformed JSON
+        '500':
+          description: Fatal error creating object
+    put:
+      tags:
+        - object
+      summary: Update a document by ID
+      description: Update an existing document, referenced by ID. Note that the existing document will be overwritten, so a full document should be supplied.
+      operationId: updateDocumentById
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: The UUID of the dataset
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The updated document
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Object creted
+        '204':
+          description: Object updated
+        '500':
+          description: Fatal error creating or updating object
+    delete:
+      tags:
+        - object
+      summary: Delete a document by ID
+      description: Delete an existing document, referenced by ID.
+      operationId: deleteDocumentById
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: The UUID of the dataset
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: No items to delete
+        '204':
+          description: Object deleted
+        '500':
+          description: Fatal error deleting object
+  /file/{dataset-id}:
+    get:
+      tags:
+        - file
+      summary: Retrieve a list of files for a single dataset
+      operationId: getFiles
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - file
+      summary: Upload a new file
+      operationId: createFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: File uploaded
+  /file/{dataset-id}/{filename}:
+    get:
+      tags:
+        - file
+      summary: Retrieve a single file
+      operationId: getFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - file
+      summary: Update an existing file
+      description: Overwrite/update an existing file and correspoinding title and description. Note that the uploaded filename must match the original filename that is being overwritten.
+      operationId: updateFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          description: The existing filename to be updated
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '204':
+          description: File updated
+    delete:
+      tags:
+        - file
+      summary: Delete a file
+      operationId: deleteFile
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: File deleted
+  /license:
+    get:
+      tags:
+        - license
+      summary: Retrieve catalogue of licenses
+      operationId: getLicenses
+      parameters:
+        - name: sort
+          in: query
+          description: Optionally reverse the sort order to retrieve items oldest-first
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Create a new license
+      description: Upload a new license to the catalogue
+      operationId: createLicense
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: License created
+  /license/{license-id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve a single license
+      operationId: getLicense
+      parameters:
+        - name: license-id
+          in: path
+          description: License ID
+          required: true
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Optionally reverse the sort order to retrieve items oldest-first
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+      responses:
+        '200':
+          description: Success
+    put:
+      tags:
+        - license
+      summary: Update a license
+      description: Update an existing license by id
+      operationId: updateLicense
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: License updated
+  /license/dataset/{dataset-id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a dataset
+      operationId: getDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: detail
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [summary, full]
+          description: >
+            Detail level:
+             `summary` - Top level dataset license summary
+             `full` - Full hierarchy of sub policies including for all documents and files where applicable
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Assign license information for a dataset
+      description: Assign a new license to a dataset. Note that if this dataset already has license information attached, the license update function (PUT) should be used instead.
+      operationId: createDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Dataset license added
+    put:
+      tags:
+        - license
+      summary: Update license information for a dataset
+      description: Update an existing license for a dataset. Note that if this dataset doesn't already have license information attached, the license creation function (POST) should be used instead.
+      operationId: updateDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: Dataset license updated
+    delete:
+      tags:
+        - license
+      summary: Remove license from a dataset
+      description: Remove the master license from a dataset. Note that any policies applied to individual documents and files will remain in place.
+      operationId: deleteDatasetLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset license removed
+  /license/dataset/{dataset-id}/{doc_id}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a single dataset document
+      operationId: getDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Assign license information to a single dataset document
+      description: Assign a new license to a dataset document. Note that if this dataset document already has license information attached, the license update function (PUT) should be used instead.
+      operationId: createDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Dataset document license added
+    put:
+      tags:
+        - license
+      summary: Update license information for a dataset document
+      description: Update an existing license for a single dataset document. Note that if this dataset document doesn't already have license information attached, the license creation function (POST) should be used instead.
+      operationId: updateDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: Dataset document license updated
+    delete:
+      tags:
+        - license
+      summary: Remove license from a dataset document
+      description: Remove the license from a single dataset document.
+      operationId: deleteDatasetDocumentLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: doc_id
+          in: path
+          description: Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset document license removed
+  /license/dataset/{dataset-id}/{filename}:
+    get:
+      tags:
+        - license
+      summary: Retrieve license information for a single dataset file
+      operationId: getDatasetFileLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: File name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - license
+      summary: Assign license information to a single dataset file
+      description: Assign a new license to a dataset file. Note that if this dataset file already has license information attached, the license update function (PUT) should be used instead.
+      operationId: createDatasetFileLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: Filename
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '201':
+          description: Dataset file license added
+    put:
+      tags:
+        - license
+      summary: Update license information for a dataset file
+      description: Update an existing license for a single dataset file. Note that if this dataset file doesn't already have license information attached, the license creation function (POST) should be used instead.
+      operationId: updateDatasetFileLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: Filename
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The license
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '204':
+          description: Dataset file license updated
+    delete:
+      tags:
+        - license
+      summary: Remove license from a dataset file
+      description: Remove the license from a single dataset file.
+      operationId: deleteDatasetFileLicense
+      parameters:
+        - name: dataset-id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: Filename
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset file license removed
+  /changes/{dataset-id}:
+    get:
+      tags:
+        - changes
+      summary: Retrieve details of write activities on a dataset
+      operationId: getChanges
+      parameters:
+        - name: dataset-id
+          in: path
+          description: Dataset ID
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          description: Optionally only retrieve entries since this timestamp
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Optionally specify a limit on the number of entries returned (defaults to 100)
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: Optionally reverse the sort order to retrieve items oldest-first
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+      responses:
+        '200':
+          description: Success
+  /schemas/{schema-id}:
+    get:
+      tags:
+        - schemas
+      summary: Retrieve schema
+      operationId: getSchema
+      parameters:
+        - name: schema-id
+          in: path
+          description: Schema name
+          example: person.json
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Schema not found
+        '500':
+          description: Fatal error retrieving schema
+  /query/{dataset-uuid}/sparql:
+    get:
+      tags:
+        - sparql
+      summary: Retrieve sparql
+      operationId: getSparql
+      parameters:
+        - name: dataset-uuid
+          in: path
+          description: Dataset name
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: The SPARQL query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Query results
+          content:
+            application/sparql-results+json:
+              schema:
+                type: object
+            application/sparql-results+xml:
+              schema:
+                type: object
+            text/csv:
+              schema:
+                type: string
+                example: subject,predicate,object
+            text/tab-separated-values:
+              schema:
+                type: string
+                example: "?subject\t?predicate\t?object"
+            application/x-binary-rdf-results-table:
+              schema:
+                format: binary
+        '400':
+          description: Bad request or malformed SPARQL
+        '500':
+          description: Fatal error
+externalDocs:
+  description: Find out more about the API Factory
+  url: http://datahub.mksmart.org
+servers:
+  - url: ''
+security:
+  - DatasetAuth: []
+components:
+  securitySchemes:
+    DatasetAuth:
+      type: http
+      scheme: basic
+
+        schema:
+                type: string
+                example: "?subject\t?predicate\t?object"
+            application/x-binary-rdf-results-table:
+              schema:
+                format: binary
+        '400':
+          description: Bad request or malformed SPARQL
+        '500':
+          description: Fatal error
+externalDocs:
+  description: Find out more about the API Factory
+  url: http://datahub.mksmart.org
+servers:
+  - url: ''
+security:
+  - DatasetAuth: []
+components:
+  securitySchemes:
+    DatasetAuth:
+      type: http
+      scheme: basic

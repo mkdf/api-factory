@@ -4,6 +4,7 @@ namespace APIF\Core\Controller\Factory;
 
 use APIF\Core\Controller\ObjectController;
 use APIF\Core\Repository\APIFCoreRepositoryInterface;
+use APIF\Core\Repository\PolicyRepositoryInterface;
 use APIF\Core\Repository\SchemaRepositoryInterface;
 use APIF\Core\Service\ActivityLogManagerInterface;
 use APIF\Core\Service\SchemaValidatorInterface;
@@ -23,6 +24,7 @@ class ObjectControllerFactory implements FactoryInterface
         $activityLog = $container->get(ActivityLogManagerInterface::class);
         $schemaValidator = $container->get(SchemaValidatorInterface::class);
         $schemaRepository = $container->get(SchemaRepositoryInterface::class);
-        return new ObjectController($repository, $activityLog, $schemaValidator, $schemaRepository, $config);
+        $policyRepository = $container->get(PolicyRepositoryInterface::class);
+        return new ObjectController($repository, $activityLog, $schemaValidator, $schemaRepository, $policyRepository, $config);
     }
 }
