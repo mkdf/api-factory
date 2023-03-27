@@ -11,7 +11,7 @@
 "name": "Apache 2.0",
 "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
 },
-"version": "0.9.4"
+"version": "0.9.5"
 },
 "tags": [
 {
@@ -569,6 +569,15 @@
 "in": "path",
 "description": "Dataset ID",
 "required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "document-id",
+"in": "query",
+"description": "Optionally only retrieve changes for this document",
+"required": false,
 "schema": {
 "type": "string"
 }

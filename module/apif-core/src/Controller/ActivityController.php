@@ -86,6 +86,7 @@ class ActivityController extends AbstractRestfulController
         $timestampParam = $this->params()->fromQuery('timestamp', "");
         $limitParam = $this->params()->fromQuery('limit', "");
         $sortParam = $this->params()->fromQuery('sort', "");
+        $documentParam = $this->params()->fromQuery('document-id', "");
         // This should = 0 or 1 if timestamp not supplied or an invalid string supplied.
         // Either way, all items will be returned.
         $timestamp = intval($timestampParam);
@@ -130,6 +131,11 @@ class ActivityController extends AbstractRestfulController
                 ],
                 '_timestamp' => ['$gte' => $timestamp]
             ];
+
+            if ($documentParam != "") {
+                $query['al:documentId'] = $documentParam;
+            }
+
             // DO NOT RETURN ANY FIELDS WHICH CONTAIN THE KEY USED IN THE ORIGINAL REQUEST
             $projection = [
                 'al:summary' => false,
